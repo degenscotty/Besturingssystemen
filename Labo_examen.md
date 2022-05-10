@@ -1009,7 +1009,7 @@ brw-rw---- 1 root disk 8, 3 May  9 15:28 /dev/sda3
 
 ```
 Je kan besluiten dat het bestand telkens overschreden wordt omdat er vanuit een andere directory geschreven wordt.
-/var > tmp1.txt > tmp2.txt  -> tmp1 is dus leeg
+du /var > tmp1.txt > tmp2.txt  -> tmp1 is dus leeg
 
 > overschrijven
 >> append
@@ -1048,4 +1048,162 @@ De inhoud van het best tmp.txt blijft hetzelfde doorheen het proces.
     >•  du /etc 1>tmp.txt  
     >•  du /etc 2>>tmp.txt  
     >•  du /etc >tmp1.txt 2>tmp2.txt  
+
+```bash
+•  du /etc  #uitvoer naar scherm
+•  du /etc 1>tmp.txt  #gebufferde uitvoer naar tmp.txt
+•  du /etc 2>>tmp.txt  #gaat fouten van commando du gaan appenderen naar tmp.txt
+•  du /etc >tmp1.txt 2>tmp2.txt #gebufferde uitvoer naar tmp1.txt & niet gebufferde uitvoer (fouten) naar tmp2.txt
+```
+
+26. > Je kunt ook omleiden naar de vuilnisbak (/dev/null). Verklaar de uitvoer bij uitvoering
+    >van volgende opdrachten:
+    >
+    >• du /etc > /dev/null
+    >• cat /dev/null
+
+```bash
+du /etc > /dev/null #uitvoer wegschrijven naar prullenbak
+cat /dev/null #prullenbak is leeg
+```
+
+27. > Ga na wat het effect is van cat /dev/null > test.txt
+
+```bash
+Maakt bestand leeg.
+```
+
+28. >Veronderstel dat een of ander programma continu informatie wegschrijft in een
+    >logbestand (dat hierdoor onbeperkt en continu in grootte toeneemt), en dat niemand
+    >geïnteresseerd is in dit logbestand. Hoe kun je vermijden dat je periodiek het bestand
+    >moet legen of verwijderen?
+
+```bash
+ln -s /dev/null datum.txt #soft link dat verwijst naar/dev/null als oplossing
+```
+
+29. > Bekijk verdere mogelijkheden met de opdrachten:
+    >• du /etc >tmp.txt 2>&1
+    >• du /etc 2>&1 >tmp.txt
+    >• du /etc &>tmp.txt
+    >• du /etc 2>tmp.txt >tmp.txt
+    >• exec 3>tmp.txt ; du /etc >&3 2>&1 ; exec 3>&-
+
+```bash	
+du /etc >tmp.txt 2>&1 #schrijf weg naar gebufferde kanaal &1 (& = file descriptor. Anders zou het schrijven naar bestand "1")
+du /etc 2>&1 >tmp.txt #fouten naar scherm op gebufferde manier en naar tmp.txt
+du /etc &>tmp.txt
+du /etc 2>tmp.txt >tmp.txt
+exec 3>tmp.txt ; du /etc >&3 2>&1 ; exec 3>&- #zelf file descriptor aanmaken (fd 3)
+
+#&1 = naar scherm, gebufferd. &2 = naar scherm, niet gebufferd.
+
+# '>' is output redirection  (output naar bestand ipv scherm) -> file terug leeg en dan toevoeging
+#'>>' regels toevoegen (append)
+# '0>' standaardinvoer
+# '1>' standaarduitvoer
+# '2>' standaardfout
+# '&1' file descriptor
+```
+
+30. >Verwijder eerst het werkbestand tmp.txt, indien dit reeds zou bestaan. Vergelijk daarna
+    >telkens de uitvoer en de inhoud van tmp.txt bij uitvoering van volgende
+    >commandoregels. Vergeet de spaties niet!
+    >• du /etc ; du /var
+    >• du /etc ; du /var > tmp.txt
+    >• ( du /etc ; du /var ; ) > tmp.txt
+    >• { du /etc ; du /var ; } > tmp.txt
+
+    ```bash
+    du /etc ; du /var #meerdere opdrachten gescheiden door ";"
+    du /etc ; du /var > tmp.txt 
+    ( du /etc ; du /var ; ) > tmp.txt #groep opdrachten met redirection op toegepast (child process)
+    { du /etc ; du /var ; } > tmp.txt #groep opdrachten met redirection op toegepast (huidige shell)
+    ```
+
+    >In UNIX wordt heel dikwijls de standaarduitvoer van het ene commando gebruikt als
+    >standaardinvoer van het volgende. Deze gecombineerde vorm van invoer- en uitvoer-
+    >redirection wordt piping genoemd. Men bekomt dit door tussen de twee betreffende
+    >opdrachten een verticale streep (|) te plaatsen. Dit kan een willekeurig aantal keer op
+    >dezelfde commandolijn herhaald worden. Hierbij worden de opdrachten steeds van links
+    >naar rechts uitgevoerd.
+    >
+    >Enkel de standaarduitvoer kan worden doorgepipet naar het volgende commando; de
+    >foutuitvoer blijft op het scherm. Je kunt dit tenietdoen door vooraf de foutuitvoer om te
+    >leiden naar standaarduitvoer d.m.v. redirection.
+    >Een probleem dat veelvuldig optreedt is dat je na het |-teken werkt in een subshell. Het
+    >omdraaien van de volgorde is bij het |-teken helaas onmogelijk. Een alternatief voor dat
+    >probleem is **process substition**.
+    >Wanneer we **process substitution** vergelijken met piping moeten we besluiten dat het
+    >eerste de voorkeur geniet. Je kan in het onderstaande voorbeeld er voor kiezen om de wc-
+    >opdracht als eerste te vermelden en dan pas de ls-opdracht. Zeker bij scripting is dit soms
+    >minder schrijf- of prutswerk.
+    >wc -l < <(ls ~)
+    >ls ~ | wc -l 
+    >
+    >**Let wel, bij beide oplossingen worden evenveel kindprocessen aangemaakt en wordt ook**
+    >**een pipe gebruikt als IPC. Er is dus geen enkele vorm van performantiewinst door gebruik**
+    >**te maken van process substitution!**
+    >Maak bij onderstaande opdrachten zoveel mogelijk gebruik van process substitution.
+    >UNIX kent vele utilities zoals **head, tail, grep, uniq, sort en awk**, die hun input, meestal
+    >tekststrings, uit de standaardinvoer halen, op deze data één of andere manipulaties
+    >uitvoeren, en de resultaten van deze manipulatie naar standaarduitvoer schrijven. Deze
+    >programma's worden filters genoemd. Filterprogramma's worden dikwijls in een keten van
+    >pipes geschakeld, zoals in volgend voorbeeld. Vergelijk de uitvoer van
+    >ps -A
+    >en
+    >ps -A | grep bash
+    
+    
+
+31. >Hoe kan je ervoor zorgen dat de uitvoer van het commando **printf** "dit is een fout" niet
+    >als standaarduitvoer, maar als standaardfout wordt geïnterpreteerd? De tekst moet dus
+    >wel op het scherm getoond worden, maar mag niet doorgepipet worden naar een
+    >volgend commando.
+
+```bash
+printf "hello" >&2 #niet gebufferd, wel weergegeven op het scherm.
+```
+
+32. >Enkel de standaarduitvoer wordt normaal doorgepipet naar het volgende commando.
+    >Hoe kan je (met een wc-filter) het aantal foutmeldingen vragen bij het commando du
+    >/etc?
+
+```bash
+du /proc 2>&1 > /dev/null | wc -l
+```
+
+33. >Hoe kun je met behulp van de head- en tail-commando's enkel de N-de lijn van een
+    >bestand tonen, voor een willekeurige N? Zorg er voor dat geen uitvoer wordt
+    >geproduceerd indien het gevraagde lijnnummer groter is dan het aantal lijnen in het
+    >bestand.
+
+```bash
+head -3 /etc/passwd | tail -1
+```
+
+34. >Met behulp van de eenvoudige opdracht dos2unix kun je de **<CR><LF>**-sequenties in een
+    >bestand dat door een Windowstoepassing is aangemaakt, vervangen door enkele <LF>-
+    >lijnscheidingstekens, zoals dit op UNIX verwacht wordt. Hoe kun je met behulp van de tr
+    >opdracht hetzelfde effect bereiken? Welke zijn de nadelen van deze benadering?
+
+```bash
+tr a-z A-Z < /etc/passwd #tr - translate or delete characters
+```
+
+35. > Het commando uniq -d *bestandsnaam* is bedoeld om alle lijnen te tonen die meerdere
+    >keren voorkomen in een bestand. Echter, indien men dit commando toepast op een
+    >bestand met als inhoud
+    >*het*
+    >*is*
+    >*mooi*
+    >*het*
+    >*geweest*
+    >*is*
+    >dan wordt geen enkele lijn getoond. Hoe komt dit?
+    >Zoek een eenvoudige oplossing hiervoor, door gebruik te maken van een pipe.
+
+```bash
+sort 35.txt | uniq -dc
+```
 
