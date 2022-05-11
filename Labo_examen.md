@@ -16,7 +16,8 @@
 > - Labo 2: **Deel 7**: Patterns, expansions
 > - Labo 3: **Deel 7**: Redirection & pipes
 > - Labo 4: **Deel 7**: Uitleg Regex + vraag 42-54
-> - Labo 5: **Deel 7**: Shellvariabelen & Shellscripting
+> - Labo 5: **Deel 7**: Shellvariabelen, Shellscripting & Arithmetic expansion
+> - Labo 6: **Deel 7**: Argumenten van een script/functie, positionele parameters en speciale parameters, Parameter expansion & Arrays
 
 
 
@@ -1746,5 +1747,468 @@ echo ${tab[1]}				 #inhoud tabel wordt uitgeschreven
 47
 [root@localhost ~]# echo ${tab[1]}
 /etc/passwd
+```
+
+### Arithmetic expansion
+
+
+
+67. >Normaal worden alle variabelen door de shell als strings beschouwd. Toch kun je met
+    >behulp van een specifiek intern commando rekenkundige bewerkingen op variabelen
+    >toepassen. Dit laat je niet alleen toe om optellingen (+), aftrekkingen (-),
+    >vermenigvuldigingen (*), gehele delingen (/ en %) en machtsverheffingen (**) uit te
+    >voeren, maar ook om bitoperaties (<<, >>, &, |, ^, ! en ~) of logische testoperaties (&&
+    >en ||) toe te passen. Zoek dit specifiek commando op in info bash of man bash; lees de
+    >secties Arithmetic Expansion en Arithmetic Evaluation.
+    >Pas het gevonden commando toe om het product van twee variabelen, x en y in een
+    >variabele z te stoppen.
+    >Welk intern (builtin) commando kun je hiervoor als alternatief gebruiken?
+
+    ```bas
+    [root@localhost ~]# echo $((7*5))
+    35
+    ```
+
+    
+
+68. >Hoe kun je in een script, met behulp van de variabele SECONDS, de uitvoeringstijd
+    >bepalen van een groep commando's? Pas dit bijvoorbeeld toe om de uitvoeringstijd (in
+    >seconden) te bepalen van de tijdrovende instructie
+    >ls -lR / > /dev/null 2>&1
+
+```bash
+#!/bin/bash
+
+echo $SECONDS
+ls -lR / > /dev/null 2>&1
+echo $SECONDS
+```
+
+```bash
+[root@localhost ~]# bash seconds.sh 
+0
+44
+```
+
+
+
+
+
+### Argumenten van een script/functie, positionele parameters en speciale parameters
+
+>Bij het uitvoeren van een shellscript kun je argumenten opgeven. Het script zal deze
+>argumenten toekennen aan de positionele parameters $1, $2 enz (of ${1}, ${2} enz). In elk
+>script beschik je steeds over de positionele parameters. Als de argumentenlijst leeg is dan
+>bestaan de positionele parameters nog steeds, maar ze hebben een lege inhoud. Je kunt de
+>positionele parameters slechts op twee manieren wijzigen:
+>
+>- a. Met **set --** argumentenlijst worden de opeenvolgende waarden uit de argumentenlijst
+>  een voor een toegewezen aan de positionele parameters. Het gebruik van het
+>  dubbele streepje wordt hierbij aangeraden om problemen met opties (d.w.z.
+>  argumenten die met een streepje beginnen) te vermijden.
+>- b. Omdat set -- ... de oorspronkelijke positionele parameters overschrijft, is het
+>  doorgaans beter om een array te gebruiken om operaties op positionele parameters
+>  uit te voeren.c. Met shift n wordt de inhoud van alle positionele parameters i vervangen door de
+>  oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
+>  verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
+>  opgeschoven.
+>- c. Met **shift n** wordt de inhoud van alle positionele parameters i vervangen door de
+>  oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
+>  verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
+>  opgeschoven.
+
+
+
+69. > Hoe kun je in een shellscript het dertiende argument aanspreken?
+
+    ```bash
+    ${13} #vanaf $10 met accolades
+    
+    # $# om het aantal parameters te checken 
+    # $@ alle parameters in 1 string
+    ```
+
+    
+
+70. >Veronderstel dat een variabele x als waarde de index van een positionele parameter
+    >bevat. Hoe kun je de waarde van deze positionele parameter bekomen?
+
+```bash
+${!x}
+```
+
+71. >Gebruik het script dat 3 argumenten verwacht. Hoe kun je bij het aanroepen van dit
+    >script enkel het eerste en derde argument opgeven?
+
+```bash
+bash 71.sh 1 "" 3
+```
+
+72. >In Bash zijn speciale variabelen gedefinieerd, waarvan men in shellscripts gebruik kan
+    >maken. Lees de sectie Special Parameters in man bash. Zo staat $0 voor de naam van het
+    >script, $$ voor het (unieke) proces-ID of PID van het script en $# voor het aantal
+    >argumenten ervan.
+    >Schrijf een script dat zijn eigen naam en proces-ID uitschrijft, evenals zijn totale aantal
+    >argumenten, gevolgd door het eerste en het laatste argument.
+
+```bash
+#!/bin/bash
+
+aantal=$#
+echo naam:${0} pid:$$ aantal params:$aantal
+echo eerste:${1} en laatste:${!aantal}                                     
+```
+
+```bash
+[root@localhost ~]# 71 para.sh a b c d e f g
+naam:para.sh pid:3299 aantal params:7
+eerste:a en laatste:g
+```
+
+73. >Verder bevatten de shellvariabelen $* en $@ alle argumenten van het script als één
+    >string. Hoe kun je deze gebruiken om, na bijvoorbeeld één of meerdere shift-opdrachten,
+    >weer de oorspronkelijke toestand van de positionele parameters te bekomen?
+
+```bash
+#!/bin/bash
+
+temp="$@" 	#Initiele parameters bewaren
+while [[ -n "$1" ]];
+do
+        echo $1
+        shift
+done
+set -- $temp #Parameters terug resetten na het shiften. (positionele parameters terug invullen)
+```
+
+```bash
+[root@localhost ~]# bash 73.sh {0..5}
+0
+1
+2
+3
+4
+5
+```
+
+74. >Tussen $* en $@ bestaat een subtiel verschil, dat men in shellscripts dikwijls nuttig kan
+    >aanwenden, vooral in combinatie met for- en while-lussen. Maak de volgende twee
+    >scripts:
+    >74a 74b
+    >./74b $*
+    >./74b $@
+    >./74b "$*"
+    >./74b "$@"
+    >IFS=:
+    >echo $#
+    >echo $1
+    >echo $274a 74b
+    >./74b $*
+    >./74b $@
+    >./74b "$*"
+    >./74b "$@"
+    >Roep vervolgens 74a op met minimum twee argumenten.
+
+```bash
+#!/bin/bash
+
+IFS=-
+echo "$*"
+IFS=$' \r\n'
+
+for i in "$@"; do
+        echo $i
+done
+```
+
+```bash
+[root@localhost ~]# bash 74.sh a "hello world"
+a-hello world
+a
+hello world
+```
+
+75. >Wat geldt voor scripts, geldt ook voor functies. Een functie heeft dus net zoals een script
+    >een exit-status. De return-opdracht zal bij een bash-functie echter de exit-status
+    >beïnvloeden en dus in tegenstelling tot wat je verwacht niet de teruggeefwaarde
+    >bepalen. Wil je iets teruggeven, gebruik dan bij het aanroepen van een functie command
+    >substitution en binnen de functie echo/printf. Schrijf een niet-recursieve functie die de
+    >faculteit van een getal dat als parameter wordt meegegeven, teruggeeft.
+
+```bash
+#!/bin/bash
+
+faculteit(){
+	res=1
+	for((i=$1;i>1;i--));do
+		((res*=i))
+	done
+	echo $res
+}
+
+echo Faculteit van $1 is $(faculteit $1)
+```
+
+```bash
+[root@localhost ~]# bash 75.sh 5
+Faculteit van 5 is 120
+```
+
+76. >Een functie kan ook uitvoerparameters simuleren. Schrijf een functie wissel die twee
+    >scriptparameters van waarde omwisselt.
+
+```bash
+#!/bin/bash
+
+wissel(){
+	local temp1=$1
+	local temp2=$2
+	eval "$1=${!temp2} $2=${!temp1}"
+}
+
+a=7
+b=12
+
+wissel a b  #opgelet, hier geen $-tekens gebruiken!
+printf "%d %d \n" $a $b
+```
+
+
+
+### Parameter expansion
+
+>n de volgende oefeningen leren we een aantal interessante bewerkingen om parameters te
+>manipuleren. Het begrip parameter slaat op alle positionele parameters en op alle
+>variabelen (shellvariabelen of andere). De reeds gekende positionele parameters $1, $2 enz.
+>vormen een belangrijke uitzondering: deze kunnen enkel worden gewijzigd d.m.v. set.
+>Verdere mogelijkheden zoek je op in de sectie Parameter Expansion van man bash.
+
+
+
+77. >De bijzondere notaties ${variabele=waarde} en ${variabele-waarde} bieden een snelle
+    >oplossing voor het toewijzen of opvragen van een waarde aan een variabele indien die
+    >nog niet gedefinieerd zou zijn.
+    >Indien een variabele wel gedefinieerd is, maar leeg, dan biedt deze notatie geen
+    >oplossing. Welk alternatief heb je hiervoor, dat beide situaties aankan? Schrijf deze zo
+    >compact mogelijk.
+
+```bash
+#!/bin/bash
+x=""
+: ${x:=7} #oplossing
+echo $x
+```
+
+78. >Schrijf een shellscript dat de laatste aantal lijnen van het bestand .bash_history in je
+    >home directory naar standaarduitvoer uitschrijft. De waarde van aantal wordt als enige
+    >argument meegegeven. Indien deze waarde ontbreekt, moeten er 10 lijnen
+    >uitgeschreven worden. Gebruik het commando tail.
+    >
+    >Met een goed gekozen delimiter kun je een string in stukken splitsen. In een aantal
+    >toepassingen is dit niet voldoende of minstens zeer onhandig.
+    >Bash kent een beperkt aantal stringoperatoren. Deze stringoperatoren laten o.a. toe de
+    >lengte van variabelen/parameters te bepalen, en substrings die beantwoorden aan bepaalde
+    >patterns uit variabelen/parameters te verwijderen. De patterns zijn beperkt (helaas zonder
+    >regular expressions), maar mogen ook variabelen bevatten.
+    >
+    >**Bash v1-compatibele manipulaties**
+    >${#variabele} geeft de lengte van de waarde van de variabele in karakters
+    >${variabele#pattern} verwijdert de kortst mogelijke substring vooraan de variabele
+    >die aan het pattern voldoet
+    >${variabele##pattern} verwijdert de langst mogelijke substring vooraan de variabele
+    >die aan het pattern voldoet
+    >${variabele%pattern} verwijdert de kortst mogelijke substring achteraan de
+    >variabele die aan het pattern voldoet
+    >${variabele%%pattern} verwijdert de langst mogelijke substring achteraan de
+    >variabele die aan het pattern voldoet
+    >**Vereisen minimaal Bash v2**
+    >${variabele:offset} geeft de deelstring vanaf positie offset.
+    >${variabele:offset:length} geeft de deelstring vanaf positie offset met length tekens.
+    >${variabele/pattern/string}
+    >geeft de string die ontstaat als je in de variabele de eerste en
+    >langste substring die aan pattern voldoet, vervangt door
+    >string.
+    >${variabele//pattern/string} geeft de string die ontstaat als je in de variabele alle
+    >substrings die aan pattern voldoen, vervangt door string.
+    >${variabele/#pattern/string} geeft de string die ontstaat als je de langste substring vooraan
+    >de variabele, die aan pattern voldoet, vervangt door string.
+    >${variabele/%pattern/string}
+    >geeft de string die ontstaat als je de langste substring
+    >achteraan de variabele, die aan pattern voldoet, vervangt
+    >door string.
+    >**Vereisen minimaal Bash v4**
+    >${variabele^} converteert de eerste letter van de string naar uppercase
+    >${variabele,} converteert de eerste letter van de string naar lowercase
+    >
+    >${variabele^^} converteert de volledige string naar uppercase
+    >${variabele,,} converteert de volledige string naar lowercase
+    >Alle uitleg hierover vind je in info bash of man bash, sectie Parameter Expansion.
+
+```bash
+#!/bin/bash
+tail -n ${1-10} ~/.bash_history
+```
+
+79. >Vul een variabele x op met de waarde /usr/share/emacs/24.5/etc/tutorials/TUTORIAL.nl.
+    >Met welke stringoperatoren kun je x opsplitsen in een directorypad en een
+    >bestandsnaam? Los dit op twee manieren op.
+    >Hoe kun je deze twee substrings toekennen aan de variabelen dir en file?
+
+```bash
+#!/bin/bash
+x="/usr/share/emacs/24.5/etc/tutorials/TUTORIAL.nl"
+printf "directory=%s bestandsnaam=%s\n" ${x%/*} ${x##*/}
+```
+
+80. >Vul een variabele x op met de regel "dit is een <b>eenvoudige</b> en <b>nuttige</b>
+    >oefening". Gebruik de stringoperatoren om de woorden eenvoudige en nuttige uit de
+    >variabele te halen. Probeer dit op twee methodes.
+
+    ```bash
+    #!/bin/bash
+    x='dit is een <b>eenvoudige</b> en <b>nuttige</b> oefening'
+    
+    #met Bash v1
+    temp=${x%%</*} 			#verwijdert de langst mogelijke substring achteraan de variabele die aan het pattern </* voldoet
+    vet1=${temp#*>}			#verwijdert de kortst mogelijke substring vooraan de variabele die aan het pattern *> voldoet
+    rest=${x##*$vet1}		#verwijdert de langst mogelijke substring vooraan de variabele die aan het pattern *eenvoudige voldoet
+    temp=${rest%</*}		#verwijdert de kortst mogelijke substring achteraan de variabele die aan het pattern </* voldoet
+    vet2=${temp##*>}		#verwijdert de langst mogelijke substring vooraan de variabele die aan het pattern *> voldoet
+    echo "$vet1 *** $vet2"
+    
+    #vanaf Bash v2
+    temp=${x/<\/b>*/""}		#geeft de string die ontstaat als je in de variabele de eerste en langste substring die aan pattern </b> voldoet, vervangt door string "".
+    vet1=${temp/*<b>/""}		#geeft de string die ontstaat als je in de variabele de eerste en langste substring die aan pattern *<b> voldoet, vervangt door string "".
+    temp=${x/*<b>/""}		
+    vet2=${temp/<\/b>*/""}
+    echo "$vet1 *** $vet2"
+    ```
+
+81. > Indien je in de stringoperatoren de variabele $@ of $* gebruikt, kun je op een relatief
+    >eenvoudige manier de laatste positionele parameter opvragen met:
+    >**echo ${@:$#:1}**
+    >Hoe vraag je op een analoge manier de voorlaatste positionele parameter op?
+
+```bash
+#!/bin/bash
+
+echo "Laatste: ${@:$#:1}"  #van $@ (alle positionele parameters) vertrek je van offset $# (index van laatste pos par) en neem je 1 pos par
+
+echo "Voorlaatste: ${@:$#-1:1}"
+echo "Twee laatste: ${@:$#-1:2}"
+echo "Andere manier voorlaatste: ${@: -2:1}"  # Spatie niet vergeten! . Betekent: van $@ (alle positionele parameters) vertrek je van offset -2 (index van voorlaatste pos par) en neem je 1 pos par
+echo "Foute manier voorlaatste: ${@:-2:1}"  # verklaring zie hieronder
+echo "Foute manier voorlaatste verduidelijking: ${onbestaandevar:-2:1}"  # zonder spatie heb je ${var:-value} wat betekent "gebruik $variabele; indien niet gedefinieerd of leeg, gebruik waarde"
+```
+
+
+
+82. >Los vorige vraag op door gebruik te maken van:
+    >\1. het mechanisme van indirecte adressering en
+    >\2. de opdracht eval.
+
+    
+
+```bash
+#!/bin/bash
+
+#1
+x=$(($#-1))
+echo ${!x}
+
+#2
+eval echo '$'$(($#-1))
+```
+
+
+
+### Arrays
+
+83. >Vanaf versie 2 kent Bash arrays of tabellen. Helaas kunnen deze in Bash v2 en Bash v3
+    >enkel met niet-negatieve (64-bit) integers geïndexeerd worden. Bash v4 laat associatieve
+    >arrays toe, vergelijkbaar met de hashes van Perl. Lees de sectie Arrays in man bash of
+    >info bash. Om de mogelijkheden van (niet-associatieve) arrays verder uit te diepen, maak
+    >je een array waarbij de gebruikte indices elkaar niet numeriek opvolgen, bijvoorbeeld:
+    >data=( 0 1 2 3 4 )
+    >data[20]=20
+    >declare -p data # ter controle
+    >grep ^data= < <(set) # alternatieve controle
+    >Vraag volgende informatie op, telkens met één statement:
+    >• alle getallen van deze array
+    >• het aantal getallen in de array
+    >• het getal met index 2 uit de array
+    >• het getal met index 5 uit de array (is leeg in ons voorbeeld)
+    >
+    >• het getal met index 20 uit de array
+    >Pas deze vragen eveneens toe op de builtin array BASH_VERSINFO.
+
+```bash
+#!/bin/bash
+data=(0 1 2 3 4)
+data[20]=20
+echo Alle getallen: ${data[@]}
+echo Aantal getallen: ${#data[@]}
+echo Getal met index 2: ${data[2]}
+echo Getal met index 5: ${data[5]}  
+echo Getal met index 20: ${data[20]}
+```
+
+84. >Getallen op een bepaalde positie (≠ index) in een array a kun je opvragen door de
+    >volledige array a[@] door te geven aan de slice-operatie ${variable:offset:length}.
+    >Herneem de vorige oefening en bepaal in één statement
+    >• het getal op positie 2 in de array
+    >• het getal op positie 5 in de array
+    >• het getal op positie 20 in de array (onbestaand)
+    >• het laatste getal uit de array
+
+```bash
+#!/bin/bash
+data=(0 1 2 3 4)
+data[20]=20
+echo "Fout: $data[1]"
+echo "Juist: ${data[1]}"
+
+echo Alle getallen: ${data[@]}
+echo Aantal getallen: ${#data[@]}
+echo Getal met index 2: ${data[2]}
+echo Getal met index 5: ${data[5]}  
+echo Getal met index 20: ${data[20]}
+
+echo Getal op positie 2: ${data[@]:2:1}
+echo Getal op positie 5: ${data[@]:5:1}
+echo Getal op positie 20: ${data[@]:20:1}
+echo Laatste getal: ${data[@]:${#data[@]}-1:1}  # of ${data[@]: -1:1}
+```
+
+85. >Je kunt een array ook initialiseren met de uitvoer van een commando. Wat is de inhoud
+    >van regel indien je volgende toekenning uitvoert (zonder IFS te wijzigen)?
+    >regel=( $(wc /etc/passwd) )
+
+```bash
+#!/bin/bash
+regel=($(wc /etc/passwd))
+echo "regel[0]: ${regel[0]}"
+echo "regel[1]: ${regel[1]}"
+echo "regel[@]: ${regel[@]}"
+declare -p regel
+grep ^regel= < <(set)
+```
+
+86. > Hoe vraag je de bestaande indices van een array op? Hoe genereer je hieruit een tweede
+    > array, geïndexeerd door opeenvolgende gehele getallen en met als waarden de indices
+    > van een eerste? Pas toe op de array uit vorige oefening, en op de builtin array
+    > BASH_VERSINFO.
+
+```bash
+#!/bin/bash
+data=(a b c d e)
+data[20]=z
+echo data: ${data[@]}
+echo indices: ${!data[@]}
+indices=(${!data[@]})
+echo indices in een array: ${indices[@]}
+echo
+echo BASH_VERSINFO: ${BASH_VERSINFO[@]}
+echo BASH_VERSINFO indices: ${!BASH_VERSINFO[@]}
 ```
 
