@@ -1233,7 +1233,7 @@ sort 35.txt | uniq -dc
     ^[1-9] [0-9]*$ testen of het een getal voorstelt met 2 cijfers. * wijst op of meerder occurences van [0-9]
     ```
 
-37. >nstalleer emacs (yum install emacs) en wijzig de werkdirectory naar
+37. >Installeer emacs (yum install emacs) en wijzig de werkdirectory naar
     >/usr/share/emacs/versienummer/etc/tutorials. Voorspel de uitvoer van volgende
     >commando's en test ze dan uit op de Emacs tutorial:
     >• grep -E 'C\-[a-z] *' TUTORIAL
@@ -1254,8 +1254,7 @@ sort 35.txt | uniq -dc
     #(grep = general regular expression parser)
     ```
 
-    38. > Wat is de uitvoer van volgend commando?
-        >
+38. > Wat is de uitvoer van volgend commando?
         > `grep -E '^.*$' TUTORIAL`
         > Wat zijn de twee verschillen met
         > `grep -E '^\.*$' T*`
@@ -1263,10 +1262,19 @@ sort 35.txt | uniq -dc
     ```bash
     grep -E '^.*$' TUTORIAL #Alle lijnen
     grep -E '^.*$' TUTORIAL #Begin, gevolgd door een punt, 1 of meerdere keren
-    # -v -> inverse: regex omdraaien
     ```
 
+39. > Zoek de opties van het grep-commando die het gedrag van grep als volgt wijzigen:
+    > • Er worden enkel lijnen getoond die niet aan het patroon voldoen.
+    > • Deze patronen worden in een configuratiebestand opgeslagen, één lijn per
+    > patroon
 
+    ```bash
+    # -v -> inverse: regex omdraaien
+    # -f -> ontvang pattern van file, 1 per lijn
+    ```
+
+    
 
 40. >Voorspel de uitvoer die je bij de volgende commando's verwacht en voer daarna pas de
     >commando's effectief uit, om te controleren dat je prognose correct was.
