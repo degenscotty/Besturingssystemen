@@ -1450,6 +1450,7 @@ find /usr -type f -size +1M -printf "%s %p\n" | sort -t " " -k1nr,1nr | cut -d "
     >bestanden in de lijst opneemt en geen directory's.
 
 ```bash	
+...
 ```
 
 52. >Gebruik het find-commando om een lijst te bekomen van alle subdirectory's van /usr
@@ -1460,6 +1461,7 @@ find /usr -type f -size +1M -printf "%s %p\n" | sort -t " " -k1nr,1nr | cut -d "
     >**Let erop dat enkel de namen van de directory's weergegeven worden.**
 
 ```bash
+...
 ```
 
 53. >Geef een lijst van alle directory's waar je als gewone gebruiker geen toegang toe hebt.
@@ -1472,5 +1474,277 @@ find / -type d 2>&1 > /dev/null | cut -d ‘ -f 2 | cut -d ‘ -f 1
 54. Toon alle bestanden van de map /etc die rwx-rechten hebben voor de huidige gebruiker.
 
 ````bash
+...
 ````
+
+
+
+### Shellvariabelen
+
+> Bij het ingeven van een commando in bash gebeurt er een fork() =  clone = terminal maakt kindproces aan. Parent en kind beschikken over zelfde code. code van kind proces wordt overschreven met ingegeven commando.
+>
+> Ronde haakjes forceren een fork(). bv `( exec ls )` .
+
+55. >Naast gekende shellvariabelen, zoals PATH, kun je zelf shellvariabelen toevoegen. Tenzij
+    >je de declare-opdracht gebruikt, zijn ze steeds van het type string. Er wordt onderscheid
+    >gemaakt tussen hoofdletters en kleine letters. Voer de volgende commando's uit:
+    >• printf “PATH %s\n” $PATH
+    >• printf “dag %s\n” $dag
+    >• dag=jan
+    >• printf “dag %s\n” $dag
+    >• set
+
+```bash
+#PATH (windows) = environment variables
+#PATH (Linux) = wanneer er een commando wordt ingegeven en deze niet wordt teruggevonden in de history, dan wordt er gezocht op volgend path:
+
+[root@localhost ~]# echo $PATH
+/root/.local/bin:/root/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
+
+
+
+#${BASH_CMDS[@]} = commando om te checken waar alle recent aangeroepen commando's zich bevinden:
+[root@localhost ~]# echo ${BASH_CMDS[@]}
+/usr/bin/ls
+
+#${!BASH_CMDS[@]} =  toont recent gebruikte commando's
+[root@localhost ~]# echo ${!BASH_CMDS[@]}
+ls
+```
+
+
+
+56. >Definieer zelf de variabele date met een willekeurige datum als inhoud. Wat is het
+    >verschil tussen $date, $(date) en ${date}? Onderzoek dit met behulp van het commando
+    >echo. Je kunt bijvoorbeeld je eerste script schrijven met de volgende regels:
+    >date="18/5/2016"
+    >echo '$date:' $date
+    >echo '${date}:' ${date}
+    >echo '$(date):' $(date)
+    >De enkele aanhalingstekens garanderen dat de tekst letterlijk wordt doorgegeven aan
+    >het echo-commando.
+    >Merk op dat de variabele date niet gekend is in de shell die het script heeft opgestart. Elk
+    >script wordt namelijk uitgevoerd in een nieuwe shell, met zijn eigen variabelenlijst,
+    >instellingen ...
+
+```bash
+#code wordt enkele geïnterpreteerd wanneer zaken tussen dubbele quotes staan. Bij single quotes zullen de zaken letterlijk genomen worden.
+
+root@localhost ~]# var = "het is mooi weer"
+bash: var: command not found...
+[root@localhost ~]# var="het is mooi weer"
+[root@localhost ~]# echo $var
+het is mooi weer
+[root@localhost ~]# echo "var=$var"
+var=het is mooi weer
+[root@localhost ~]# echo 'var=$var'
+var=$var
+
+[root@localhost ~]# echo ${var}iable 	#manier om variabelen tussen strings weer te geven
+het is mooi weeriable
+
+[root@localhost ~]# date="datum"
+[root@localhost ~]# echo "date=$(date)" #command substitution
+date=Wed May 11 03:06:51 PM CEST 2022
+```
+
+57. >Bash ondersteunt vanaf versie 3 de mogelijkheid tot indirecte adressering: je kunt de
+    >inhoud van een variabele opvragen door haar naam in een tweede variabele te stoppen,
+    >die je invult in ${!varnaam}. Dit is vergelijkbaar met pointers in C en C++. Vul de inhoud
+    >van de variabele een willekeurig op, en geef aan de variabele twee als inhoud de string
+    >'een'. Voorspel het resultaat van
+    >echo ${een}
+    >echo ${twee}
+    >echo ${!twee}
+    >echo ${$twee}
+    >In oudere versies van Bash kun je dit gedrag simuleren d.m.v. de opdracht eval. Hoe?
+
+```bash
+[root@localhost ~]# een=1
+[root@localhost ~]# echo ${een}
+1
+[root@localhost ~]# twee=een
+[root@localhost ~]# echo ${twee}
+een
+[root@localhost ~]# echo ${!twee}
+1
+
+[root@localhost ~]# eval $twee=17 #Met eval kan je de waarden van variabelen (adhv pointers) aanpassen.
+[root@localhost ~]# echo $een
+17
+
+[root@localhost ~]# echo {1..10} #brace expension
+1 2 3 4 5 6 7 8 9 10
+
+
+[root@localhost ~]# echo {1..$een}
+{1..17}
+[root@localhost ~]# eval echo {1..$een} #Eerst wordt eval uitgevoerd, daarna de brace expension
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+
+#variable verwijderen: unset variable_name
+```
+
+58. >Bekijk de inhoud van de shellvariabelen PS1, PS2, SHLVL, RANDOM, SECONDS en PWD,
+    >en zoek de betekenis ervan op in info bash of man bash, sectie Shell Variables.
+    >Vraag de inhoud van deze variabelen eerst interactief op (met echo) en schrijf vervolgens
+    >een script om de inhoud van deze variabelen op het scherm te tonen. Kan je de
+    >verschillen verklaren?
+
+```bash
+#PS1 = primary prompt
+[root@localhost ~]# echo $PS1
+[\u@\h \W]\$
+
+#PS2 = secondary prompt, wordt gebruikt bij incompleet commando
+[root@localhost ~]# echo $PS2
+>
+
+#SHLVL = shell level. om te kijken of dat je in een subshell aan het werken bent of niet.
+[root@localhost ~]# echo $SHLVL
+1
+[root@localhost ~]# bash
+[root@localhost ~]# echo $SHLVL
+2
+[root@localhost ~]# exit
+exit
+[root@localhost ~]# echo $SHLVL
+1
+
+#RANDOM = geeft random getal terug tussen 1-(2^15-1). Af te raden.
+#mogelijke examenvraag: script om bytes om te zetten naar getal.
+head -c 8 /dev/random #random cijfer van 8 bytes.
+| An -tu8 #omzetten naar leesbaar cijfer
+```
+
+59. > Hoe kun je commentaar toevoegen in een script?
+
+    ```bash
+    #
+    ```
+
+    
+
+60. >Hoe kun je de variabele PATH zodanig wijzigen dat je bij het aanroepen van een
+    >shellscript (dat zich in de actieve directory bevindt), niet steeds naar de actieve directory
+    >moet verwijzen?
+    >Zorg ervoor dat je oplossing werkt in eender welke directory. Het script moet dus steeds
+    >gezocht worden in de werkdirectory, zonder telkens de waarde van PATH aan te passen.
+
+```bash
+
+```
+
+61. > Hoe kun je ervoor zorgen dat wanneer bij de cd-opdracht een relatieve padnaam (dus
+    >niet beginnend met /) als argument opgegeven wordt, niet alleen de huidige
+    >werkdirectory als prefix uitgeprobeerd wordt, maar ook een aantal vaste directory's?
+
+```bash
+```
+
+62. >Hoe kun je met eenzelfde opdracht regelmatig heen en terug schakelen tussen twee
+    >mappen als actieve directory?
+
+```bash
+
+```
+
+63. >Je kunt met het commando **read** tegelijkertijd meerdere variabelen inlezen via het
+    >standaard invoerkanaal. Test dit uit met:
+    >read a b c d
+    >Kan je dit aanpassen zodat de gegevens uit een bestand gelezen worden?
+    >Probeer dit ook eens met een script op te lossen, en merk op dat de variabelen enkel in
+    >het script bestaan!
+
+```bash
+[root@localhost ~]# read a b c d
+het is mooi weer
+[root@localhost ~]# echo $a
+het
+
+#alles dat niet meer in een variabele past wordt in de laatste variabele gestoken.
+#bv:  Het is mooi weer vandaag:
+#var1:het
+#var2:is
+#var3: mooi weer vandaag  
+
+#uit bestand:
+[root@localhost ~]# read a b c d < /etc/passwd
+[root@localhost ~]# echo $a
+root:x:0:0:root:/root:/bin/bash
+[root@localhost ~]# echo $b
+[root@localhost ~]# echo $c
+```
+
+64. >Achterhaal de waarde van de bijzondere variabele IFS. Merk op dat echo $IFS je niet veel
+    >wijzer maakt; echo "$IFS" (met aanhalingstekens) verraadt echter al dat er een newline-
+    >karakter in de waarde staat. De eigenlijke waarde van IFS kun je vinden met
+    >grep ^IFS < <(set)
+    >Zoals je weet uit vorige oefeningen, zorgt $' ' hierin voor interpretatie van de escapes.
+    >Standaard bevat IFS dus een spatie, een tab en een regeleinde. Deze karakters worden
+    >door read gebruikt voor het splitsen van invoervelden, ongeveer zoals o.a. de operator
+    ><< in C++ en de Scanner-klasse in Java.
+    >Je kunt de waarde van IFS ook (tijdelijk) wijzigen, hetzij door een functie te gebruiken,
+    >hetzij door de IFS-variabele vóór het commando in te stellen. Gebruik het commando
+    >read om een aantal variabelen in te lezen gesplitst op spaties, dubbelepunten en
+    >komma's. Ga de werking na met read
+
+```bash
+[root@localhost ~]# grep ^IFS < <(set)
+IFS=$' \t\n' #splitst default op spaties, tabs & newlines
+```
+
+65. >Het wijzigen van IFS kan voor verwarring zorgen. Voer volgend script uit:
+    >IFS=':'
+    >x=ik:ben:groot
+    >echo x = $x
+    >echo x = "$x"
+    >echo x = '$x'
+    >grep -E ^x= < <(set)
+    >grep -E ^x < <(set)
+    >declare -p x
+    >declare -p ${!x*}
+
+```bash
+[root@localhost ~]# bash ifs.sh
+x = ik ben groot
+x = ik:ben:groot
+x = $x
+x=ik:ben:groot
+x=ik:ben:groot
+declare -- x="ik:ben:groot"
+declare -- x="ik:ben:groot"
+[root@localhost ~]# grep ^IFS < <(set)
+IFS=$' \t\n'
+```
+
+66. >Je kunt de standaarduitvoer van een commando ook toekennen aan een variabele.
+    >Daarbij maak je gebruik van command substitution. Dit is vooral zinvol wanneer de
+    >uitvoer van een commando uit slechts één regel bestaat. Indien je slechts een deel van
+    >de uitvoer aan de variabele wilt toekennen, dan kun je proberen dit er met cut uit te
+    >halen.
+    >Voorspel de inhoud van de variabele t na volgende commando's:
+    >\1. t=$(du /etc/passwd)
+    >\2. t=$(cut -f1 < <(du /etc/passwd))
+    >\3. t=$(cut -f1 < <(wc -l /etc/passwd))
+    >\4. t=$( cut -d " " -f2 < <(wc -l /etc/passwd))
+    >\5. t=$(wc -l < /etc/passwd)
+    >\6. tab=( $(wc -l /etc/passwd) )
+    >\7. echo ${tab[1]}
+
+```bash
+t=$(du /etc/passwd) #uitvoer van commando komt in variable t = command substitution
+t=$(cut -f1 < <(du /etc/passwd))
+t=$(cut -f1 < <(wc -l /etc/passwd))
+t=$( cut -d " " -f2 < <(wc -l /etc/passwd))
+t=$(wc -l < /etc/passwd)
+tab=( $(wc -l /etc/passwd) ) #er wordt een tabel aangemaakt
+echo ${tab[1]}				 #inhoud tabel wordt uitgeschreven
+
+
+[root@localhost ~]# echo ${tab[0]}
+47
+[root@localhost ~]# echo ${tab[1]}
+/etc/passwd
+```
 
