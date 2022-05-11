@@ -12,9 +12,11 @@
 
 > **Planning/Verloop Labo's:**
 >
-> - week 1: **Deel 1**: De terminal, Man pages, **Deel 2**: Compileren in de shell
-> - week 2: **Deel 7**: Patterns, expansions
-> - week 3: **Deel 7**: Redirection & pipes
+> - Labo 1: **Deel 1**: De terminal, Man pages, **Deel 2**: Compileren in de shell
+> - Labo 2: **Deel 7**: Patterns, expansions
+> - Labo 3: **Deel 7**: Redirection & pipes
+> - Labo 4: **Deel 7**: Uitleg Regex + vraag 42-54
+> - Labo 5: **Deel 7**: Shellvariabelen & Shellscripting
 
 
 
@@ -1206,4 +1208,261 @@ tr a-z A-Z < /etc/passwd #tr - translate or delete characters
 ```bash
 sort 35.txt | uniq -dc
 ```
+
+36. > Het filter-commando grep toont alle lijnen van een bestand die aan een bepaald patroon
+    > voldoen. Op welke drie verschillende manieren (drie verschillende opties, met betrekking
+    > op de interpretatie van regular expressions) kan dit patroon opgegeven worden? Let
+    > erop dat het patroon door het grep-commando moet worden geïnterpreteerd en niet
+    > door de shell. Gebruik de drie mogelijkheden om alle lijnen van een bestand te zoeken
+    > die een woord bevatten uit de lijst: BEGIN END IF ENDIF
+    > In de man-pages van grep vind je een extra sectie over regular expressions.
+
+    **[Regex]:**
+
+    ```
+    ^begin van lijn
+    $einde van lijn
+    .willekeurig teken
+    		?mag voorkomen maar moet niet
+    		+1ofmeer
+    		*0ofmeer
+    [bereik] (kan gevolgd worden door ?of+of*)
+    [^alles behalve bereik] (kan gevolgd worden door ?of+of*)
+    {2} komt 2x voor
+    {2,3} komt min 2x en max 3x voor
+    ^[1-9] [0-9]*$ testen of het een getal voorstelt met 2 cijfers. * wijst op of meerder occurences van [0-9]
+    ```
+
+37. >nstalleer emacs (yum install emacs) en wijzig de werkdirectory naar
+    >/usr/share/emacs/versienummer/etc/tutorials. Voorspel de uitvoer van volgende
+    >commando's en test ze dan uit op de Emacs tutorial:
+    >• grep -E 'C\-[a-z] *' TUTORIAL
+    >• grep -E '(C\-[a-z] *){2}' TUTORIAL
+    >• grep '\(C\-[a-z] *\)\{2\}' TUTORIAL
+    >Het patroon moet tussen enkele of dubbele aanhalingstekens staan, zodat de shell de
+    >speciale tekens niet interpreteert, maar het patroon ongewijzigd doorgeeft aan het grep-
+    >commando.
+
+    ```bash
+    grep -E 'C\-[a-z] *' TUTORIAL 
+    grep -E '(C\-[a-z] *){2}' TUTORIAL
+    grep '\(C\-[a-z] *\)\{2\}' TUTORIAL
+    
+    #1. -E=extended regex (Hoofdletter C, gevolgd door minteken, gevolgd door letter A-Z, gevolgd door 0 of meerdere spaties)
+    #2. Zelfde als het voorgaande maar 2x na elkaar.
+    #3. 
+    #(grep = general regular expression parser)
+    ```
+
+    38. > Wat is de uitvoer van volgend commando?
+        >
+        > `grep -E '^.*$' TUTORIAL`
+        > Wat zijn de twee verschillen met
+        > `grep -E '^\.*$' T*`
+
+    ```bash
+    grep -E '^.*$' TUTORIAL #Alle lijnen
+    grep -E '^.*$' TUTORIAL #Begin, gevolgd door een punt, 1 of meerdere keren
+    # -v -> inverse: regex omdraaien
+    ```
+
+
+
+40. >Voorspel de uitvoer die je bij de volgende commando's verwacht en voer daarna pas de
+    >commando's effectief uit, om te controleren dat je prognose correct was.
+
+    > \1. grep -E '^$' TUTORIAL | wc -l
+    > \2. grep -Ev '^$' TUTORIAL
+    > \3. grep -E 'margin|direction' TUTORIAL | nl
+    > \4. nl TUTORIAL | grep -E 'margin|direction'
+    > \5. grep -E '^-+$' TUTORIAL | uniq -d
+    > \6. grep -E '^-+$' TUTORIAL | sort | uniq -d
+    > \7. grep -E '\--+' TUTORIAL | grep -Ev '^-+$'
+
+    > Een aantal van deze commando's zijn syntactisch correct, maar bevatten logische
+    > fouten. Welke? 
+
+    ```bash
+    1. grep -E '^$' TUTORIAL | wc -l 			#Alle lege lijnen. Output doorsluizen naar wordcount -l (aantal matches tellen)
+    2. grep -Ev '^$' TUTORIAL 		 			#Alles behalve lege lijnen
+    3. grep -E 'margin|direction' TUTORIAL | nl	#Alle lijnen die ofwel het woord margin, ofwe het woord direction bevatten.
+    											#nl nummert iedere lijn. niet de juiste lijnnummeres die we verwachten.
+    4. nl TUTORIAL | grep -E 'margin|direction'	#betere optie om lijnnummers weer te geven
+    5. grep -E '^-+$' TUTORIAL | uniq -d		#Enkel lijnen met mintekens. uniq -d toont enkel de unieke lijnen.
+    6. grep -E '^-+$' TUTORIAL | sort | uniq -d #Altijd sort gebruiken bij uniq! anders werkt het niet zoals gewenst.
+    7. grep -E '\--+' TUTORIAL | grep -Ev '^-+$'#Deel1: Minstens 2 mintekens. 
+    											#Deel2: Zoekt naar lijnen met die niet 1 of meerdere mintekens bevatten
+    											#De combinatie zorgt er voor dat er geen matches zijn.
+    											
+    Een aantal van deze commando's zijn syntactisch correct, maar bevatten logische
+    fouten. Welke? 
+    
+    3, 5 & 7 zijn niet ok.
+    ```
+
+
+
+41. >Welke van onderstaande constructies kun je gebruiken indien de uitvoer van de
+    >opdracht te lang is om op één scherm getoond te worden?
+    >• du /
+    >• du / | less
+    >• du / | more
+    >• du / | cat
+    >Welk commando is zinloos en waarom?
+
+    ```bash
+    du /
+    du / | less #scrollable, beter dan more
+    du / | more #vergelijkbaar met less. less is beter.
+    du / | cat #zinloos
+    ```
+
+42. >Bekijk hoeveel keer je het commando man in het verleden (voor de huidige inlogsessie)
+    >reeds gebruikt hebt. Gebruik hiervoor het bestand .bash_history uit je home-directory en
+    >de commando's wc en grep.
+
+```bash
+[root@localhost ~]# grep -E  "^man" .bash_history | wc -l
+6
+```
+
+43. >In het bestand /etc/passwd worden de velden gescheiden door een :-teken. Het **eerste**
+    >veld bevat de **gebruikersnaam** en het **derde veld** het **gebruikersID**, terwijl het **vierde veld**
+    >het **nummer van de primaire groep** is waartoe de gebruiker behoort.
+    >Sorteer het passwd-bestand met behulp van het sort commando, met het nummer van
+    >de primaire groep als sleutel. Zorg ervoor dat het sort commando enkel sorteert op het
+    >veld met de primaire groep (en niet op het restant van de lijn), en dit veld alfabetisch
+    >(niet-numeriek) sorteert. Bij deze sortering moet bijvoorbeeld gelden: 1 < 100 < 12. Geef
+    >de volledige commandolijn waarmee je deze opdracht hebt uitgevoerd. Voer dit
+    >commando vervolgens uit, waarbij je de uitvoer omleidt naar het bestand ~/passwd.
+    >Doe nu hetzelfde met het group-bestand. Dit bestand bevat onder meer als eerste veld
+    >de groepsnaam, terwijl het nummer van de groep nu in het derde veld staat. Sorteer
+    >opnieuw volgens dezelfde criteria, met het nummer van de groep als sleutel. Leid de
+    >uitvoer nu om naar het bestand ~/group.
+
+```bash
+sort -t : -k1,1 /etc/passwd #eerste veld
+sort -t : -k1.2,1.2 /etc/passwd #eerste veld, 2de char
+sort -t : -k4,4 /etc/passwd > passwd #4de veld wegschrijven naar passwd
+sort -t : -k3,3 /etc/group > group #3de veld wegschrijven naar group
+
+#UPG: user private groups: Groep waarbij gebruiker enigste lid is.
+```
+
+44. >Gebruik het commando join met aangepaste opties om op basis van de daarnet
+    >gecreëerde bestanden ~/passwd en ~/group een lijst af te drukken met op elke lijn enkel
+    >drie velden: de gebruikers-ID, de volledige gebruikersnaam en de naam van de primaire
+    >groep waartoe de gebruiker behoort. Geef de volledige commandolijn waarmee je deze
+    >opdracht hebt uitgevoerd. Hoeveel uitvoerregels zijn er? Hoe heb je dit aantal geteld?
+    >Vergelijk met het aantal regels in het passwd bestand. Indien deze aantallen niet
+    >overeenkomen heb je ofwel bij deze vraag, ofwel bij de vorige een fout gemaakt.
+
+```bash	
+join -t : -1 4 -2 3 /etc/passwd /etc/group #We nemen het 4de veld van het 1ste bestand en het 3de veld van het 2de bestand
+join -t : -1 4 -2 3 -o "1.1 1.3 2.1" passwd group | less #-o is een uitvoerlijn. 
+														 #1.1 gebruikersnaam, 1.3 userid & 2.1 naam primaire groep
+						 
+#combinatie 43+44:
+join -t : -1 4 -2 3 -o "1.3 1.1 2.1"
+ < (sort -t : -k4,4 /etc/passwd) 
+ < sort( -t : -k3,3 /ectd/group)
+```
+
+45. >Sorteer het /etc/passwd bestand, met behulp van het sort commando. Gebruik als
+    >primaire sleutel het vierde veld van het bestand. Zorg ervoor dat je in numerieke
+    >volgorde sorteert (12 < 100). Regels met gelijke numerieke waarden voor het vierde veld
+    >moeten gesorteerd worden met het vijfde veld als secundaire sleutel, waarbij geen
+    >onderscheid mag gemaakt worden tussen hoofdletters en kleine letters, en voor de
+    >
+    >sorteervolgorde nu de omgekeerd alfabetische volgorde moet genomen worden. Geef
+    >de volledige commandolijn waarmee je deze opdracht hebt uitgevoerd.
+
+```bash
+sort -t : -k4n,4n -k5,5 < /etc/passwd
+```
+
+46. >Gebruik het cut commando met aangepaste opties om van het bestand /etc/passwd alle
+    >gebruikersnamen te tonen. Geef opnieuw de volledige commandolijn waarmee je deze
+    >opdracht hebt uitgevoerd.
+
+```bash
+cut -d : -f 1 /etc/passwd
+```
+
+47. >Het commando **tee** bestandsnaam neemt de standaardinvoer, geeft de invoer
+    >ongewijzigd door aan de standaarduitvoer, en kopieert de standaardinvoer tegelijkertijd
+    >naar het opgegeven bestand. Gecombineerd met een pipe laat dit je toe de uitvoer van
+    >een programma terzelfdertijd op het beeldscherm te bekijken, en te loggen voor later
+    >gebruik. Hoe kun je ervoor zorgen dat de uitvoer van een programma tegelijkertijd op
+    >het beeldscherm verschijnt, en wordt toegevoegd aan een bestaand bestand, zonder dat
+    >de oude inhoud van dat bestand wordt overschreven?
+    >Het commando **find** zoekt in alle subdirectory's vanaf een opgegeven directory naar alle
+    >bestanden die aan bepaalde criteria voldoen (naam, grootte ...) en toont alle gewenste
+    >informatie van alle bestanden die voldoen. Dit commando heeft heel veel mogelijkheden
+    >door het toevoegen van aangepaste opties. Leer de goede opties op te zoeken in de man-
+    >pages. Het commando genereert dikwijls veel foutmeldingen, die je bij voorkeur omleidt.
+
+```bash
+...
+```
+
+48. > Zoek naar alle bestanden in de /etc directory tree waarvan de naam begint met pass.
+
+```bash	
+find /etc -type f -name 'pass*'
+```
+
+49. >Je kunt ook meerdere testen combineren. Hoe vraag je alle subdirectory's (geen
+    >bestanden) waarvoor de naam begint met sh?
+
+```bash
+find /etc -type f -name "sh*"
+```
+
+50. >Gebruik het find-commando om een lijst te bekomen van alle bestanden in de /usr
+    >directory tree met een bestandsgrootte van minstens 1 megabyte. Bij het uitprinten (één
+    >lijn per bestand) moet je het volledig pad van de gevonden bestanden laten voorafgaan
+    >door de grootte van het bestand. Geef de volledige commandolijn waarmee je deze
+    >opdracht hebt uitgevoerd. Let er ook op dat je enkel bestanden in de lijst opneemt en
+    >geen directory's.
+
+```bash
+find /usr -type f -size +1M -exec du -h {} \; #commando du uitvoeren voor elk gevonden object {} = object in kwestie
+strace 2>&1 find /usr -type f -size +1M -exec du -h {} \+ > /dev/null; #+ gaat concatineren
+find /usr -type f -size +1M -printf "%s %p\n" | sort -t " " -k1nr,1nr | cut -d " " -f2 #geformatteerde output
+
+#\; object per object \+ verzameling van objecten (concat)
+```
+
+51. >Gebruik het find-commando om een lijst te bekomen van alle bestanden in je
+    >persoonlijke map, die gedurende de laatste twee weken gewijzigd werden. Bij het
+    >uitprinten (één lijn per bestand) moet je het volledig pad van de gevonden bestanden
+    >laten voorafgaan door het tijdstip van de laatste wijziging. Geef de volledige
+    >commandolijn waarmee je deze opdracht hebt uitgevoerd. Let er ook op dat je enkel
+    >bestanden in de lijst opneemt en geen directory's.
+
+```bash	
+```
+
+52. >Gebruik het find-commando om een lijst te bekomen van alle subdirectory's van /usr
+    >waarin zich C- of C++-headerbestanden (bestanden met suffix .h) bevinden. Gebruik een
+    >commandolijn van de gedaante
+    >find ... | sort | uniq
+    >
+    >**Let erop dat enkel de namen van de directory's weergegeven worden.**
+
+```bash
+```
+
+53. >Geef een lijst van alle directory's waar je als gewone gebruiker geen toegang toe hebt.
+    >Tip: gebruik cut en de foutuitvoer van het commando find.
+
+```bash
+find / -type d 2>&1 > /dev/null | cut -d ‘ -f 2 | cut -d ‘ -f 1
+```
+
+54. Toon alle bestanden van de map /etc die rwx-rechten hebben voor de huidige gebruiker.
+
+````bash
+````
 
