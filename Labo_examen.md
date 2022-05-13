@@ -18,6 +18,7 @@
 > - Labo 4: **Deel 7**: Uitleg Regex + vraag 42-54
 > - Labo 5: **Deel 7**: Shellvariabelen, Shellscripting & Arithmetic expansion
 > - Labo 6: **Deel 7**: Argumenten van een script/functie, positionele parameters en speciale parameters, Parameter expansion & Arrays
+> - Labo 7: **Deel 7**: Structuren: if, While & for
 
 
 
@@ -1804,18 +1805,18 @@ echo $SECONDS
 >
 >- a. Met **set --** argumentenlijst worden de opeenvolgende waarden uit de argumentenlijst
 >  een voor een toegewezen aan de positionele parameters. Het gebruik van het
->  dubbele streepje wordt hierbij aangeraden om problemen met opties (d.w.z.
->  argumenten die met een streepje beginnen) te vermijden.
+>   dubbele streepje wordt hierbij aangeraden om problemen met opties (d.w.z.
+>   argumenten die met een streepje beginnen) te vermijden.
 >- b. Omdat set -- ... de oorspronkelijke positionele parameters overschrijft, is het
 >  doorgaans beter om een array te gebruiken om operaties op positionele parameters
->  uit te voeren.c. Met shift n wordt de inhoud van alle positionele parameters i vervangen door de
->  oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
->  verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
->  opgeschoven.
+>   uit te voeren.c. Met shift n wordt de inhoud van alle positionele parameters i vervangen door de
+>   oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
+>   verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
+>   opgeschoven.
 >- c. Met **shift n** wordt de inhoud van alle positionele parameters i vervangen door de
 >  oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
->  verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
->  opgeschoven.
+>   verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
+>   opgeschoven.
 
 
 
@@ -2210,5 +2211,305 @@ echo indices in een array: ${indices[@]}
 echo
 echo BASH_VERSINFO: ${BASH_VERSINFO[@]}
 echo BASH_VERSINFO indices: ${!BASH_VERSINFO[@]}
+```
+
+87. >Schrijf een script met als naam weekdag dat als enig argument een getal meekrijgt (0
+    >t.e.m. 6) en de corresponderende weekdag (in het Nederlands) uitschrijft. De waarde 0
+    >komt hierbij overeen met zondag.
+    >Met welke parameter kun je dit script gebruiken om de weekdag van vandaag te
+    >bekomen?
+
+```bash
+#!/bin/bash
+dagen=( zondag maandag dinsdag woensdag donderdag vrijdag zaterdag )
+echo ${dagen[$1]}
+
+#met als parameter $(date '+%w')
+```
+
+
+
+
+
+### Herhalingsinstructies Output van een commando verwerken in een script
+
+
+
+Dikwijls bestaat de uitvoer van een commando uit één regel, waarvan je slechts het deel, dat
+je nodig hebt in je script wilt opslaan in een variabele. Dit kan op diverse manieren:
+• Gebruik cut met een gepaste delimiter. Deze kan echter slechts uit één teken
+bestaan. Standaard is de delimiter voor dit commando een tabkarakter.
+• Sla de volledige regel op in een variabele en gebruik stringoperatoren om het
+interessante deel af te zonderen.
+• Gebruik de opdracht read, die – op basis van IFS – een regel opsplitst en de delen
+ervan aan variabelen toekent. De inputregel moet hierbij komen van
+standaardinvoer. Indien de invoer doorgepipet wordt, dan zijn de variabelen enkel
+gekend in de nieuwe shell.
+• Gebruik arrays om de alle delen van de regel op te slaan in arrayelementen – alweer
+op basis van IFS – en verwijs met de juiste indices naar de gewenste delen.
+De variabele IFS is standaard ingesteld op whitespace, dus spaties, tabs en regeleinden. Je
+kunt deze echter ook zelf wijzigen, zowel interactief als binnen een script; in dit laatste geval
+is de wijziging enkel van kracht binnen het script.
+
+
+
+**Om niet telkens de standaardwaarde $' \t\n' opnieuw te moeten typen, zou je IFS**
+**eventueel kunnen kopiëren naar een hulpvariabele. Een betere oplossing bestaat er in om**
+**een aparte functie te voorzien of om de IFS-variabele enkel te wijzigen voor de huidige**
+**regel. Op die manier kan je enkele geheugenreferenties uitsparen!**
+
+
+
+n een script kunnen if-testen dikwijls vervangen worden door alternatieven op basis van de
+&&- en/of ||-operatoren. Maak daar nuttig gebruik van om je code bondig te houden.
+
+
+
+89. >Ontwikkel een shellscript dat als (enige) parameter een bestandsnaam heeft. Als output
+    >moet het script het gemiddelde aantal karakters per regel en het gemiddelde aantal
+    >woorden per regel uitschrijven. Gebruik de output van het commando wc en probeer
+    >met de diverse methodes die hierboven aangehaald werden (behalve de tweede) om
+    >deze output op te splitsen.
+    >Opgelet: de shell behandelt alle getallen als integers. Niettemin kun je er, met behulp
+    >van wat wiskunde, voor zorgen dat delingen correct worden afgerond. Hoe?
+
+
+
+```bash
+#!/bin/bash
+
+if (($#!=1));then
+	echo geen parameter meegegeven! >&2 #file descriptro 2. Foutmelding
+	exit1
+fi
+
+if [[ ! -f "$1" ]]; then
+	echo $1 is geen bestand >&2
+    exit 1
+fi
+
+#array( $(wc "$1") )
+read lijnen woorden kars naam < <(wc "$1")
+echo gemiddeld aantal woorden per lijn: $((woorden/lijnen))
+echo gemoddeld aantal karakters per lijn: $((kars/lijnen))
+```
+
+
+
+90. >Wat moet je doen opdat de read-instructie lijnen niet alleen in woorden zou opsplitsen
+    >op basis van spaties, tabs en regeleinden, maar ook op basis van :-tekens?
+
+```bash
+IFS=: read a b > /etc/passwd
+```
+
+
+
+91. >Ontwikkel een script om de gebruikersnaam (veld 1 van /etc/passwd) te bepalen aan de
+    >hand van een gebruikers-ID (veld 3 van /etc/passwd) dat je als (enige) parameter aan het
+    >script meegegeven hebt.
+    >Je kunt de output van het commando grep zowel met cut, read als met een array
+    >analyseren.
+
+```bash
+#!/bin/bash
+if (($#!=1));then
+	echo Fout bij parameters! >&2
+fi
+
+if [[ "$1" =~ ^[0-9]+$ ]]; then
+	echo $1 stelt geen getal voor >&2
+	exit 1
+fi
+
+grep -E "^.*:x:$1" /etc/passwd | cut -d : -f1 	#begin lijn, gevolgd door 0 of meer random tekens, 
+							   					#gevolgd door :, gevolgd door x, gevolgd door :, 
+							   					#gevolgd door getal $1, gevolgd door :.
+```
+
+
+
+### Lussen: while en until
+
+Met een lus kan je een bepaald deel van het script herhalen zolang de exit status van een
+commando waar is. Je kunt hierbij het test-commando gebruiken, maar ook een read-
+commando, of om het even welk ander commando, of zelfs gegroepeerde commando's
+(tussen ronde haakjes of accolades, of een pipe).
+Als de exit status gelijk is aan 0 (waar), worden de opdrachten tot de afsluitende done
+uitgevoerd, waarna de voorwaarde-opdracht weer aan de beurt is. Wanneer de lus niet
+doorlopen wordt, is de exit status van de lus 0. Wanneer de lus wel doorlopen wordt, is de
+exit-status van de lus gelijk aan de exit status van de laatste opdracht die binnen de while-lus
+uitgevoerd werd. De until-lus is functioneel gelijk aan de while-lus, maar de exit status van
+de voorwaarde wordt geïnverteerd.
+
+**while**
+
+```bash
+while *commando* ; do  (zolang exitstatus 0 is)
+...
+done
+```
+**for**
+```bash
+for i in ... ; do
+...
+done
+```
+**testen**
+```bash
+testen op getallen: ((i<10))
+testen op string [[ "$i" == "hallo"]]
+testen of het een bestand is [[ -f "$1"]]
+testen als var niet bestaat [[ -z "$1"]]
+testen als var wel bestaat [[ -n "$1"]]
+```
+**if**
+```bash
+if *commando*
+then ...
+elif *commando*
+then ...
+fi
+```
+
+**Examenvragen vorige jaren:**
+
+```bash
+Schrijf eigen versie van commando du
+Schrijf eigen versie van commando wc -l
+```
+
+
+
+92. >Ontwikkel een script dat het commando tail n simuleert. Als eerste argument moet een
+    >bestandsnaam opgegeven worden en als tweede argument mag het aantal regels
+    >opgegeven worden. Ontbreekt het tweede argument, dan worden de 10 laatste regels
+    >weergegeven. Realiseer dit op twee manieren:
+    >• Gebruik een while-lus met een read-commando om het bestand te overlopen en
+    >een array om de gegevens cyclisch op te slaan.
+    >• Gebruik geen array, maar bepaal vooraf het aantal lijnen van het bestand.
+
+    
+
+```bash
+#!/bin/bash
+if (($#!=1 && $#!=2));then
+	echo "verkeerd aantal parameters" >&2
+	exit 1
+fi
+
+if [[ ! -f "$1"]];then
+	echo $1 is geen bestand >&2
+	exit 1
+fi
+
+if [[ -n "$2" && ! "$2" =~ ^[0-9]+$ ]]; then
+	echo "$2 stelt geen getal voor" >&2
+	exit 1
+fi
+
+aantal=${2-10}
+echo $aantal
+
+array=() 
+teller=0
+while read lijn < "$1" ;do
+	array[$teller]="$lijn"
+	((teller++)) #haakjes belangrijk in bash!
+done < "$1"
+
+for ((i=0;i<aantal;i++)) ;  do
+	echo ${array[ $(( (teller+i)%aantal)) ]}
+done
+
+#declare -a numeriek gedeclareerd
+#declare -A string gedeclareerd
+```
+
+
+
+93. >Hoe kun je met behulp van de while- of until-lus een aantal commando's oneindig lang
+    >laten uitvoeren? Onderbreek de uitvoering met Ctrl+C.
+
+```bash
+while : ; do : ; done
+```
+
+94. >Het bestand ping.out bevat de output van een Windows batch file:
+    >ping -n 1 AL005951
+    >ping -n 1 AL005952
+    >...
+    >Indien toestel xxxxxxxx actief is, wordt het commando ping beantwoord met regels van
+    >de vorm:
+    >Pinging xxxxxxxx [141.96.126.137] with 32 bytes of data:
+    >Reply from 141.96.126.137: bytes=32 time=1322ms TTL=124
+    >Je kunt niet-actieve toestellen herkennen aan het feit dat het commando niet wordt
+    >beantwoord zoals bij actieve. De foutboodschappen die dan gegenereerd worden zijn
+    >divers. Maak een Bash-script dat uit ping.out een inventaris opmaakt van alle niet-
+    >actieve toestellen (één lijn per toestel). Het script moet ook een samenvattende regel
+    >weergeven die zowel het aantal actieve als het totaal niet-aantal toestellen vermeldt.
+    >Zorg ervoor dat het script onafhankelijk is van de precieze foutboodschappen die niet-
+    >actieve toestellen produceren. Construeer twee oplossingen, al dan niet gebruikmakend
+    >van associatieve arrays (enkel beschikbaar in Bash v4).
+
+```bash
+#!/bin/bash
+
+while read lijn; do
+	if [[ "$lijn" =~ ^Pinging ]]; then
+		read pinging comp rest <<< "$lijn" #lezen van string <<<, lezen van bestand <	
+		echo $comp
+		array["$comp"]=1 #sleutel moet sowiso een waarde bevatten
+	fi
+	if [[ "$lijn" =~ ^Reply ]]
+		unset array["$comp"] #laatstse keer da comp variabele is ingevuld er uit gooien.
+	fi
+done < ping.out
+
+for i in ${!array[@]}; do
+	echo $i ${array[$1]}
+done
+```
+
+95. >Gebruik (enkel) het bestand /etc/passwd om voor alle groepsnummers het aantal
+    >gebruikers met hetzelfde primaire groepsnummer te tellen. Realiseer dit op twee
+    >manieren:
+    >• Gebruik een while-lus met een read-commando om het bestand te overlopen
+    >en arrays om de gegevens op te slaan.
+    >• Sla eerst de gegevens geordend op in een tijdelijk bestand, en verwerk
+    >vervolgens dit bestand.
+
+```bash
+#!/bin/bash
+
+array=()
+
+while IFS=: read naam x uid gid rest; do #splitsen op : -> Internal Field Seperator IFS=:
+	if [[ -z "${array[$gid]}" ]]; then
+		array[$gid]=1
+	else
+		((array[$gid]++))
+	fi
+
+done < /etc/passwd
+
+for i in ${!array[@]};do
+	echo "$i: ${array[$i]}"
+done
+```
+
+96. >Gebruik de bestanden /etc/group en /etc/passwd om een overzicht te maken van alle
+    >groepen, gevolgd door de volledige lijst van gebruikers die deze groep als primaire groep
+    >hebben. Gebruik een while-lus met een read-commando om het bestand /etc/group te
+    >overlopen en grep om de gebruikers op te sporen
+
+```bash
+#!/bin/bash
+
+while IFS=: read naam x gid rest ; do
+	array=( $(grep -E "^.*:x:.*:$gid:" /etc/passwd | cut -d : -f1) )
+	echo "$naam: ${array[@]}"
+	unset array #tabel terug leegmaken
+done < /etc/group
 ```
 
