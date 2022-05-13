@@ -19,6 +19,7 @@
 > - Labo 5: **Deel 7**: Shellvariabelen, Shellscripting & Arithmetic expansion
 > - Labo 6: **Deel 7**: Argumenten van een script/functie, positionele parameters en speciale parameters, Parameter expansion & Arrays
 > - Labo 7: **Deel 7**: Structuren: if, While & for
+> - Labo 8: **Deel7**: De for-lus: 100, 101, 103, 104
 
 
 
@@ -2422,8 +2423,6 @@ for ((i=0;i<aantal;i++)) ;  do
 	echo ${array[ $(( (teller+i)%aantal)) ]}
 done
 
-#declare -a numeriek gedeclareerd
-#declare -A string gedeclareerd
 ```
 
 
@@ -2511,5 +2510,200 @@ while IFS=: read naam x gid rest ; do
 	echo "$naam: ${array[@]}"
 	unset array #tabel terug leegmaken
 done < /etc/group
+```
+
+
+
+### De for-lus
+
+> **extra info:**
+
+> **declare -a array**:  declaratie numeriek geassocieerde array  (array=() werkt ook)
+> **declare -A array**:  declaratie string geassocieerde array 
+>
+> **[[ -n "${ array["$i"] }" ]]** checken of inhoud non-zero is
+>
+> **[[ -z "${ array["$i"] }" ]]** checken of inhoud 0 (zero) is
+>
+> **$** staat voor "vervang door"
+
+
+
+100. >Ontwikkel een script dat alle parameters uitschrijft die meer dan één keer
+     >voorkomen in de argumentenlijst van het script. De volgorde waarin de minstens dubbel
+     >voorkomende parameters worden uitgeschreven heeft geen belang (sorteren mag),
+     >maar je moet er wel voor zorgen dat parameters die meer dan twee keer voorkomen
+     >toch slechts eenmaal weggeschreven worden. Laat als eerste parameter ook eventuele
+     >opties -i of -I (van ignore case) toe, die desgewenst aangeven dat er geen onderscheid
+     >mag gemaakt worden tussen hoofdletters en kleine letters.
+     
+     > Extra info oefening 100:
+     >
+     > **cmd1 && cmd2** : als cmd1 niet lukt zal cmd2 niet uitgevoerd worden. = Logische AND voor exit statusen.
+     >
+     > **cmd1 || cmd2** : als cmd1 niet lukt zal cmd2 WEL uitgevoerd worden. 
+     >
+     > **&&** heef prioriteit boven **||**
+     >
+     > **${i,,}** -> ,, = to_lowercase
+     >
+     > **${i,}** -> , =enkel Eerste letter to_lowercase
+     >
+     > **${i^^}** -> ^^ = to_uppercase
+     >
+     > **${i^}** -> ^ =enkel Eerste letter to_uppercase
+     >
+     > *meer info? man bash -> /parameter expansion*
+     
+     
+
+```bash
+#!/bin/bash
+
+declare -A params #string geindexeerde tabel = dictionary
+
+if [[ "$1" == "-i" || "$1" == "-I" ]]; then
+	ic=1
+fi
+
+for i in "$@" ; do
+	if ((ic==1)); then
+    	[[ -z ${params["${i,,}"]} ]] && param["${i,,}"]=1 || ((params["${i,,}"]++)) 
+    fi
+    else
+        [[ -z ${params["$i"]} ]] && param["${i}"]=1 || ((params["${i}"]++))
+done  
+
+for i in "${params[@]}";do
+	(($params["$i"] > 1)) && echo $i
+done
+```
+
+
+
+101. >Ontwikkel een script dat een beperkte versie van het commando wc simuleert. Het
+     >script moet het aantal regels en de bestandsnaam afdrukken van elk bestand dat als
+     >parameter meegegeven wordt. Het script mag enkel interne Bash-instructies (if, for,
+     >case, let, while, read enz.) gebruiken, en behalve echo geen externe commando's; het
+     >gebruik van awk, sed, perl en wc in het bijzonder is niet toegelaten. Je zult bijgevolg elk
+     >bestand regel voor regel moeten inlezen en deze tellen. Het script moet bovendien een
+     >samenvattende regel weergeven met het totale aantal regels. Indien geen enkele
+     >parameter meegegeven wordt, neem je alle bestanden in de huidige werkdirectory in
+     >beschouwing. Los dit zo beknopt mogelijk op met de speciale notaties voor shell-
+     >variabelen
+
+
+
+````bash
+#!/bin/bash
+
+tot_lijnen=0
+tot_woorden=0
+tot_kars=0
+
+files=( ${@:-*} ) #korte notatie van 
+				#if [[ -z "$@" ]]; then 
+					#files=( $@ ) 
+				#else 
+					#files=( * ) 
+				#fi
+
+for file in "${files[@]}";do
+	#[[ -f "$file" ]] && continue; 	#check of bestand bestaat. korte notatie
+    								#&& = Als eerste commando true is zal het 2de ook uitgevoerd worden.
+   
+   if [[ ! -f "$file" ]];then  #lange versie
+   		echo $file is geen bestand
+   		continue
+   	fi
+   	
+    lijnen=0
+    woorden=0
+    kars=0
+    while read lijn; do
+    	((lijnen++))
+    	temp=( $lijn )
+    	((woorden+=${#temp[@]}))
+    	unset temp #tijdelijke table vernietigeng
+    	((kars=kars${#lijn}+1)) #+1 voor \n character
+    done < "$file"
+    ((tot_lijnen+=lijnen))
+    ((tot_woorden+=woorden))
+    ((tot_kars+=kars))
+    printf "%4d %4d %4d %s" $lijnen $woorden $kars "$file"
+done	
+
+printf "%4d %4d %4d %s" $tot_lijnen $tot_woorden $tot_kars $total
+````
+
+
+
+103. >Enerzijds kun je met behulp van het commando ps -e informatie opvragen over alle
+     >processen die actief zijn. De vier kolommen in de output tonen respectievelijk het
+     >proces-ID (PID), de TTY device file van de (pseudo-)terminal, de CPU time, en het
+     >commando dat het proces opgestart heeft. Anderzijds kun je met behulp van het
+     >commando kill -KILL pid een proces met willekeurig proces-ID afbreken. Ontwikkel een
+     >script dat alle processen afbreekt waarvan het commando één van de strings bevat die
+     >als parameters bij het oproepen van het script meegegeven wordt. Indien geen enkele
+     >parameter meegegeven wordt, moet het script een gesorteerde lijst weergeven van alle
+     >unieke commandonamen van actieve processen. Behalve de interne instructies (if, for,
+     >case, let, while, read enz.) mag je ook de externe commando's grep, sort en uniq
+     >gebruiken. Om problemen te vermijden, schrijf je bij het testen de kill-opdracht uit naar
+     >standaarduitvoer i.p.v. deze daadwerkelijk uit te voeren.
+
+     ```bash
+     #!/bin/bash
+     
+     trap 'ls; exit 1' SIGINT #signaal handler. Voer b 'ls; exit 1' uit bij SIGINT signaal
+     
+     if (($#==0)); then
+     	declare -A array
+     	eerste=0
+     	while read pid tty time cmd;do
+     		((eerste==0)) && { eerste=1 ; continue ; }
+     		array["$cmd"]=1
+     	done < <(ps -e)
+     	for i in ${!array[@]}; do
+     		echo $i
+     	done | sort
+     fi
+     
+     else 
+     	eerste=0
+     	while read pid tty time cmd;do
+     		((eerste==0)) && { eerste=1 ; continue ; }
+     		for i in "$@";do
+     			[[ "$cmd" =~ $i ]] && echo kill $pid 
+     			#kill -9 om te forcen. Dan wordt signaal 9 verstuurd naar het proces met als PID $pid.
+     		done
+     	done < <(ps -e)
+     fi
+     
+     ```
+
+     104. > **WAS EEN VRAAG OP HET EXAMEN VORIG JAAR**
+          >
+          > Ontwikkel een script dat (zonder getopt te gebruiken) alle opties die aan het script
+          > worden meegegeven naar standaarduitvoer wegschrijft, één per regel. Je moet dus alle
+          > karakters die voorkomen in parameters die beginnen met een minteken verzamelen, en
+          > deze één voor één verwerken. Bekommer je niet om opties die meerdere keren zouden
+          > voorkomen. Voor de argumentenlijst -Ec -rq /etc/passwd -a moet het script dus als
+          > uitvoer E, c, r, q en a produceren.
+
+```bash
+#!/bin/bash
+
+while [[ -n "$1" ]]; do
+	case "$1" in
+		-?*)  while read -N1 kar; do
+					[[ "$kar" != $'\n' && "$kar" != "-"  ]] && echo $kar
+				done <<< "$1"
+				;;
+		[!-]*) echo ongeldige optie >&2
+			   exit 1
+			   ;;
+	esac
+	shift #$1 wordt $2
+done
 ```
 
