@@ -2681,7 +2681,7 @@ printf "%4d %4d %4d %s" $tot_lijnen $tot_woorden $tot_kars $total
      
      ```
 
-     104. > **WAS EEN VRAAG OP HET EXAMEN VORIG JAAR**
+104. > **WAS EEN VRAAG OP HET EXAMEN VORIG JAAR**
           >
           > Ontwikkel een script dat (zonder getopt te gebruiken) alle opties die aan het script
           > worden meegegeven naar standaarduitvoer wegschrijft, één per regel. Je moet dus alle
