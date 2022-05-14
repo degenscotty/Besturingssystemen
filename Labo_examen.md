@@ -1073,7 +1073,7 @@ fork();
    ...
    ```
 
-   3. >Schrijf een C-programma **writestring**.c dat het proces-ID naar het scherm schrijft gevolgd
+3. >Schrijf een C-programma **writestring**.c dat het proces-ID naar het scherm schrijft gevolgd
       >door de string die als enige parameter wordt meegegeven en vervolgens 10 seconden
       >wacht vooraleer te eindigen.
       >
