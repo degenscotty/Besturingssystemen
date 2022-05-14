@@ -1002,6 +1002,294 @@ int main(int argc, char **argv){
 
 ## Deel VI: Processen en POSIX-threads
 
+Een nieuw proces aanmaken gebeurt met de systeemaanroep **fork()**. De systeemaanroep
+maakt een nieuw proces aan, het kind, dat bijna een exacte kopie is van het proces dat de
+systeemaanroep heeft gebruikt, het ouderproces. Na het beëindigen van de systeemaanroep
+beschik je over twee processen, het kind en het ouderproces, die beide de uitvoering
+verderzetten bij het terugkeren van de fork()-systeemaanroep. Beide processen beschikken
+over dezelfde programmatekst maar hebben elk hun eigen kopie van de stapel, de heap, en
+het datasegment. Initieel bevat de stapel, de heap, en het datasegment van het kindproces
+dezelfde informatie als de overeenkomstige segmenten van het ouderproces. Om in een
+programma het onderscheid te kunnen maken tussen het kind en het ouderproces moet je
+weten dat de systeemaanroep fork() twee verschillende return-waardes heeft. In het
+kindproces geeft fork() de waarde 0 terug, terwijl in het ouderproces het proces-ID van het
+nieuwe aangemaakte kindproces wordt teruggegeven.
+
+
+
+**Opdrachten**
+
+1. > Gegeven onderstaande code:
+
+```bash
+int main(int argc, char **argv){
+...
+fork();
+fork();
+fork();
+...
+}
+```
+
+> Voorspel hoeveel kindprocessen er zullen worden aangemaakt zonder de code uit te
+> voeren.
+
+```bash
+...
+```
+
+2. > Schrijf een programma dat drie kindprocessen aanmaakt en zorg ervoor dat ieder
+   > kindproces zijn proces-ID naar het scherm schrijft en daarna stopt. Het proces-ID kan je
+   > m.b.v. de systeemaanroep getpid() opvragen en een proces kan je beëindigen met de
+   > functie exit(int exitstatus). De exitstatus van een correct beëindigd proces is steeds 0
+   > terwijl een waarde verschillend van 0 duidt op een fout.
+
+   > In bovenstaande opdracht kan je nog met een eenvoudige if/else-structuur het onderscheid
+   > maken tussen wat het ouderproces en wat het kindproces moet uitvoeren. Het kindproces
+   > moet immers alleen maar zijn proces-ID naar het scherm schrijven en zichzelf beëindigen.
+   > Wanneer het gaat om meer dan een paar lijnen code, is het interessanter om een nieuw
+   > programma te ontwikkelen, eventueel zelfs in een andere programmeertaal, dat je
+   > onmiddellijk na de fork()-systeemaanroep uitvoert. Hetzelfde geldt wanneer het kindproces
+   > een programma moet uitvoeren dat reeds bestaat en dat dus niet door jou nog moet
+   > worden ontwikkeld. 
+   >
+   > Een nieuw programma uitvoeren gebeurt met de systeemaanroep execve(const char*
+   > filename, char *const argv[], char *const envp[]). Execve zal het tekstsegment, het
+   > datasegment, de stapel en de heap van het huidige proces overschrijven met de gegevens
+   > van het uitvoerbaar bestand filename. Argumenten voor het nieuwe programma worden als
+   > tweede parameter argv opgegeven. Als laatste parameter envp kan je een tabel van strings,
+   > in de vorm van naam-waardeparen, doorgeven aan het nieuwe programma.
+   > Bemerk dat bij de oplijsting van systeemaanroepen met strace execve op de eerste lijn staat.
+   > Concreet wil dit zeggen dat van het shellproces een kopie gemaakt wordt en dat
+   > onmiddellijk daarna het proces wordt overschreven met de inhoud van de opdracht die je op
+   > de opdrachtlijn hebt ingetikt.
+   > Naast het rechtstreeks gebruik van de systeemaanroep execve, bestaan er een aantal
+   > bibliotheek-functies die allemaal na een aantal tussenstappen execve zullen aanroepen. Deze
+   > functies beginnen allemaal met het woord exec gevolgd door één of twee letters. Het
+   > verschil met execve zit hem in het aantal parameters en de manier waarop de argumenten
+   > aan het nieuwe programma worden doorgegeven. Hieronder vind je een overzicht.
+
+   ```BASH
+   ...
+   ```
+
+   3. >Schrijf een C-programma **writestring**.c dat het proces-ID naar het scherm schrijft gevolgd
+      >door de string die als enige parameter wordt meegegeven en vervolgens 10 seconden
+      >wacht vooraleer te eindigen.
+      >
+      >**echo $$** om pid op te vragen van huidige terminal.
+      >
+      >```C
+      >#lnclude <stdio.h> 
+      >#include <unistd.h> 
+      >int main(int argc, char**argv){
+      >    if (argc!=2){ 
+      >        fprintf(stderr,"Usage writestring string\n"); 
+      >        return 1;
+      >    }
+      >	printf("ppid=%d pid=%d argv[1]=%s\n",getppid(),getpid(),argv[1]); 
+      >    sleep(10); //process wissel verplichten
+      >    return 0; 
+      >}
+      >```
+      >
+      >1. Herschrijf nu opdracht 2 waarbij het kindproces de systeemaanroep **execv**
+      >     gebruikt om “writestring hello” uit te voeren.
+      >     Opgelet: In het ouderproces moet je wachten tot wanneer het kindproces klaar is,
+      >     waarna je nog een boodschap naar het scherm schrijft. Dit doe je door gebruik te
+      >     maken van de systeemaanroep waitid of waitpid.
+      >
+      >   ```c
+      >   #include <unistd.h> 
+      >   #include <fcntl.h> 
+      >   #include <sys/wait. h> 
+      >   #include <sys/stat.h> 
+      >   #include <stdio.h> 
+      >   #include <stdlib.h>
+      >   
+      >   
+      >   int main(int argc, char *argv[] {
+      >       int pid=fork();
+      >       if(pid==0){
+      >           char *args[]={"writestring","sfdfdfdfdfd",(char*)0); 
+      >   		if(execv("writestring",args) <0){
+      >               perror("writestring");
+      >               exit(1);
+      >           }
+      >   		return 0; 
+      >       }
+      >       waitpid(pid,NULL,0);
+      >   	return 0; 
+      >   }
+      >   ```
+      >
+      >2.  Idem als deel 1 maar maak nu gebruik van de systeemaanroep **execl**. De laatste
+      >     C-string-parameter moet (char *)0 zijn om het einde van de opsomming aan te
+      >     geven. Bemerk dat gewoon 0 schrijven niet voldoende is en zelfs fout is. Wanneer
+      >     de grootte van een int verschillend is van de grootte van een char *, zal het aantal
+      >     argumenten dat doorgegeven wordt aan execl verkeerd zijn.
+      >
+      >   ```c
+      >   #include <unistd.h> 
+      >   #include <fcntl.h> 
+      >   #include <sys/wait. h> 
+      >   #include <sys/stat.h> 
+      >   #include <stdio.h> 
+      >   #include <stdlib.h>
+      >   
+      >   
+      >   int main(int argc, char *argv[] {
+      >       int pid=fork();
+      >       if(pid==0){
+      >       	if(execl("writestring","writestring","sfdfdfdfdfd",(char*)0)<0){
+      >       	  	perror("writestring");
+      >       	  	exit(1);
+      >       	}
+      >       	return 0; 
+      >       }
+      >       waitpid(pid,NULL,0);
+      >   	return 0; 
+      >   }
+      >   ```
+
+
+
+4. >Schrijf een C++-programma met als naam watchfiled.cc dat alle bestanden in de gaten
+   >houdt die opgesomd zijn in het tekstbestand watchfile.txt. Telkens wanneer een
+   >opgesomd bestand in het tekstbestand wordt gewijzigd, wordt een boodschap naar het
+   >scherm geschreven. Het C++-programma loopt in een oneindige lus die telkens het
+   >bestand watchfile.txt lijn per lijn inleest en nagaat of het bestand dat zich op een
+   >gegeven lijn bevindt reeds in de gaten wordt gehouden. Wanneer dit niet zo is wordt een
+   >kindproces aangemaakt dat watchfile (zie Sectie V, opdracht 7) uitvoert op het “nieuwe”
+   >bestand.
+
+   ```bash
+   #niet te kennen "Dat zijn C++ vragen. Dat ga ik u niet aandoen." ~ Wim
+   ```
+
+5. >Pas watchfiled.cc aan zodat nu ook rekening wordt gehouden met kindprocessen die
+   >beëindigd worden. Een kindproces voert watchfile uit en zal beëindigd worden wanneer
+   >het bestand bv. verwijderd of verplaatst wordt. De bedoeling is ook dat de
+   >bestandsnaam van het verwijderde/verplaatste bestand in watchfile.txt wordt
+   >verwijderd. Controleren of een proces gestopt is, kan met de systeemaanroep waitpid.
+   >Bekijk hoe je waitpid kan gebruiken in non-blocking mode ttz. zonder dat de uitvoering
+   >wordt gepauzeerd.
+   >Wanneer een gebruiker een bestand in watchfile.txt verwijdert zou je eigenlijk het
+   >bijhorend kindproces moeten stoppen. Dit hoef je niet te implementeren.
+
+   ```bash
+   #niet te kennen "Dat zijn C++ vragen. Dat ga ik u niet aandoen." ~ Wim
+   ```
+
+6. >Pas de gegeven code aan zodat het ouderproces het grootste van de gegeneerde
+      >getallen bepaalt en vervolgens ieder kindproces op de hoogte brengt wie de winnaar is,
+      >ttz. welk proces het grootste getal heeft gegenereerd. De uitvoer met zes kindprocessen ziet er als volgt uit:
+      
+      ```
+      Process 1819 is the winner
+      I'm the winner!
+      Process 1819 is the winner
+      Process 1819 is the winner
+      Process 1819 is the winner
+      Process 1819 is the winne
+      ```
+      
+      ```c
+      #include <unistd.h>
+      #include <fcntl.h>
+      #include <sys/wait.h>
+      #include <sys/stat.h>
+      #include <stdio.h>
+      #include <stdlib.h>
+      #include <time.h>
+      
+      #define N 6
+      
+      typedef struct
+      {
+          int pid;
+          int getal;
+          int fd_PC[2];
+          int fd_CP[2];
+      } data;
+      
+      int main(int argc, char *argv[])
+      {
+      
+          data d[N];
+      
+          for (int i = 0; i < N; i++)
+          { // 6 forks
+              if (pipe(d[i].fd_CP) < 0)
+              {
+                  perror(argv[0]);
+                  exit(1);
+              }
+              if (pipe(d[i].fd_PC) < 0)
+              {
+                  perror(argv[0]);
+                  exit(1);
+              }
+              d[i].pid = fork();
+              if (d[i].pid == 0)
+              {
+                  close(d[i].fd_CP[0]); // file descriptor sluiten die niet meer gebruikt wordt.
+                  close(d[i].fd_PC[1]);
+                  srand(getpid());
+                  int getal = rand();
+                  printf("Child send %d to parent\n", getal);
+                  write(d[i].fd_CP[1], &getal, sizeof(int)); // deblokkeert Parent
+                  close(d[i].fd_CP[1]);
+                  read(d[i].fd_PC[0], &getal, sizeof(int)); // blokkeert Child
+                  close(d[i].fd_PC[0]);
+                  //printf("Child received %d from parent\n", getal);
+                  if (getal == getpid())
+                  {
+                      printf("Im the winner \n");
+                  }
+                  else
+                  {
+                      printf("Process %d is the winner \n", getal);
+                  }
+                  return 0;
+              }
+              close(d[i].fd_CP[1]);
+              close(d[i].fd_PC[0]);
+          }
+      
+          for (int i = 0; i < N; i++)
+          {                                                  // 6 forks
+              read(d[i].fd_CP[0], &d[i].getal, sizeof(int)); // blokkeert Parent
+              close(d[i].fd_CP[0]);
+             //printf("Parent received %d from child %d \n", d[i].getal, d[i].pid);
+          }
+      
+          int index = 0;
+          for (int i = 0; i < N; i++)
+          {
+              if (d[i].getal > d[index].getal) // grootste zoeken
+              {
+                  index = i;
+              }
+          }
+      
+          for (int i = 0; i < N; i++)
+          {
+              //printf("Parent send %d from child %d \n", index, d[i].pid);
+              write(d[i].fd_PC[1], &d[i].pid, sizeof(int)); // deblokkeert Child
+              close(d[i].fd_PC[1]);
+          }
+      
+          for (int i = 0; i < N; i++)
+          {
+              waitpid(d[i].pid, NULL, 0); // vanaf er een fork() is, is er een waitpid nodig.
+          }
+          return 0;
+      }
+      ```
+      
+      
+
 ## Deel VII: Programmeren in Bash
 
 ### Patterns, expansions en het opzoeken van hulp
