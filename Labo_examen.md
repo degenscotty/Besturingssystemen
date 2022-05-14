@@ -18,8 +18,10 @@
 > - Labo 4: **Deel 7**: Uitleg Regex + vraag 42-54
 > - Labo 5: **Deel 7**: Shellvariabelen, Shellscripting & Arithmetic expansion
 > - Labo 6: **Deel 7**: Argumenten van een script/functie, positionele parameters en speciale parameters, Parameter expansion & Arrays
-> - Labo 7: **Deel 7**: Structuren: if, While & for
-> - Labo 8: **Deel7**: De for-lus: 100, 101, 103, 104
+> - Labo 7: **Deel 7**: Structuren: if & While
+> - Labo 8: **Deel 7**: De for-lus: 100, 101, 103, 104
+> - Labo 9: **Deel 5**: uitleg nmap + oef 5 **cat**, oef 6 **cp** & oef 7 **watchfile.**
+> - Labo 10: **Deel 6:** Deel VI: Processen en POSIX-threads
 
 
 
@@ -696,24 +698,68 @@ int main()
 ```
 
 5. >Bestudeer gronding de werking van de shell-opdracht cat en schrijf in C een eigen versie
-   >van cat. Bekijk bv. wat er gebeurt wanneer je de opdracht “cat /etc/passwd - /etc”
+   >van **cat**. Bekijk bv. wat er gebeurt wanneer je de opdracht “cat /etc/passwd - /etc”
    >opgeeft of wanneer cat geen argumenten meekrijgt. Wanneer je een directory opgeeft
    >als argument, geeft cat een foutmelding. Dit gedrag hoef je niet na te bootsen.
 
 ```c	
-#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h> 
+#include <sys/stats.h> 
+#include <stdio.h> 
 #include <stdlib.h>
-#include <pthread.h>
+#include <sys/mman.h>
 #include <string.h>
 
-int main()
-{
-    #todo
-    return 0;
+int main(int argc, char ** argv){ 
+    unsigned char buffer[BUFSIZ];
+ 
+    if (argc==1){ 
+     	int n = read(0,buffer,BUFSIZ); //lezen standaard invoer
+        while(n>0){
+            write(1,buffer,n);
+            n=read(0,buffer,BUFSIZ);
+        }     
+        if(n<0){
+            perror(argv[0]);
+            exit(1); 
+        }
+    }
+    else{
+        
+        for(i=1;i<argc;i++){
+            
+            int fd=open(argv[i],O_RDONLY); 	// bestand Read-only openen
+				if (fd<0){ 					// controleren of bestand is geopend.
+					perror(argv[i]);
+					continue;
+				}
+				int n=read(fd,buffer,BUFSIZ);
+				while (n>0){ //buffer van geopende bestand uitschrijven en het volgende deel ervan inlezen naar de buffer
+					n=write(1,buffer,n);
+					if (n<0){
+						perror(argv[i]);
+						continue;
+					}
+					n=read(fd,buffer,BUFSIZ);
+				}
+				if (n<0){
+					perror(argv[i]);
+					continue;
+				}
+			
+				if (close(fd)<0){
+					perror(argv[i]);
+					continue;
+				}
+        }
+    }
+   return 0; 
 }
 ```
 
-6. >Schrijf een eigen versie van de opdracht cp waar twee argumenten op de opdrachtlijn
+6. >Schrijf een eigen versie van de opdracht **cp** waar twee argumenten op de opdrachtlijn
    >worden verwacht. Het eerste argument is het bronbestand en het tweede het
    >doelbestand. Wanneer de eerste parameter een directory is, wordt een foutboodschap
    >naar het scherm geschreven en stopt het programma met exit-status 1. Wanneer het
@@ -723,20 +769,165 @@ int main()
    >gebruik van de bibliotheekfunctie exit die dan achter de schermen de systeemaanroep
    >_exit aanroept.
 
-   ```c	
+   
+   
+   **Read/Write Oplossing:**
+   
+   ```bash
+   #include <unistd.h>
+   #include <fcntl.h>
+   #include <sys/types.h>
+   #include <sys/stat.h>
    #include <stdio.h>
    #include <stdlib.h>
-   #include <pthread.h>
-   #include <string.h>
    
-   int main()
-   {
-       #todo
-       return 0;
+   typedef struct stat sstat;
+   
+   int main(int argc, char ** argv){
+   	if (argc!=3){
+   		fprintf(stderr,"Gelieve twee argumenten op te geven\n");
+   		exit(1);
+   	}
+   	
+   	int fd_in, fd_out;
+   
+   	fd_in=open(argv[1],O_RDONLY);
+   	if (fd_in<0){
+   		perror(argv[1]);
+   		exit(1);
+   	}
+   	
+   	sstat s;
+   
+   	if (fstat(fd_in,&s)<0){
+   		perror(argv[1]);
+   		exit(1);
+   	}
+   	
+   	fd_out=open(argv[2],O_WRONLY | O_CREAT, s.st_mode);
+   	if (fd_out<0){
+   		perror(argv[2]);
+   		if (close(fd_in)<0){
+   			perror(argv[1]);
+   		}
+   		exit(1);
+   	}
+   	unsigned char buffer[BUFSIZ];
+   	int bytesread=read(fd_in,buffer,BUFSIZ);
+   	int byteswritten;
+   	
+   	while (bytesread>0){
+   		byteswritten=write(fd_out,buffer,bytesread);
+   		bytesread=read(fd_in,buffer,BUFSIZ);
+   	}
+   	if (bytesread<0){
+   		perror(argv[1]);
+   		if (close(fd_in)<0 || close(fd_out)<0){
+   			perror(argv[1]);
+   		}
+   		exit(1);
+   	}
+   	
+   	if (byteswritten<0){
+   		perror(argv[2]);
+   		if (close(fd_in)<0 || close(fd_out)<0){
+   			perror(argv[1]);
+   		}
+   		exit(1);
+   	}
+   
+   	if (close(fd_in)<0){
+   		perror(argv[1]);
+   		if (close(fd_out)<0){
+   			perror(argv[2]);
+   		}
+   		exit(1);
+   	}
+   
+   	if (close(fd_out)<0){
+   		perror(argv[2]);
+   		exit(1);
+   	}
+   
+   	return 0;
    }
    ```
-
-7. Schrijf een C-programma met als naam watchfile.c dat één argument, een bestand, op de
+   
+   
+   
+   **Memory Mapping (mmap) Oplossing:**
+   
+   ```c	
+   #include <unistd.h>
+   #include <fcntl.h>
+   #include <sys/types.h> 
+   #include <sys/stats.h> 
+   #include <stdio.h> 
+   #include <stdlib.h>
+   #include <sys/mman.h>
+   #include <string.h>
+   
+   int main(int argc, char ** argv){ 
+       if (argc!=3){ 
+           char fout[]="Geen twee bestanden opgegeven!\n"; 
+           write(2,fout,strlen(fout)); 
+           exit(1); 
+       }
+   	
+       int fd_in=open(argv[1],O_RDONLY); //file descriptor eerste bestand
+      
+       if (fd_in<0){
+           perror(argv[1]); 
+           exit(1); 
+       }     
+      struct stat s; 
+     
+       if (fstat(fd_in,&s)<0){ 
+          perror(argv[1]);
+          exit(1); 
+      }
+       
+      int fd_out=open(argv[2],O_WRONLY|O_CREAT,s.st_mode);	//file descriptor voor het bestand waar naar geschreven moet worden
+       												   	//file_name, write only, mode/permissies als bestand niet bestaat
+       
+     
+       if(fd_out<0){
+            perror(argv[2]);
+            exit(1); 
+       }
+       
+       unsigned char * in=mmap(NULL,s.st_size,PROT_READ ,MAP_PRIVATE,fd_in,0); //s.st_size= grootte i/o bestand
+       unsigned char * out=mmap(NULL,s.st_size,PROT_READ | PROT_WRITE, MAP_PRIVATE,fd_in,0);
+       
+      if(in == MAP_FAILED || out == MAP_FAILED){
+          perror(argv[0]);
+          exit(1); 
+      }
+       
+      if(close(fd_in)<0){ //file descriptors mogen gesloten worden na memory mapping (mmap)
+          perror(argv[1]);
+          exit(1);
+      }
+       
+      if(close(fd_out)<0){ //file descriptors mogen gesloten worden na memory mapping (mmap)
+          perror(argv[1]);
+          exit(1);
+      }
+          
+      int i; 
+      for(i=0;i<s.st_size;i++)
+      { 
+          out[i] = in[i];
+      } 
+      munmap(in,s.st_size);
+      munmap(out,s.st_size);
+       
+      return 0;
+       
+   }
+   ```
+   
+7. Schrijf een C-programma met als naam **watchfile**.c dat één argument, een bestand, op de
    opdrachtlijn verwacht. Het programma loopt in een oneindige lus en schrijft telkens een
    boodschap naar het scherm wanneer het bestand dat op de opdrachtlijn werd
    meegegeven werd gewijzigd. Wanneer er geen argument werd opgegeven of het
@@ -744,14 +935,63 @@ int main()
    programma afgesloten met exit-status 1.
 
 ```c	
-#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <stdio.h>
+#include <time.h>
 #include <string.h>
 
-int main()
-{
-    #todo
+int main(int argc, char **argv){
+	if (argc!=2) // controle op juiste usage (juiste aantal argumenten)
+    { 
+		char str[] = "Usage: watchfile <filename>";
+        write(2, str, strlen(str));
+        exit(1);
+    }
+
+    int fd=open(argv[1], O_RDONLY); // controle of bestand geopend kan worden
+    if (fd<0)
+    {
+        perror(argv[1]);
+        exit(1);
+    }
+
+    struct stat s; 
+
+    if(stat(fd,&s)<0)  //stat informatie controleren
+    {
+        perror(argv[1]);
+        exit(1);
+    }
+
+    if (! S_ISREG(s.st_mode) ) //S_ISREG is een macro om te testen of het een "regular" bestand is en bv geen directory.
+    {
+        char str[] = "Error: Meegegeven argument is geen bestand";
+        write(2, str, strlen(str));
+        exit(1);
+    }
+
+    int check = s.st_mtimespec.tv_sec; //modification tijd
+    while (1)
+    {
+        if(fstat(fd,&s)<0) 
+        {
+            perror(argv[1]);
+            exit(1);
+        }
+        int time=s.st_mtimespec.tv_sec; 
+        if (time!=check) //checken of modification tijd is veranderd
+        {
+            char str[] = "File changed!";
+            write(1, str, strlen(str));
+            check=time;
+        }   
+        sleep(1);
+    }
+    
     return 0;
 }
 ```
