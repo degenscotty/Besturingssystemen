@@ -176,7 +176,7 @@ man 2 read #2 duidt op System Calls
 
    ```bash 
    ls -l #extra info zoals rechten en aanmaakdatum
-   ls -h #toont hidden files
+   ls -h #-h gaat in combinatie met -l de grootte van het bestand weergeven in kilobytes, megabytes, gigabytes...
    ```
 
 6. > Bekijk met “ls /” de inhoud van de hoofddirectory.

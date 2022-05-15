@@ -16,6 +16,8 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op *elke
 
 2. > Wat moet je voorzien om op een Unix-systeem Windows applicaties te kunnen uitvoeren?
 
+   
+
 3. > Bespreek hoe je op Windows een Unix-applicatie kan uitvoeren? Wat wordt in deze context bedoeld
    > met een subsysteem?
 
