@@ -20,8 +20,9 @@
 > - Labo 6: **Deel 7**: Argumenten van een script/functie, positionele parameters en speciale parameters, Parameter expansion & Arrays
 > - Labo 7: **Deel 7**: Structuren: if & While
 > - Labo 8: **Deel 7**: De for-lus: 100, 101, 103, 104
-> - Labo 9: **Deel 5**: uitleg nmap + oef 5 **cat**, oef 6 **cp** & oef 7 **watchfile.**
-> - Labo 10: **Deel 6:** Deel VI: Processen en POSIX-threads
+> - Labo 9: **Deel 5**: Uitleg nmap + oef 5 **cat**, oef 6 **cp** & oef 7 **watchfile.**
+> - Labo 10: **Deel 6:** Processen en POSIX-threads
+> - Labo 11: **Deel 6**: Shared memory & threads (oef **6b** & **6c**)
 
 
 
@@ -218,7 +219,7 @@ man 2 read #2 duidt op System Calls
    >“cd /tmp” uit en keer daarna terug naar je home-directory.
 
    ```bash
-   [root@localhost tmp]# cd`
+   [root@localhost tmp]# cd
    [root@localhost ~]#
    ```
 
@@ -1185,13 +1186,17 @@ fork();
       >getallen bepaalt en vervolgens ieder kindproces op de hoogte brengt wie de winnaar is,
       >ttz. welk proces het grootste getal heeft gegenereerd. De uitvoer met zes kindprocessen ziet er als volgt uit:
       
+      (**Labo 11 minuut 30: Examenvraag vorige jaren**)
+      
+      
+      
       ```
       Process 1819 is the winner
       I'm the winner!
       Process 1819 is the winner
       Process 1819 is the winner
       Process 1819 is the winner
-      Process 1819 is the winne
+      Process 1819 is the winner
       ```
       
       ```c
@@ -1285,6 +1290,372 @@ fork();
               waitpid(d[i].pid, NULL, 0); // vanaf er een fork() is, is er een waitpid nodig.
           }
           return 0;
+      }
+      ```
+      
+      
+      
+      **3 versies: 1 met veel semaforen, 1 met een tabel van datastructuren ipv datastructuur van tabellen & 1 met 2 semafore ipv n * 2 semaforen.**
+      
+      
+      
+      **6a**
+      
+      ```c
+      #include <sys/mman.h>
+      #include <unistd.h>
+      #include <stdio.h>
+      #include <pthread.h>
+      #include <semaphore.h>
+      #include <sys/types.h>
+      #include <fcntl.h>
+      #include <string.h>
+      #include <sys/wait.h>
+      #include <sys/stat.h>
+      #include <stdlib.h>
+      
+      #define N 1000
+      
+      typedef struct {
+      	int pids[N];
+      	int numbers[N];
+      	int winner;
+      	sem_t sem_PC[N];
+      	sem_t sem_CP[N];
+      } data;
+      
+      int main(int argc, char **argv){
+      	data * d=mmap(NULL,sizeof(data),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
+      	if (d==MAP_FAILED){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      	for(int i=0;i<N;i++){
+      		sem_init(&(d->sem_PC[i]),1,0);
+      		sem_init(&(d->sem_CP[i]),1,0);
+      		int pid=fork();
+      		if (pid==0){
+      			//CHILD
+      			srand(getpid());
+      			d->numbers[i]=rand();
+      			sem_post(&(d->sem_CP[i]));
+      			sem_wait(&(d->sem_PC[i]));
+      			if (d->winner==getpid()){
+      				printf("I'm the winner...\n");
+      			}
+      			else {
+      				printf("Process %d is the winner\n",d->winner);
+      			}
+      			return 0;
+      		}
+      		d->pids[i]=pid;
+      	}
+      
+      	for(int i=0;i<N;i++){
+      		sem_wait(&(d->sem_CP[i]));
+      	}
+      
+      	int index=0;
+      	for(int i=1;i<N;i++){
+      		if (d->numbers[i]>d->numbers[index])
+      			index=i;
+      	}
+      	
+      	d->winner=d->pids[index];
+      
+      	for(int i=0;i<N;i++){
+      		sem_post(&(d->sem_PC[i]));
+      	}
+      
+      
+      
+      	for(int i=0;i<N;i++){
+      		waitpid(d->pids[i],NULL,0);
+      	}
+      	
+      	for(int i=0;i<N;i++){
+      		sem_destroy(&(d->sem_CP[i]));
+      		sem_destroy(&(d->sem_PC[i]));
+      	}
+      
+      	if (munmap(d,sizeof(data))<0){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      }
+      ```
+      
+      
+      
+      
+      
+      
+      
+      **6b**
+      
+      ```C
+      #include <unistd.h>
+      #include <fcntl.h>
+      #include <sys/mman.h>
+      #include <sys/stat.h>
+      #include <sys/wait.h>
+      #include <stdio.h>
+      #include <stdlib.h>
+      #include <string.h>
+      #include <pthread.h>
+      #include <semaphore.h>
+      
+      #define N 6
+      
+      typedef struct {
+      	int numbers;
+      	int winner;
+      	sem_t sem_PC;
+      	sem_t sem_CP;	
+      } data;
+      
+      int main(int argc, char **argv){
+      	
+      	data* d=mmap(NULL,sizeof(data)*N,PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
+      	int pids[N];
+      	if (d==MAP_FAILED){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      	
+      	for(int i=0;i<N;i++){
+      		sem_init(&(d[i].sem_PC),1,0);
+      		sem_init(&(d[i].sem_CP),1,0);
+      		pids[i]=fork();
+      		if (pids[i]==0){
+      			//CHILD
+      			srand(getpid());
+      			d[i].numbers=rand();
+      			sem_post(&(d[i].sem_CP));
+      			sem_wait(&(d[i].sem_PC));
+      			if (d[i].winner==getpid()){
+      				printf("I'm the winner\n");
+      			}
+      			else {
+      				printf("Proces %d is the winner\n",d[i].winner);
+      			}	
+      			return 0;
+      		}
+      	}
+      	for(int i=0;i<N;i++){
+      		sem_wait(&(d[i].sem_CP));
+      	}
+      	for(int i=0;i<N;i++){
+      		printf("Child %d produced %d \n",pids[i],d[i].numbers);
+      	}
+      	int index=0;
+      	for(int i=0;i<N;i++){
+      		if (d[i].numbers>d[index].numbers) 
+      			index=i;
+      	}
+      
+      	for(int i=0;i<N;i++){
+      		d[i].winner=pids[index];
+      		sem_post(&(d[i].sem_PC));
+      	}
+      
+      	for(int i=0;i<N;i++){
+      		waitpid(pids[i],NULL,0);
+      	}
+      	for(int i=0;i<N;i++){
+      		sem_destroy(&(d[i].sem_PC));
+      		sem_destroy(&(d[i].sem_CP));
+      	}
+      
+      	if (munmap(d,sizeof(data)*N)<0){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      	return 0;
+      }	
+      	
+      ```
+      
+      **6c**
+      
+      ```bash
+      #include <sys/mman.h>
+      #include <unistd.h>
+      #include <stdio.h>
+      #include <pthread.h>
+      #include <semaphore.h>
+      #include <sys/types.h>
+      #include <fcntl.h>
+      #include <string.h>
+      #include <sys/wait.h>
+      #include <sys/stat.h>
+      #include <stdlib.h>
+      
+      #define N 10
+      
+      typedef struct {
+      	int pids[N];
+      	int numbers[N];
+      	int winner;
+      	sem_t sem_PC;
+      	sem_t sem_CP;
+      } data;
+      
+      int main(int argc, char **argv){
+      	data * d=mmap(NULL,sizeof(data),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
+      	if (d==MAP_FAILED){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      	sem_init(&(d->sem_CP),1,0);
+      	sem_init(&(d->sem_PC),1,0);
+      	for(int i=0;i<N;i++){
+      		int pid=fork();
+      		if (pid==0){
+      			//CHILD
+      			srand(getpid());
+      			d->numbers[i]=rand();
+      			sem_post(&(d->sem_CP));
+      			sem_wait(&(d->sem_PC));
+      			if (d->winner==getpid()){
+      				printf("I'm the winner...\n");
+      			}
+      			else {
+      				printf("Process %d is the winner\n",d->winner);
+      			}
+      			return 0;
+      		}
+      		d->pids[i]=pid;
+      	}
+      	int v;
+      	sem_getvalue(&(d->sem_CP),&v);
+      	while(v!=N){
+      		sem_getvalue(&(d->sem_CP),&v);
+      	}
+      
+      	int index=0;
+      	for(int i=1;i<N;i++){
+      		if (d->numbers[i]>d->numbers[index])
+      			index=i;
+      	}
+      	
+      	d->winner=d->pids[index];
+      
+      	for(int i=0;i<N;i++){
+      		sem_post(&(d->sem_PC));
+      	}
+      
+      
+      
+      	for(int i=0;i<N;i++){
+      		waitpid(d->pids[i],NULL,0);
+      	}
+      	
+      	for(int i=0;i<N;i++){
+      		sem_destroy(&(d->sem_CP));
+      		sem_destroy(&(d->sem_PC));
+      	}
+      
+      	if (munmap(d,sizeof(data))<0){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      }
+      ```
+      
+      **6d**
+      
+      ```C
+      #include <unistd.h>
+      #include <sys/wait.h>
+      #include <sys/stat.h>
+      #include <fcntl.h>
+      #include <stdio.h>
+      #include <stdlib.h>
+      #include <string.h>
+      #include <time.h>
+      #include <sys/mman.h>
+      #include <semaphore.h>
+      #include <pthread.h>
+      
+      #define N 6
+      
+      typedef struct {
+      	int number;
+      	sem_t sem_CP;
+      	int winner;
+      } data ;
+      
+      int main (int argc, char **argv){
+      	int pids[N];
+      	data * d=mmap(NULL,sizeof(data)*N,PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
+      	
+      
+      	if (d==MAP_FAILED){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      	sem_t *sem_PC=mmap(NULL,sizeof(sem_t),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
+      	
+      	if (sem_PC==MAP_FAILED){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      	sem_init(sem_PC,1,0);
+      	
+      	for(int i=0;i<N;i++){
+      		sem_init(&d[i].sem_CP,1,0);
+      		pids[i]=fork();
+      
+      		if (pids[i]==0){
+      			srand(getpid());
+      			d[i].number=rand();
+      			printf("Process %d generated %d\n",getpid(),d[i].number);
+      			sem_post(&d[i].sem_CP);
+      			sem_wait(sem_PC);
+      			if (getpid()==d[i].winner){
+      				printf("I'm the winner\n");
+      			}
+      			else {
+      				printf("Process %d is the winner\n",d[i].winner);
+      			}
+      			return 0;
+      		}
+      	}
+      	for(int i=0;i<N;i++){
+      		sem_wait(&d[i].sem_CP);
+      	}
+      	int index=0;
+      	for (int i=0;i<N;i++){
+      		if (d[i].number>d[index].number) 
+      			index=i;
+      	}	
+      	
+      	for(int i=0;i<N;i++){
+      		d[i].winner=pids[index];
+      	}
+      	
+      	for(int i=0;i<N;i++){
+      		sem_post(sem_PC);
+      	}
+      
+      	for(int i=0;i<N;i++){
+      		//printf("waiting for process %d to finish\n",pids[i]);
+      		waitpid(pids[i],NULL,0);
+      	}
+      	
+      	for(int i=0;i<N;i++){
+      		sem_destroy(&d[i].sem_CP);
+      	}
+      	sem_destroy(sem_PC);
+      	
+      	if (munmap(d,sizeof(data)*N)<0){
+      		perror(argv[0]);
+      		exit(1);
+      	}
+      
+      
+      	return 0;
       }
       ```
       
@@ -1941,8 +2312,59 @@ cut -d : -f 1 /etc/passwd
     >door het toevoegen van aangepaste opties. Leer de goede opties op te zoeken in de man-
     >pages. Het commando genereert dikwijls veel foutmeldingen, die je bij voorkeur omleidt.
 
-```bash
-...
+```c
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+    /* 1. alle bestanden openen en de fildescriptor bijhouden in een array */
+
+    int *fds = malloc(sizeof(int) * (argc - 1));
+    int teller = 0;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-") == 0) {
+            fds[teller++] = 1;
+            continue;
+        }
+        fds[teller] = open(argv[i], O_WRONLY | O_CREAT); // bestanden aanmaken indien ze niet bestaan
+        if (fds[teller] < 0) {
+            perror(argv[i]);
+            continue;
+        }
+        teller++;
+    }
+    fds[teller++] = 1; //stdin naar stdout schrijven
+
+    /* 2. inlezen van stdin en wegschrijven naar elke uitvoer filedescriptor */
+
+    char buffer[BUFSIZ];
+
+    int n = read(0, buffer, BUFSIZ);
+    while (n != 0) {
+        for (int i = 0; i < teller; i++) {
+            write(fds[i], buffer, n);
+        }
+        n = read(0, buffer, BUFSIZ);
+    }
+    if (n < 0) {
+        perror(argv[0]);
+    }
+
+    /* alle bestanden sluiten */
+    for (int i = 0; i < teller; i++) {
+        if (fds[i] == 1) {
+            continue;
+        }
+        if (close(fds[i]) < 0) {
+            perror(argv[i]);
+        }
+    }
+    free(fds);
+    return 0;
+}
 ```
 
 48. > Zoek naar alle bestanden in de /etc directory tree waarvan de naam begint met pass.
@@ -3233,5 +3655,13 @@ while [[ -n "$1" ]]; do
 	esac
 	shift #$1 wordt $2
 done
+```
+
+
+
+**handige functies**
+
+```c
+int dimension = atoi(argv[1]); //( = Asci To Integer) zet string om naar int
 ```
 
