@@ -918,8 +918,12 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 52. >Bespreek de stappen die moeten ondernomen worden wanneer bij adresvertaling wordt vastgesteld
     >dat een deel van het proces zich niet in het geheugen bevindt? (p121)
-
-**![img](https://lh3.googleusercontent.com/2TyS2YEi7Nwc2_xD1leDHuu1rhUQh_S9fosPDJhN8TOsD71E_Nkg6SqfiEG7M3kcCyV0bENQuemGLnreAjEq5HFWADVxT3D2koFyeMRj59IZ8W9TqVNrbYiqvLpC1tpAcaDHI2thYZbAquOfqA)**
+    
+    Tot nu toe hebben we verondersteld dat het gehele proces in het hoofdgeheugen moet geladen en uitgevoerd worden. Gebruik makend van partitionering of segmentatie kan deze eis versoepeld worden. De uitvoering van een proces kan tijdelijk worden verder gezet indien de pagina's (of segmenten) met de volgende op te vragen instructies en gegevenslocaties zich in het hoofdgeheugen bevinden, ook al zijn andere pagina's of segmenten van het procesbeeld niet aanwezig. Dit concept noemt men **virtueel geheugen.**
+    
+    Het deel van een proces dat zich op een bepaald moment werkelijk in het hoofdgeheugen (dat nu reeël geheugen wordt genoemd) bevindt , wordt de **residente set** van het proces genoemd.
+    
+    Het gebruik van virtueel geheugen zorgt voor **overhead**. Telkens naar een **logisch adres** gerefereerd wordt dat **zich niet in het hoofdgeheugen bevindt,** moet niet alleen het OS tweemaal (na de paginafout, en na de interrupt (zie hieronder)) de controle overnemen , maar moet eveneens een ander stuk uitgestapt worden.
 
 **(nummers verwijzen naar nummers uit de figuur)**
 
@@ -932,8 +936,10 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 
 
+**![img](https://lh3.googleusercontent.com/2TyS2YEi7Nwc2_xD1leDHuu1rhUQh_S9fosPDJhN8TOsD71E_Nkg6SqfiEG7M3kcCyV0bENQuemGLnreAjEq5HFWADVxT3D2koFyeMRj59IZ8W9TqVNrbYiqvLpC1tpAcaDHI2thYZbAquOfqA)**
+
 53. >Wat zijn de drie voordelen van het gebruik van virtueel geheugen? Wat is het nadeel van het gebruik
-    >van virtueel geheugen?
+    >van virtueel geheugen? (p122)
 
 **Voordelen:**
 
@@ -947,8 +953,8 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 54. >Welke twee parameters moet het besturingssysteem in de gaten houden om te zien of er bij het
     >gebruik van virtueel geheugen te veel dan wel te weinig paginafouten optreden? Wat wordt er
-    >bedoeld met “**thrashing**”? **Hoe** kan het besturingssysteem oordeelkundig **inschatten** welke pagina’s
-    >in de toekomst nodig zullen zijn en welke niet?
+    >bedoeld met “**thrashing**”?  **Hoe** kan het besturingssysteem oordeelkundig **inschatten** welke pagina’s
+    >in de toekomst nodig zullen zijn en welke niet? (p122)
 
 - gemiddelde tijd tussen 2 paginafouten **(L)**
 - gemiddelde tijd die nodig is om pagina te vervangen **(S)**
