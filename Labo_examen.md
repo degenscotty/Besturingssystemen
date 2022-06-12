@@ -29,7 +29,7 @@
 ## Deel I: Inleiding
 
 Lokaal inloggen op een Linux toestel kan op twee manieren gebeuren. Je kan inloggen op de
-grafische console of je kan inloggen op een van de vijf a zes tekstuele consoles. Veranderen
+**grafische console** of je kan inloggen op een van de vijf a zes **tekstuele consoles**. Veranderen
 van console kan via de toetsencombinaties CTRL-ALT-F1, CTRL-ALT-F2, ... , CTRL-ALT-F7.
 Wanneer je Linux draait m.b.v. VirtualBox, dan moet je mogelijks gebruikmaken van de
 toetsencombinaties HOSTKEY-F1, HOSTKEY-F2, ..., HOSTKEY-F7 waarbij de HOSTKEY
@@ -71,6 +71,20 @@ ctrl+Z
 
 3. > Wanneer een programma vraagt om gegevens in te typen, met welke
    > toetsencombinatie kan je dan aangeven dat de invoer stopt.
+   >
+   > Je kan vraag 1 en vraag 3 het best uitproberen m.b.v. het commando “**cat**”. Deze
+   > opdracht kopieert alle invoer van het toetsenbord (**standaard invoer**) naar het
+   > scherm (**standaard uitvoer)**.
+   > Probeer dit nu ook uit met de opdracht “**mail root@localhost**”. Hier zal eerst
+   > gevraagd worden om het **onderwerp** van het bericht in te geven, gevolgd door
+   > het **bericht** zelf. Wanneer je het einde van de invoer aangeeft, zal een mail
+   > verstuurd worden naar de gebruiker root op het lokale toestel. De gebruiker root
+   > kan zijn mail lezen door de opdracht **mail** uit te voeren zonder parameters.
+   > Hierdoor kom je terecht in een interactieve omgeving waar je een overzicht krijgt
+   > van alle berichten. Bij het intikken van een nummer dat naast een bericht staat,
+   > kan je de mail lezen. Het bericht **verwijderen** kan door het ingeven van de letter **d**
+   > gevolgd door het **berichtnummer**. De interactieve omgeving verlaten kan door
+   > het ingeven van de letter **q**.
 
 ```bash 
 ctrl+D
@@ -84,18 +98,18 @@ ctrl+W
 ```
 
 5. > In een shell kan je aan “**auto completion**” doen door gebruik te maken van de
-   > tab-toets. Tik de letters “les” in, en tik vervolgens op de tab-toets. Je merkt dat er
+   > **tab-toets**. Tik de letters “les” in, en tik vervolgens op de tab-toets. Je merkt dat er
    > automatisch less verschijnt. Nu kan het zijn dat er nog opdrachten zijn die met
    > less beginnen. Tik nogmaals op de tab-toets om te kijken welke opdrachten er
-   > met less beginnen. Een ander handigheidje is “reverse search” om eerder
-   > ingetypte commando’s te suggereren tijdens het typen. Gebruik hiervoor
-   > “CTRL+r”.
+   > met less beginnen. Een ander handigheidje is “**reverse search**” om **eerder**
+   > **ingetypte commando’s te suggereren** tijdens het typen. Gebruik hiervoor
+   > “**CTRL+r**”.
 
 ...
 
-6. >Linux telt enkele duizenden opdrachten met elk nog een variabel aantal opties. De opdracht zelf wordt doorgaans beperkt tot enkele letters die de afkorting vormen van een woord dat de functie van de opdracht deels omschrijft. Zo staat het commando “**ls**” voor “list”, “**mkdir**” voor “make directory”, het commando “**wc**” voor “word count”, het commando “**cc**” voor “C-compiler”, het commando “**dd**“ voor “convert and copy”. Bij het laatste voorbeeld is er een conflict omdat de afkorting cc reeds gebruikt wordt voor de C-compiler. Als oplossing heeft men de volgende letter van het alfabet gebruikt.
+6. >Linux telt enkele duizenden opdrachten met elk nog een variabel aantal opties. De opdracht zelf wordt doorgaans beperkt tot enkele letters die de afkorting vormen van een woord dat de functie van de opdracht deels omschrijft. Zo staat het commando “**ls**” voor “list”, “**mkdir**” voor “make directory”, het commando “**wc**” voor “word count”, het commando “**cc**” voor “C-compiler”, het commando “**dd**“ voor “convert and copy”. Bij het laatste voorbeeld is er een conflict omdat de afkorting cc reeds gebruikt wordt voor de C-compiler. Als **oplossing** heeft men de **volgende letter van het alfabet** gebruikt.
    >
-   > “Auto completion” voor commando’s werd reeds in het vorige punt naar voor gebracht maar geldt ook voor de bijhorende opties. Geef op de commandolijn het commando “**ls** -“ in en gebruik vervolgens de tab-toets. Je merkt dat er een pak opties verschijnen die voorafgegaan worden door twee mintekens. Onder Linux kan je veelal opties op de commandolijn meegeven in twee formaten. Het korte formaat bestaat uit één letter en wordt voorafgegaan door één minteken. Dezelfde optie kan je ook meegeven d.m.v. het lange formaat. In dat geval zal de optie voorafgegaan worden door twee opeenvolgende mintekens. Wanneer je de keuze hebt tussen de twee formaten zal je merken dat de korte variant de voorkeur geniet. 
+   > “Auto completion” voor commando’s werd reeds in het vorige punt naar voor gebracht maar geldt ook voor de bijhorende opties. Geef op de commandolijn het commando “**ls** -“ in en gebruik vervolgens de tab-toets. Je merkt dat er een pak opties verschijnen die voorafgegaan worden door twee mintekens. Onder Linux kan je veelal opties op de commandolijn meegeven in **twee formaten**. Het **korte** formaat bestaat uit **één letter** en wordt voorafgegaan door **één minteken**. Dezelfde optie kan je ook meegeven d.m.v. het lange formaat. In dat geval zal de optie voorafgegaan worden door **twee opeenvolgende mintekens**. Wanneer je de keuze hebt tussen de twee formaten zal je merken dat de korte variant de voorkeur geniet. 
    >
    >Zo kan het commando “**wc --words --lines /etc/passwd**” ook geschreven worden als “**wc -w -l /etc/passwd**” en zelfs als “**wc -wl /etc/passwd**”. De opdracht toont het aantal lijnen en het aantal woorden uit het bestand /etc/passwd.
 
@@ -107,23 +121,24 @@ ctrl+W
    > achterhalen. Zo zal de opdracht “**man ls**” de info tonen van de ls-opdracht.
    > Man toont de informatie a.d.h.v. een pager, een programma dat de informatie
    > niet alleen op het scherm toont maar dat ook gebruikersinteractie toelaat. Zo kan
-   > je scrollen, zoeken naar bepaalde woorden, etc. Standaard is de pager ingesteld
+   > je scrollen, zoeken naar bepaalde woorden, etc. Standaard is de **pager** ingesteld
    > op het commando **less**. Dit betekent dat wanneer je wil weten hoe je voorwaarts
    > moet zoeken in een manpagina, je dit moet gaan zoeken bij het commando **less**
-   > en niet bij het commando man. Vraag de manpagina op van het commando **less**
+   > en **niet** bij het commando **man**. Vraag de manpagina op van het commando **less**
    > en ga na hoe je een tekst die met less wordt getoond kan afsluiten. Hoe kan je
    > voorwaarts zoeken in een manpagina?
 
 Je kan zoeken naar een bepaalde term door deze als volgt mee te geven: /term. 
 
 ```bash	
-man ls /term #voorwaarts zoeken
-man ls ?term #achterwaarts zoeken
+man ls 
+/term #voorwaarts zoeken
+?term #achterwaarts zoeken
 ```
 
 Dit commando zal naar "term" zoeken in de man page van **ls**. (`n` om naar het volgende en `shift + n`om naar het vorige resultaat te gaan.)
 
-2. > Hoe kan je zorgen dat er bij het zoeken in een manpagina geen rekening wordt
+2. > Hoe kan je zorgen dat er bij het zoeken in een manpagina **geen** rekening wordt
    > gehouden met het verschil tussen hoofd- en kleine letters?
 
 ```bash
@@ -152,7 +167,7 @@ Dit commando zal naar "term" zoeken in de man page van **ls**. (`n` om naar het 
 ```
 
 4. >Wanneer je de opdracht “man read” intikt krijg je de info te zien van het
-   >commando read. Er is echter ook een systeemaanroep read aanwezig. Hoe kan je
+   >commando read. Er is echter ook een **systeemaanroep** read aanwezig. Hoe kan je
    >aan man meegeven dat je niet de info wenst te zien van het commando read
    >maar wel van de systeemaanroep read?		
 
@@ -189,8 +204,8 @@ man 2 read #2 duidt op System Calls
    ```
 
 7. >In punt 5 en 6 heb je gemerkt dat de uitvoer voorzien wordt van kleuren. Zo
-   >worden bv. directories in het donkerblauw gekleurd en symbolische links in het
-   >lichtblauw. Dit gedrag is te wijten aan het feit dat er voor ls een alias gedefinieerd
+   >worden bv. **directories** in het **donkerblauw** gekleurd en **symbolische links** in het
+   >**lichtblauw**. Dit gedrag is te wijten aan het feit dat er voor ls een **alias gedefinieerd**
    >is die telkens ls vervangt door “ls --color=auto”. Ga met de opdracht “alias” na
    >welke andere aliassen er bestaan.
 
@@ -223,21 +238,26 @@ man 2 read #2 duidt op System Calls
    [root@localhost ~]#
    ```
 
-9. >Een directory aanmaken kan via de opdracht “mkdir”. Maak in je home-directory
+9. >Een directory aanmaken kan via de opdracht “**mkdir**”. Maak in je home-directory
    >een directory aan met als naam ‘c’ waar je toekomstige C-programma’s naartoe
    >kan kopiëren.
 
-   ...
-
+   ```bash
+   [root@localhost ~]# mkdir c
+   ```
+   
 10. >Een bestand kopiëren gebeurt via de opdracht “cp”. De eerste parameter is de
-    >bron, de tweede de bestemming. Een bestand verplaatsen doe je via de opdracht
-    >“mv”.
+    >**bron**, de tweede de **bestemming**. Een bestand verplaatsen doe je via de opdracht
+    >“**mv**”.
 
-    ...
-
+    ```bash
+    [root@localhost ~]# cp ./tmp.txt ./c
+    [root@localhost ~]# mv ./tmp.txt ./c
+    ```
+    
     
 
-## Deel II:  Compileren in de Shell
+## Deel II:  Compileren in de Shell (kwam niet aan bod tijdens de labo's)
 
 In Linux is het vrij eenvoudig om een C of C++ programma te compileren zonder gebruik te
 maken van een IDE. Het enige wat je nodig hebt is een eenvoudige tekstverwerker. In een
@@ -246,24 +266,25 @@ consoles is nano eenvoudig te gebruiken, terwijl vi en vim ... al wat geavanceer
 Open in BASH een tekstverwerker (nano, vi, vim, neovim, ...) naar keuze en tik daarin
 onderstaand codefragment:
 
-```bash
+```C
 #include <stdio.h>
 int main(){
-	printf(“Hello world!”);
+	printf("Hello world!");
 	return 0;
 }
 ```
 
 Sla dit bestand vervolgens op als hello.**c** (let op de extensie). Om nu dit bestand te
-compileren voer je op de commandolijn “**cc hello.c -o hello**” of “make hello” uit. Na het
+compileren voer je op de commandolijn “**cc hello.c -o hello**” (cc =  c compiler) of “make hello” uit. Na het
 succesvol compileren kan je bestand uitvoeren door op de commandolijn “**./hello**” in te
 tikken. Bemerk dat je voor het uitvoerbaar bestand de “./” niet mag vergeten!
-Wanneer je met de opdracht “file” informatie over het uitvoerbaar bestand opvraagt, zal je
+
+Wanneer je met de opdracht “**file**” informatie over het uitvoerbaar bestand opvraagt, zal je
 merken dat er gebruikgemaakt wordt van shared libraries en dat het uitvoerbaar bestand
-dus niet alle code bevat om de string “Hello world!” naar het scherm te schrijven. Is dit niet
-de bedoeling, dan kan je bij het compileren de compileroptie “-static” opgeven (installeer
-hiervoor de static versie van de C API via yum install glibc-static). Hierdoor wordt alles
-statisch gelinkt en krijg je dus een uitvoerbaar bestand dat alle code bevat om de gegeven
+dus **niet alle code** bevat om de string “Hello world!” naar het scherm te schrijven. Is dit niet
+de bedoeling, dan kan je bij het compileren de compileroptie “**-static**” opgeven (installeer
+hiervoor de static versie van de C API via **yum install glibc-static**). Hierdoor wordt alles
+**statisch** gelinkt en krijg je dus een uitvoerbaar bestand dat alle code bevat om de gegeven
 tekst naar het scherm te schrijven.
 
 > **extra:**
@@ -276,12 +297,12 @@ tekst naar het scherm te schrijven.
 
 > Compileer bovenstaand bestand dynamisch en statisch en bekijk het verschil in grootte. De
 > grootte van een bestand kan je het gemakkelijkst achterhalen met de opdracht “du” of met
-> de opdracht “ls”. Maak in beide gevallen handig gebruik van de optie “**-h**“ om de
+> de opdracht “**ls**”. Maak in beide gevallen handig gebruik van de optie “**-h**“ om de
 > bestandsgrootte in bytes, KB, MB, ... te krijgen.
 
 ```bash	
-gcc -static test.c #statisch. Grotere bestandsgrootte. Te gebruiken wanneer benodigde libraries niet aanwezig zijn op systeem.
-gcc -c test.c #dynamic
+cc -static test.c #statisch. Grotere bestandsgrootte. Te gebruiken wanneer benodigde libraries niet aanwezig zijn op systeem.
+cc -c test.c #dynamic
 ```
 
 
@@ -1668,7 +1689,7 @@ fork();
 Zoals reeds eerder vermeld bevat de shell enkele honderden commando’s met elk nog tal
 van command line options. Het is dan ook logisch dat wanneer je meer informatie zoekt over
 een welbepaalde opdracht, je dit doet a.d.h.v. het commando man waarbij je de naam van
-de opdracht meegeeft als parameter. Als extra parameter kan je ook nog het sectienummer
+de opdracht meegeeft als parameter. Als extra parameter kan je ook nog het **sectienummer**
 meegeven of de optie -a wanneer je alle man-pagina’s waar de naam die je als parameter
 hebt opgegeven wil overlopen. 
 
@@ -1677,15 +1698,17 @@ op de vragen te antwoorden.
 
 **Opdrachten**
 
-1. > Met welk van de commando’s cp, dd, ln, mktemp, touch en cat kan je vlug een aantal
-   > (lege) bestanden aanmaken waarvan de namen als parameters van het commando
+1. > Met welk van de commando’s **cp, dd, ln, mktemp, touch** en **cat** kan je **vlug een aantal**
+   > **(lege) bestanden aanmaken** waarvan de namen als parameters van het commando
    > worden opgegeven?
 
 ```bash
-touch
-#cp & dd -> kopiëren
+touch file1 file2 file3 file4
+#cp & dd -> kopiëren & dd voor “convert and copy”
 #ln -> files linken
 #mktemp -> temp dir aanmaken
+#touch -> bestand aanmaken
+#cat -> bestand lezen
 ```
 
 2. >Wat verschijnt er op het scherm indien je de opdracht head /etc/passwd uitvoert? Zoek
@@ -1711,21 +1734,20 @@ of rm -- -rf (-- = einde opties) #verwijderen
 -rf = combinatie
 ```
 
-4. >Welke opties moet je toevoegen aan het commando wc om enkel de grootte van een  
-   >bestand te tonen zonder extra informatie?
+4. >Welke opties moet je toevoegen aan het commando wc om enkel de **grootte** van een bestand te tonen zonder extra informatie?
 
 ```bash
 -c  of --bytes
 ```
 
-5. >In Bash zijn er ook Bash-builtin opdrachten zoals cd, set, pwd, exec, printf en :  waarvoor  
+5. >In Bash zijn er ook Bash-builtin opdrachten zoals **cd, set, pwd, exec, printf** en :  waarvoor  
    >er geen aparte man-pagina’s beschikbaar  zijn. Een overzicht kan je bekomen door man  
-   >builtin  of door de man-pagina van Bash op te vragen. Zoek informatie op over het  
+   >builtin of door de man-pagina van Bash op te vragen. Zoek informatie op over het  
    >gebruik van de opdrachten cd, set, pwd, exec, printf en :.
 
 ```bash	
 -cd: change directory
--set: set shell & environment variables
+-set: set shell & environment variables instellen
 -pwd: print working directory
 -exec: uitvoeren van bestand
 -printf: printen van een string
@@ -1743,6 +1765,31 @@ synchroniseert gecachete writes (schrijf opdrachten) naar storage om buffers lee
 
 ```bash
 -dd: converteert en kopieert bestand.
+#Benodigde commando:
+
+```
+```bash
+#uitvoer fdisk -l
+[root@localhost c]# fdisk -l
+
+Disk /dev/sda: 20 GiB, 21474836480 bytes, 41943040 sectors
+Disk model: VMware Virtual S
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x9bbdd1fb
+
+Device     Boot    Start      End  Sectors Size Id Type
+/dev/sda1  *        2048  2099199  2097152   1G 83 Linux
+/dev/sda2        2099200 37750783 35651584  17G 83 Linux
+/dev/sda3       37750784 41943039  4192256   2G 82 Linux swap / Solaris
+
+
+Disk /dev/zram0: 967 MiB, 1013972992 bytes, 247552 sectors
+Units: sectors of 1 * 4096 = 4096 bytes
+Sector size (logical/physical): 4096 bytes / 4096 bytes
+I/O size (minimum/optimal): 4096 bytes / 4096 bytes
 ```
 
 8. >Hoe kan je met dd een kopie maken van de eerste 512 bytes van de vaste schijf? Bekijk  
@@ -1752,6 +1799,8 @@ synchroniseert gecachete writes (schrijf opdrachten) naar storage om buffers lee
 head -c 512 /dev/sda < mbr.img
 #of
 dd if=/dev/sda of=mbr2.img bs=512 count=1
+
+[root@localhost ~]# strings /dev/sda
 ```
 
 9. >Gebruik het commando find om een lijst van bestanden te krijgen die de afgelopen 24u  
@@ -1762,7 +1811,7 @@ find / -type f -mtime 1
 ```
 
 10. > Met het commando wodim kan je van op de opdrachtlijn  een CD/DVD-branden.  Met het  
-    > commando genisoimage kan je een ISO-bestand aanmaken. Hoe kan je van de inhoud  
+    > commando **genisoimage** kan je een ISO-bestand aanmaken. Hoe kan je van de inhoud  
     > van de /root directory een ISO-bestand maken?
 
 ```bash
@@ -1771,21 +1820,38 @@ genisoimage [options] -o output.iso /root
 
 11. >Bij vraag 10 zal je merken dat de namen van de bestanden/directories werden gewijzigd.
     >Je kunt dit vermijden door de image in Joliet-formaat weg te schrijven.
-    >Naast reguliere expressies kent Unix ook patterns om een verzameling strings te beschrijven.
-    >De mogelijkheden van standaard patterns zijn veel beperkter dan bv. reguliere expressies en 
+    >**Naast reguliere expressies** kent Unix ook **patterns** om een verzameling strings te beschrijven.
+    >De mogelijkheden van standaard patterns zijn veel **beperkter** dan bv. reguliere expressies en 
     >
     >worden gebruikt zowel in opdrachten als in shellscripts. In recente Bash-versies werden deze
     >patterns uitgebreid. Extended pattern matching kan worden aangezet met de opdracht
     >“shopt –s extglob”. Bij het uitvoeren van een commando met een pattern wordt eerst een lijst met
     >bestandsnamen gegenereerd die aan het opgegeven patroon voldoen. Dit wordt meestal
-    >“Pathname Expansion” genoemd. Meer uitleg kan je vinden in de man-pagina van Bash
+    >“**Pathname Expansion**” genoemd. Meer uitleg kan je vinden in de man-pagina van Bash
     >onder de rubriek “Pathname Expansion”.
 
-    ...
+    **Pathname Expansion:**
 
+    - adhv Curly braces
+    
+    ```bash
+    [root@localhost ~]# echo txt{1,2,3,4}
+    txt1 txt2 txt3 txt4
+    ```
+    
+    - adhv Wildcard
+    
+    ```bash
+    [root@localhost ~]# ls /etc/l*.conf
+    /etc/ld.so.conf     /etc/libuser.conf  /etc/logrotate.conf
+    /etc/libaudit.conf  /etc/locale.conf
+    ```
+    
+    
+    
     **Maak voor onderstaande opdrachten de volgende lege bestanden aan: a, b, c, d, e, ab.c, a.b,**
     **b.a, b.c, c.d en d.e.**
-
+    
 12. >Voer de volgende opdrachten uit:
     >• dir a*.*
     >• dir a*
@@ -1817,19 +1883,31 @@ genisoimage [options] -o output.iso /root
     >verkeerde /-teken gebruikt?
 
     ```bash
+    Het /-teken zorgt dat de string letterlijk geprint wordt en er dus geen pathname extension wordt toegepast.
     
+    root@localhost oef12]# printf "%s\n" [a/-e]
+    [a/-e]
+    [root@localhost oef12]# printf "%s\n" [a-e]
+    a
+    b
+    c
+    d
+    e
     ```
 
 15. >Hoe kan je een lijst met bestandsnamen bekomen die precies uit één enkel karakter
     >bestaan?
 
     ```bash
-    
+    printf "%s\n" ?
     ```
 
-...
+16. >Vraag een lijst met bestandsnamen die uit precies twee karakters bestaan. Vergelijk de
+    >uitvoer met die van de vorige opgave.
 
-
+    ```bash
+    $ printf "%s\n" ??
+    ```
 
 **notities** (labo2)
 
@@ -1877,16 +1955,14 @@ brw-rw---- 1 root disk 8, 3 May  9 15:28 /dev/sda3
 
 
 
-
-
 ### Redirection, piping en filtering, process substitution en het commando find
 
 >Zoals reeds bij deel V aangehaald werd, zal elk in de shell gestart programma beschikken
->over drie file descriptors: standaardinvoer (stdin), standaarduitvoer (stdout) en
->standaardfout (stderr). Gewone uitvoer wordt steeds naar standaarduitvoer gestuurd terwijl
+>over **drie** **file descriptors**: **standaardinvoer (stdin)**, **standaarduitvoer (stdout)** en
+>**standaardfout (stderr)**. Gewone uitvoer wordt steeds naar standaarduitvoer gestuurd terwijl
 >eventuele fouten terechtkomen op standaardfout. In de shell waarin je ingelogd bent is
->standaardinvoer meestal gelijk aan het toetsenbord (invoer wordt afgesloten met Ctrl-D
->voor end of file of eventueel Ctrl-C voor terminate), en worden beide uitvoerkanalen met het
+>standaardinvoer **meestal gelijk aan het toetsenbord** (invoer wordt afgesloten met **Ctrl-D**
+>voor end of file of eventueel **Ctrl-C** voor terminate), en worden beide uitvoerkanalen met het
 >beeldscherm verbonden. **Elk kanaal** heeft een **eigen nummer** waarmee de shell de kanalen identificeert:
 >
 >**0** standaardinvoer
@@ -1903,13 +1979,17 @@ brw-rw---- 1 root disk 8, 3 May  9 15:28 /dev/sda3
     >• du /etc 1>> tmp.txt
     >• > tmp.txt du /etc
     >• du /var > tmp1.txt > tmp2.txt
-
-- de uitvoer van het commando,
-- de toestand van de werkbestanden tmp\*.txt (bijvoorbeeld via de commando's wc
-  tmp\*.txt of ls -l tmp*.txt),
-- de inhoud van de werkbestanden tmp.txt (bijvoorbeeld via het commando cat
-  tmp*.txt of door de bestanden in een teksteditor te openen).
-  Wat besluit je na het vergelijken van de resultaten van elke tussenstap?
+    
+    > Bekijk na elk commando:
+    >
+    > - de uitvoer van het commando,
+    >
+    > - de toestand van de werkbestanden tmp\*.txt (bijvoorbeeld via de commando's wc
+    >   tmp\*.txt of ls -l tmp*.txt),*
+    >
+    > - de inhoud van de werkbestanden tmp.txt (bijvoorbeeld via het commando cat
+    >   tmp*.txt of door de bestanden in een teksteditor te openen).
+    >   Wat besluit je na het vergelijken van de resultaten van elke tussenstap?
 
 ```
 Je kan besluiten dat het bestand telkens overschreden wordt omdat er vanuit een andere directory geschreven wordt.
@@ -1936,10 +2016,15 @@ du /var > tmp1.txt > tmp2.txt  -> tmp1 is dus leeg
     >informatie terug over de shell-variabele noclobber?
 
 ```
-De inhoud van het best tmp.txt blijft hetzelfde doorheen het proces. 
->| kan gebruikt worden om de noclobber optie te overriden. 
--C doet het zelfde als noclobber. 
-+C zorgt er voor dat je het terug kan aanpassen.
+De -o noclobber informatie zorgt er voor dat bestanden niet meer overschreven kunnen worden.
+ 
+>| kan gebruikt worden om de noclobber shell variabele te overriden. 
+set -C doet het zelfde als set -o  noclobber. 
++C zorgt er voor dat je het terug kan aanpassen. (zelfde als set +o noclobber)
+
+De informatie over de shell-variabele noclobber kan teruggevonden worden in de Bash Builtin Commands.
+man set
+/noclobber
 ```
 
 
@@ -1974,7 +2059,7 @@ cat /dev/null #prullenbak is leeg
 27. > Ga na wat het effect is van cat /dev/null > test.txt
 
 ```bash
-Maakt bestand leeg.
+Maakt bestand leeg. (want prullenbak is leeg)
 ```
 
 28. >Veronderstel dat een of ander programma continu informatie wegschrijft in een
@@ -2002,12 +2087,13 @@ exec 3>tmp.txt ; du /etc >&3 2>&1 ; exec 3>&- #zelf file descriptor aanmaken (fd
 
 #&1 = naar scherm, gebufferd. &2 = naar scherm, niet gebufferd.
 
-# '>' is output redirection  (output naar bestand ipv scherm) -> file terug leeg en dan toevoeging
-#'>>' regels toevoegen (append)
+# '>' is output redirection  (output naar bestand ipv scherm) -> file terug leeg en dan toevoeging (overschrijven)
+# '>>' regels toevoegen (append)
 # '0>' standaardinvoer
 # '1>' standaarduitvoer
 # '2>' standaardfout
-# '&1' file descriptor
+# '&1' file descriptor 1 (= standaard uitvoer)
+# '&2' file descriptor 2 (= fouten kanaal)
 ```
 
 30. >Verwijder eerst het werkbestand tmp.txt, indien dit reeds zou bestaan. Vergelijk daarna
@@ -2021,32 +2107,32 @@ exec 3>tmp.txt ; du /etc >&3 2>&1 ; exec 3>&- #zelf file descriptor aanmaken (fd
     ```bash
     du /etc ; du /var #meerdere opdrachten gescheiden door ";"
     du /etc ; du /var > tmp.txt 
-    ( du /etc ; du /var ; ) > tmp.txt #groep opdrachten met redirection op toegepast (child process)
-    { du /etc ; du /var ; } > tmp.txt #groep opdrachten met redirection op toegepast (huidige shell)
+    ( du /etc ; du /var ; ) > tmp.txt #groep opdrachten met redirection op toegepast ( child process )
+    { du /etc ; du /var ; } > tmp.txt #groep opdrachten met redirection op toegepast { huidige shell }
     ```
 
-    >In UNIX wordt heel dikwijls de standaarduitvoer van het ene commando gebruikt als
-    >standaardinvoer van het volgende. Deze gecombineerde vorm van invoer- en uitvoer-
-    >redirection wordt piping genoemd. Men bekomt dit door tussen de twee betreffende
-    >opdrachten een verticale streep (|) te plaatsen. Dit kan een willekeurig aantal keer op
+    >In UNIX wordt heel dikwijls de **standaarduitvoer** van het ene commando **gebruikt als**
+    >**standaardinvoer** van het volgende. Deze gecombineerde vorm van invoer- en uitvoer-
+    >redirection wordt **piping** genoemd. Men bekomt dit door tussen de twee betreffende
+    >opdrachten een verticale streep (**|**) te plaatsen. Dit kan een willekeurig aantal keer op
     >dezelfde commandolijn herhaald worden. Hierbij worden de opdrachten steeds van links
     >naar rechts uitgevoerd.
     >
-    >Enkel de standaarduitvoer kan worden doorgepipet naar het volgende commando; de
+    >**Enkel de standaarduitvoe**r kan worden doorgepipet naar het volgende commando; de
     >foutuitvoer blijft op het scherm. Je kunt dit tenietdoen door vooraf de foutuitvoer om te
     >leiden naar standaarduitvoer d.m.v. redirection.
-    >Een probleem dat veelvuldig optreedt is dat je na het |-teken werkt in een subshell. Het
-    >omdraaien van de volgorde is bij het |-teken helaas onmogelijk. Een alternatief voor dat
+    >Een probleem dat veelvuldig optreedt is dat je **na het |-teken werkt in een subshell**. Het
+    >**omdraaien** van de volgorde is bij het |-teken helaas **onmogelijk**. Een alternatief voor dat
     >probleem is **process substition**.
     >Wanneer we **process substitution** vergelijken met piping moeten we besluiten dat het
     >eerste de voorkeur geniet. Je kan in het onderstaande voorbeeld er voor kiezen om de wc-
     >opdracht als eerste te vermelden en dan pas de ls-opdracht. Zeker bij scripting is dit soms
     >minder schrijf- of prutswerk.
-    >wc -l < <(ls ~)
-    >ls ~ | wc -l 
+    >wc -l << (ls ~) //Process substitution (= alternatief pipes, omdraaien volgorde)
+    >ls ~ | wc -l     //Gewoon piping (stdout wordt gebruikt als stdin)
     >
     >**Let wel, bij beide oplossingen worden evenveel kindprocessen aangemaakt en wordt ook**
-    >**een pipe gebruikt als IPC. Er is dus geen enkele vorm van performantiewinst door gebruik**
+    >**een pipe gebruikt als IPC (inter process communication). Er is dus geen enkele vorm van performantiewinst door gebruik**
     >**te maken van process substitution!**
     >Maak bij onderstaande opdrachten zoveel mogelijk gebruik van process substitution.
     >UNIX kent vele utilities zoals **head, tail, grep, uniq, sort en awk**, die hun input, meestal
@@ -2108,19 +2194,22 @@ tr a-z A-Z < /etc/passwd #tr - translate or delete characters
     >Zoek een eenvoudige oplossing hiervoor, door gebruik te maken van een pipe.
 
 ```bash
-sort 35.txt | uniq -dc
+sort 35.txt | uniq -dc 
+#-d (repeated) only print duplicate lines, one for each group
+#-c (count) prefix lines by the number of occurrences
 ```
 
-36. > Het filter-commando grep toont alle lijnen van een bestand die aan een bepaald patroon
-    > voldoen. Op welke drie verschillende manieren (drie verschillende opties, met betrekking
-    > op de interpretatie van regular expressions) kan dit patroon opgegeven worden? Let
-    > erop dat het patroon door het grep-commando moet worden geïnterpreteerd en niet
+36. > Het filter-commando **grep** toont alle lijnen van een bestand die aan een bepaald **patroon**
+    > voldoen. **Op welke drie verschillende manieren** (drie verschillende opties, met betrekking
+    > op de interpretatie van regular expressions) kan dit patroon opgegeven worden? 
+    >
+    > Let erop dat het patroon door het grep-commando moet worden geïnterpreteerd en niet
     > door de shell. Gebruik de drie mogelijkheden om alle lijnen van een bestand te zoeken
     > die een woord bevatten uit de lijst: BEGIN END IF ENDIF
     > In de man-pages van grep vind je een extra sectie over regular expressions.
-
+    
     **[Regex]:**
-
+    
     ```
     ^begin van lijn
     $einde van lijn
@@ -2134,7 +2223,19 @@ sort 35.txt | uniq -dc
     {2,3} komt min 2x en max 3x voor
     ^[1-9] [0-9]*$ testen of het een getal voorstelt met 2 cijfers. * wijst op of meerder occurences van [0-9]
     ```
-
+     ```bash
+    drie verschillende manieren:
+    
+    -G, --basic-regexp (= grep)
+    	Interpret  PATTERNS  as  basic  regular  expressions. This is the default.
+    
+    -E, --extended-regexp (= egrep)
+    	Interpret PATTERNS as extended regular expressions
+    
+    -F, --fixed-strings (= fgrep)
+    	Interpret PATTERNS as fixed strings, not regular expressions.
+     ```
+    
 37. >Installeer emacs (yum install emacs) en wijzig de werkdirectory naar
     >/usr/share/emacs/versienummer/etc/tutorials. Voorspel de uitvoer van volgende
     >commando's en test ze dan uit op de Emacs tutorial:
@@ -2150,7 +2251,7 @@ sort 35.txt | uniq -dc
     grep -E '(C\-[a-z] *){2}' TUTORIAL
     grep '\(C\-[a-z] *\)\{2\}' TUTORIAL
     
-    #1. -E=extended regex (Hoofdletter C, gevolgd door minteken, gevolgd door letter A-Z, gevolgd door 0 of meerdere spaties)
+    #1.-E=extended regex (Hoofdletter C, gevolgd door minteken, gevolgd door letter A-Z, gevolgd door 0 of meerdere spaties)
     #2. Zelfde als het voorgaande maar 2x na elkaar.
     #3. 
     #(grep = general regular expression parser)
@@ -2163,13 +2264,13 @@ sort 35.txt | uniq -dc
 
     ```bash
     grep -E '^.*$' TUTORIAL #Alle lijnen
-    grep -E '^.*$' TUTORIAL #Begin, gevolgd door een punt, 1 of meerdere keren
+    grep -E '^\.*$' T* #Begin, gevolgd door een punt, 1 of meerdere keren
     ```
 
 39. > Zoek de opties van het grep-commando die het gedrag van grep als volgt wijzigen:
-    > • Er worden enkel lijnen getoond die niet aan het patroon voldoen.
-    > • Deze patronen worden in een configuratiebestand opgeslagen, één lijn per
-    > patroon
+    > • Er worden enkel lijnen getoond die **niet** aan het patroon voldoen.
+    > • Deze patronen worden in een configuratiebestand opgeslagen, **één lijn per**
+    > **patroon**
 
     ```bash
     # -v -> inverse: regex omdraaien
@@ -2181,13 +2282,13 @@ sort 35.txt | uniq -dc
 40. >Voorspel de uitvoer die je bij de volgende commando's verwacht en voer daarna pas de
     >commando's effectief uit, om te controleren dat je prognose correct was.
 
-    > \1. grep -E '^$' TUTORIAL | wc -l
-    > \2. grep -Ev '^$' TUTORIAL
-    > \3. grep -E 'margin|direction' TUTORIAL | nl
-    > \4. nl TUTORIAL | grep -E 'margin|direction'
-    > \5. grep -E '^-+$' TUTORIAL | uniq -d
-    > \6. grep -E '^-+$' TUTORIAL | sort | uniq -d
-    > \7. grep -E '\--+' TUTORIAL | grep -Ev '^-+$'
+    > 1. grep -E '^$' TUTORIAL | wc -l
+    > 2. grep -Ev '^$' TUTORIAL
+    > 3. grep -E 'margin|direction' TUTORIAL | nl
+    > 4. nl TUTORIAL | grep -E 'margin|direction'
+    > 5. grep -E '^-+$' TUTORIAL | uniq -d
+    > 6. grep -E '^-+$' TUTORIAL | sort | uniq -d
+    > 7. grep -E '\--+' TUTORIAL | grep -Ev '^-+$'
 
     > Een aantal van deze commando's zijn syntactisch correct, maar bevatten logische
     > fouten. Welke? 
@@ -2239,7 +2340,7 @@ sort 35.txt | uniq -dc
 43. >In het bestand /etc/passwd worden de velden gescheiden door een :-teken. Het **eerste**
     >veld bevat de **gebruikersnaam** en het **derde veld** het **gebruikersID**, terwijl het **vierde veld**
     >het **nummer van de primaire groep** is waartoe de gebruiker behoort.
-    >Sorteer het passwd-bestand met behulp van het sort commando, met het nummer van
+    >Sorteer het passwd-bestand met behulp van het **sort** commando, met het nummer van
     >de primaire groep als sleutel. Zorg ervoor dat het sort commando enkel sorteert op het
     >veld met de primaire groep (en niet op het restant van de lijn), en dit veld alfabetisch
     >(niet-numeriek) sorteert. Bij deze sortering moet bijvoorbeeld gelden: 1 < 100 < 12. Geef
@@ -2257,10 +2358,12 @@ sort -t : -k4,4 /etc/passwd > passwd #4de veld wegschrijven naar passwd
 sort -t : -k3,3 /etc/group > group #3de veld wegschrijven naar group
 
 #UPG: user private groups: Groep waarbij gebruiker enigste lid is.
+#-t = field seperator (: in dit geval)
+#-k = key
 ```
 
 44. >Gebruik het commando join met aangepaste opties om op basis van de daarnet
-    >gecreëerde bestanden ~/passwd en ~/group een lijst af te drukken met op elke lijn enkel
+    >**gecreëerde** bestanden **~/passwd** en ~/group een lijst af te drukken met op elke lijn enkel
     >drie velden: de gebruikers-ID, de volledige gebruikersnaam en de naam van de primaire
     >groep waartoe de gebruiker behoort. Geef de volledige commandolijn waarmee je deze
     >opdracht hebt uitgevoerd. Hoeveel uitvoerregels zijn er? Hoe heb je dit aantal geteld?
@@ -2274,35 +2377,58 @@ join -t : -1 4 -2 3 -o "1.1 1.3 2.1" passwd group | less #-o is een uitvoerlijn.
 						 
 #combinatie 43+44:
 join -t : -1 4 -2 3 -o "1.3 1.1 2.1"
- < (sort -t : -k4,4 /etc/passwd) 
- < sort( -t : -k3,3 /ectd/group)
+ < (sort -t : -k4,4 /etc/passwd)  #gecreëerde bestanden ~/passwd
+ < sort( -t : -k3,3 /ectd/group)  #gecreëerde bestanden ~/group
 ```
 
 45. >Sorteer het /etc/passwd bestand, met behulp van het sort commando. Gebruik als
-    >primaire sleutel het vierde veld van het bestand. Zorg ervoor dat je in numerieke
+    >**primaire sleutel** het **vierde veld** van het bestand. Zorg ervoor dat je in **numerieke**
     >volgorde sorteert (12 < 100). Regels met gelijke numerieke waarden voor het vierde veld
-    >moeten gesorteerd worden met het vijfde veld als secundaire sleutel, waarbij geen
-    >onderscheid mag gemaakt worden tussen hoofdletters en kleine letters, en voor de
+    >moeten gesorteerd worden met het **vijfde veld** als **secundaire sleutel**, waarbij **geen**
+    >**onderscheid** mag gemaakt worden tussen **hoofdletters en kleine letters**, en voor de
     >
-    >sorteervolgorde nu de omgekeerd alfabetische volgorde moet genomen worden. Geef
+    >sorteervolgorde nu de **omgekeerd alfabetische** volgorde moet genomen worden. Geef
     >de volledige commandolijn waarmee je deze opdracht hebt uitgevoerd.
 
 ```bash
-sort -t : -k4n,4n -k5,5 < /etc/passwd
+sort -t : -k4n,4n -k5fr,5fr < /etc/passwd
+
+-n, --numeric-sort
+             compare according to string numerical value
+-f, --ignore-case
+             fold lower case to upper case characters
+-r, --reverse
+			 reverse the result of comparisons
+             
+#-k4n,4n betekent sorteren op veld (key) 4, numeriek
+#-k5fr,5fr betekent sorteren op veld (key) 5, ignore case, reverse (=omgekeerd alfabetisch)
 ```
 
 46. >Gebruik het cut commando met aangepaste opties om van het bestand /etc/passwd alle
-    >gebruikersnamen te tonen. Geef opnieuw de volledige commandolijn waarmee je deze
+    >**gebruikersnamen** te tonen. Geef opnieuw de volledige commandolijn waarmee je deze
     >opdracht hebt uitgevoerd.
 
 ```bash
-cut -d : -f 1 /etc/passwd
+cut -d : -f 1 /etc/passwd #cut met : als delimiter en enkel field 1 (gebruikersnaam)
+
+-d, --delimiter=DELIM
+              use DELIM instead of TAB for field delimiter
+-f, --fields=LIST
+              select only these fields;  also print any line that contains  no
+              delimiter character, unless the -s option is specified
+              
+[root@localhost ~]# cut -d : -f 1 /etc/passwd
+root
+bin
+daemon
+adm
+...
 ```
 
-47. >Het commando **tee** bestandsnaam neemt de standaardinvoer, geeft de invoer
-    >ongewijzigd door aan de standaarduitvoer, en kopieert de standaardinvoer tegelijkertijd
-    >naar het opgegeven bestand. Gecombineerd met een pipe laat dit je toe de uitvoer van
-    >een programma terzelfdertijd op het beeldscherm te bekijken, en te loggen voor later
+47. >Het commando **tee** bestandsnaam neemt de **standaardinvoer**, geeft de invoer
+    >**ongewijzigd** door aan de **standaarduitvoer**, en kopieert de standaardinvoer tegelijkertijd
+    >naar het **opgegeven bestand**. Gecombineerd met een pipe laat dit je toe de uitvoer van
+    >een programma terzelfdertijd op het **beeldscherm** te bekijken, en te **loggen** voor later
     >gebruik. Hoe kun je ervoor zorgen dat de uitvoer van een programma tegelijkertijd op
     >het beeldscherm verschijnt, en wordt toegevoegd aan een bestaand bestand, zonder dat
     >de oude inhoud van dat bestand wordt overschreven?
@@ -2311,6 +2437,12 @@ cut -d : -f 1 /etc/passwd
     >informatie van alle bestanden die voldoen. Dit commando heeft heel veel mogelijkheden
     >door het toevoegen van aangepaste opties. Leer de goede opties op te zoeken in de man-
     >pages. Het commando genereert dikwijls veel foutmeldingen, die je bij voorkeur omleidt.
+    >
+    >**tee**: Read from standard input and write to standard output and files
+    >
+    >bv. **echo ok | tee f1 f2 f3** (schrijft "ok" (afkomstig van standaard invoer adhv pipe) naar f1,f2 & f3)
+    
+    
 
 ```c
 #include <unistd.h>
@@ -2322,7 +2454,7 @@ cut -d : -f 1 /etc/passwd
 int main(int argc, char **argv) {
     /* 1. alle bestanden openen en de fildescriptor bijhouden in een array */
 
-    int *fds = malloc(sizeof(int) * (argc - 1));
+    int *fds = malloc(sizeof(int) * (argc - 1)); //aantal output files tellen: elke opgegeven parameter is een file
     int teller = 0;
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-") == 0) {
@@ -2362,30 +2494,53 @@ int main(int argc, char **argv) {
             perror(argv[i]);
         }
     }
-    free(fds);
+    free(fds); //geheugen terug vrij maken
     return 0;
 }
 ```
 
 48. > Zoek naar alle bestanden in de /etc directory tree waarvan de naam begint met pass.
 
-```bash	
+```bash
 find /etc -type f -name 'pass*'
+
+/etc/pam.d/passwd
+/etc/passwd-
+/etc/passwdqc.conf
+/etc/passwd
+/etc/authselect/password-auth
+
+-type:
+              c		 File is of type c:
+              b      block (buffered) special
+              c      character (unbuffered) special
+              d      directory
+              p      named pipe (FIFO)
+              f      regular file
+              l      symbolic link; this is never true if the -L option or the
+                     -follow  option is in effect, unless the symbolic link is
+                     broken.  If you want to search for symbolic links when -L
+                     is in effect, use -xtype.
+              s      socket
+              D      door (Solaris)
+
+
 ```
 
 49. >Je kunt ook meerdere testen combineren. Hoe vraag je alle subdirectory's (geen
     >bestanden) waarvoor de naam begint met sh?
 
 ```bash
-find /etc -type f -name "sh*"
+find . -type d -name "sh*" #in de volledige dir structuur naar directories (-type d) gaan zoeken die starten met "sh".
+./.local/share
 ```
 
-50. >Gebruik het find-commando om een lijst te bekomen van alle bestanden in de /usr
-    >directory tree met een bestandsgrootte van minstens 1 megabyte. Bij het uitprinten (één
-    >lijn per bestand) moet je het volledig pad van de gevonden bestanden laten voorafgaan
-    >door de grootte van het bestand. Geef de volledige commandolijn waarmee je deze
+50. >Gebruik het find-commando om een lijst te bekomen van alle **bestanden** in de **/usr**
+    >directory tree met een bestandsgrootte van minstens **1 megabyte**. Bij het uitprinten (één
+    >lijn per bestand) moet je het **volledig pad** van de gevonden bestanden laten voorafgaan
+    >door de **grootte** van het bestand. Geef de volledige commandolijn waarmee je deze
     >opdracht hebt uitgevoerd. Let er ook op dat je enkel bestanden in de lijst opneemt en
-    >geen directory's.
+    >**geen directory's**.
 
 ```bash
 find /usr -type f -size +1M -exec du -h {} \; #commando du uitvoeren voor elk gevonden object {} = object in kwestie
@@ -2395,15 +2550,26 @@ find /usr -type f -size +1M -printf "%s %p\n" | sort -t " " -k1nr,1nr | cut -d "
 #\; object per object \+ verzameling van objecten (concat)
 ```
 
-51. >Gebruik het find-commando om een lijst te bekomen van alle bestanden in je
-    >persoonlijke map, die gedurende de laatste twee weken gewijzigd werden. Bij het
-    >uitprinten (één lijn per bestand) moet je het volledig pad van de gevonden bestanden
-    >laten voorafgaan door het tijdstip van de laatste wijziging. Geef de volledige
+51. >Gebruik het **find**-commando om een **lijst** te bekomen van alle **bestanden** in je
+    >**persoonlijke map**, die gedurende de **laatste twee weken gewijzigd** werden. Bij het
+    >uitprinten (**één lijn per bestand**) moet je het **volledig pad** van de gevonden bestanden
+    >laten voorafgaan door het **tijdstip** van de laatste wijziging. Geef de volledige
     >commandolijn waarmee je deze opdracht hebt uitgevoerd. Let er ook op dat je enkel
-    >bestanden in de lijst opneemt en geen directory's.
+    >**bestanden** in de lijst opneemt en geen directory's.
 
 ```bash	
-...
+find /usr -type f -mtime 14 -exec du -h {}
+
+-mtime n
+              File's data was last modified n*24 hours ago.  See the  comments
+              for -atime to understand how rounding affects the interpretation
+              of file modification times.
+
+find ./besturingssytemen/ -type f -mtime 0 -exec du --time {} \;
+
+4	2022-06-11 17:41	./besturingssytemen/f3
+4	2022-06-11 17:41	./besturingssytemen/f1
+4	2022-06-11 17:41	./besturingssytemen/f2
 ```
 
 52. >Gebruik het find-commando om een lijst te bekomen van alle subdirectory's van /usr

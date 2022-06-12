@@ -6,7 +6,7 @@
 
 In een **asymmetrische** multiprocessor wordt de kernel van het besturingssysteem altijd uitgevoerd op een bepaalde **master processor**. Deze is verantwoordelijk voor **scheduling** en heeft **volledige controle over het volledige geheugen** en andere bronnen. 
 
-De **andere processoren** kunnen alleen gebruikersprogramma’s en hulpprogramma’s van het besturingssysteem uitvoeren. Heeft een andere processor een dienst nodig (bijvoorbeeld I/O oproep) dan moet die een verzoek sturen naar de master en wachten tot die dienst is uitgevoerd.
+De **andere processoren** kunnen alleen gebruikersprogramma’s en hulpprogramma’s van het besturingssysteem uitvoeren. Heeft een andere processor een dienst nodig (bijvoorbeeld I/O oproep) dan moet die een verzoek sturen naar de master en wachten tot die dienst is uitgevoerd. 
 
 
 
@@ -30,7 +30,7 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
 
 **pro's symmetrische multiprocessor :**
 
-- Symmetrische multiprocessing biedt  ruime mogelijkheden op het gebied van beschikbaarheid (fouttolerantie) en stapsgewijze uitbreidingsmogelijkheden.
+- Symmetrische multiprocessing biedt  ruime mogelijkheden op het gebied van beschikbaarheid (fouttolerantie) en stapsgewijze uitbreidingsmogelijkheden. (Als een processor uitvalt heeft dit weinig invloed op het systeem, het wordt enkel langzamer.)
 
 
 
@@ -51,7 +51,7 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
    
    **AchtergrondInfo:**
    
-   Om systeemaanroepen te kunnen uitvoeren moet de processor overschakelen naar kernelmodus. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid bij UNIX kan een systeemaanroep rechtstreeks vanuit een programma in C of C++ worden gegenereerd. Programma’s die voor systeemaanroepen louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de POSIX-standaard voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het besturingssysteem verbergt alle complexiteit en biedt een eenvoudige gebruiksvriendelijke interface aan, wat ook wel een virtuele machine wordt genoemd.
+   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid bij UNIX kan een systeemaanroep rechtstreeks vanuit een programma in C of C++ worden gegenereerd. Programma’s die voor systeemaanroepen louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de POSIX-standaard voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
    
    
    
@@ -964,3 +964,21 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 
 > Vraag 55 en verder heeft de prof laten vallen.
+
+
+
+
+
+### Begrippen
+
+**Besturingssysteem**:
+
+**Kernel**:
+
+**Subsysteem**:
+
+**NT**:
+
+**Executive**:
+
+**System Call**: Een **systeemaanroep**, of **system call**, is een verzoek van een computerprogramma aan het besturingssysteem om een bepaalde taak uit te voeren voor het programma. Alle systeemaanroepen samen vormen de interface (de API) van het besturingssysteem of de kernel.
