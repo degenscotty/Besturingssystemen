@@ -303,6 +303,14 @@ tekst naar het scherm te schrijven.
 ```bash	
 cc -static test.c #statisch. Grotere bestandsgrootte. Te gebruiken wanneer benodigde libraries niet aanwezig zijn op systeem.
 cc -c test.c #dynamic
+
+
+root@localhost c]# ls -l
+total 1712
+-rwxr-xr-x 1 root root 1713536 Jun 12 09:32 a.out #static
+-rwxr-xr-x 1 root root   25136 Jun 12 09:31 test
+-rw-r--r-- 1 root root      68 Jun 12 09:31 test.c
+-rw-r--r-- 1 root root    1504 Jun 12 09:32 test.o #dynamic
 ```
 
 
@@ -2543,7 +2551,7 @@ find . -type d -name "sh*" #in de volledige dir structuur naar directories (-typ
     >**geen directory's**.
 
 ```bash
-find /usr -type f -size +1M -exec du -h {} \; #commando du uitvoeren voor elk gevonden object {} = object in kwestie
+find /usr -type f -size +1M -exec du -h {} \; #commando du uitvoeren voor elk gevonden object. {} = object in kwestie
 strace 2>&1 find /usr -type f -size +1M -exec du -h {} \+ > /dev/null; #+ gaat concatineren
 find /usr -type f -size +1M -printf "%s %p\n" | sort -t " " -k1nr,1nr | cut -d " " -f2 #geformatteerde output
 
@@ -2558,29 +2566,40 @@ find /usr -type f -size +1M -printf "%s %p\n" | sort -t " " -k1nr,1nr | cut -d "
     >**bestanden** in de lijst opneemt en geen directory's.
 
 ```bash	
-find /usr -type f -mtime 14 -exec du -h {}
+find /usr -type f -mtime 14 -exec du -h {} \;
 
 -mtime n
               File's data was last modified n*24 hours ago.  See the  comments
               for -atime to understand how rounding affects the interpretation
               of file modification times.
 
-find ./besturingssytemen/ -type f -mtime 0 -exec du --time {} \;
+find ./besturingssytemen/ -type f -mtime 0 -exec du --time {}  
 
 4	2022-06-11 17:41	./besturingssytemen/f3
 4	2022-06-11 17:41	./besturingssytemen/f1
 4	2022-06-11 17:41	./besturingssytemen/f2
 ```
 
-52. >Gebruik het find-commando om een lijst te bekomen van alle subdirectory's van /usr
-    >waarin zich C- of C++-headerbestanden (bestanden met suffix .h) bevinden. Gebruik een
+52. >Gebruik het find-commando om een lijst te bekomen van alle **subdirectory's** van /usr
+    >waarin zich C- of C++-headerbestanden (bestanden met suffix **.h**) bevinden. Gebruik een
     >commandolijn van de gedaante
     >find ... | sort | uniq
     >
     >**Let erop dat enkel de namen van de directory's weergegeven worden.**
+    >
+    >sort: sorteert output op bepaalde key.
+    >
+    >cut: toon specifieke deel van output op basis van key.
+    >
+    >uniq: diplicated lijnen worden gemerged naar eerste voorkomen
 
 ```bash
-...
+find /usr -type f -name "*.h" | rev | cut -d / -f 2 | rev | uniq -u
+
+#rev: reverse de output
+#cut -d / -f 2 : cutten op delimeter / en veld 2 (de subdirectory naam) nemen
+#rev: terug reversen 
+#uniq -u : enkel unieke lijnen tonen
 ```
 
 53. >Geef een lijst van alle directory's waar je als gewone gebruiker geen toegang toe hebt.
@@ -2593,18 +2612,26 @@ find / -type d 2>&1 > /dev/null | cut -d ‘ -f 2 | cut -d ‘ -f 1
 54. Toon alle bestanden van de map /etc die rwx-rechten hebben voor de huidige gebruiker.
 
 ````bash
-...
+ ls -l /etc | sort -t : -k1,1 | grep "rwx" 
+ #geen enkele files. 
+ #sort is optioneel
+ 
+ #voorbeeld dat wel een output heeft
+[root@localhost ~]# ls -l /etc | sort -t : -k1,1 | grep "rw-rw"
+-rw-rw-r--.  1 root root        19 Feb 25  2021 locale.conf
+-rw-rw-r--.  1 root root        28 Feb 25  2021 vconsole.conf
+-rw-rw-r--.  1 root root       615 Feb 25  2021 fstab
 ````
 
 
 
 ### Shellvariabelen
 
-> Bij het ingeven van een commando in bash gebeurt er een fork() =  clone = terminal maakt kindproces aan. Parent en kind beschikken over zelfde code. code van kind proces wordt overschreven met ingegeven commando.
+> Bij het ingeven van een commando in bash gebeurt er een fork() =  clone = terminal maakt **kindproces** aan. Parent en kind beschikken over zelfde code. code van kind proces wordt overschreven met ingegeven commando.
 >
-> Ronde haakjes forceren een fork(). bv `( exec ls )` .
+> Ronde haakjes forceren een **fork()** = **kindproces**. bv `( exec ls )` .
 
-55. >Naast gekende shellvariabelen, zoals PATH, kun je zelf shellvariabelen toevoegen. Tenzij
+55. >Naast gekende shellvariabelen, zoals PATH, kun je **zelf shellvariabelen toevoegen**. Tenzij
     >je de declare-opdracht gebruikt, zijn ze steeds van het type string. Er wordt onderscheid
     >gemaakt tussen hoofdletters en kleine letters. Voer de volgende commando's uit:
     >• printf “PATH %s\n” $PATH
@@ -2620,8 +2647,6 @@ find / -type d 2>&1 > /dev/null | cut -d ‘ -f 2 | cut -d ‘ -f 1
 [root@localhost ~]# echo $PATH
 /root/.local/bin:/root/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
 
-
-
 #${BASH_CMDS[@]} = commando om te checken waar alle recent aangeroepen commando's zich bevinden:
 [root@localhost ~]# echo ${BASH_CMDS[@]}
 /usr/bin/ls
@@ -2636,10 +2661,10 @@ ls
 56. >Definieer zelf de variabele date met een willekeurige datum als inhoud. Wat is het
     >verschil tussen $date, $(date) en ${date}? Onderzoek dit met behulp van het commando
     >echo. Je kunt bijvoorbeeld je eerste script schrijven met de volgende regels:
-    >date="18/5/2016"
-    >echo '$date:' $date
-    >echo '${date}:' ${date}
-    >echo '$(date):' $(date)
+    >**date="18/5/2016"**
+    >**echo '$date:' $date**
+    >**echo '${date}:' ${date}**
+    >**echo '$(date):' $(date)**
     >De enkele aanhalingstekens garanderen dat de tekst letterlijk wordt doorgegeven aan
     >het echo-commando.
     >Merk op dat de variabele date niet gekend is in de shell die het script heeft opgestart. Elk
@@ -2667,9 +2692,9 @@ het is mooi weeriable
 date=Wed May 11 03:06:51 PM CEST 2022
 ```
 
-57. >Bash ondersteunt vanaf versie 3 de mogelijkheid tot indirecte adressering: je kunt de
+57. >Bash ondersteunt vanaf versie 3 de mogelijkheid tot **indirecte adressering**: je kunt de
     >inhoud van een variabele opvragen door haar naam in een tweede variabele te stoppen,
-    >die je invult in ${!varnaam}. Dit is vergelijkbaar met pointers in C en C++. Vul de inhoud
+    >die je invult in **${!varnaam}**. Dit is vergelijkbaar met pointers in C en C++. Vul de inhoud
     >van de variabele een willekeurig op, en geef aan de variabele twee als inhoud de string
     >'een'. Voorspel het resultaat van
     >echo ${een}
@@ -2695,7 +2720,6 @@ een
 [root@localhost ~]# echo {1..10} #brace expension
 1 2 3 4 5 6 7 8 9 10
 
-
 [root@localhost ~]# echo {1..$een}
 {1..17}
 [root@localhost ~]# eval echo {1..$een} #Eerst wordt eval uitgevoerd, daarna de brace expension
@@ -2704,7 +2728,7 @@ een
 #variable verwijderen: unset variable_name
 ```
 
-58. >Bekijk de inhoud van de shellvariabelen PS1, PS2, SHLVL, RANDOM, SECONDS en PWD,
+58. >Bekijk de inhoud van de shellvariabelen **PS1, PS2, SHLVL, RANDOM, SECONDS** en **PWD**,
     >en zoek de betekenis ervan op in info bash of man bash, sectie Shell Variables.
     >Vraag de inhoud van deze variabelen eerst interactief op (met echo) en schrijf vervolgens
     >een script om de inhoud van deze variabelen op het scherm te tonen. Kan je de
@@ -2732,6 +2756,9 @@ exit
 
 #RANDOM = geeft random getal terug tussen 1-(2^15-1). Af te raden.
 #mogelijke examenvraag: script om bytes om te zetten naar getal.
+
+head -c 8 /dev/random | od -An -tu8
+
 head -c 8 /dev/random #random cijfer van 8 bytes.
 | An -tu8 #omzetten naar leesbaar cijfer
 ```
@@ -2742,8 +2769,6 @@ head -c 8 /dev/random #random cijfer van 8 bytes.
     #
     ```
 
-    
-
 60. >Hoe kun je de variabele PATH zodanig wijzigen dat je bij het aanroepen van een
     >shellscript (dat zich in de actieve directory bevindt), niet steeds naar de actieve directory
     >moet verwijzen?
@@ -2751,7 +2776,9 @@ head -c 8 /dev/random #random cijfer van 8 bytes.
     >gezocht worden in de werkdirectory, zonder telkens de waarde van PATH aan te passen.
 
 ```bash
-
+huidige map bijvoegen (path variabele uitbreiden): . (punt) toevoegen.
+. is een hardlink naar huidige map
+.. is een hardlink naar bovenliggende map
 ```
 
 61. > Hoe kun je ervoor zorgen dat wanneer bij de cd-opdracht een relatieve padnaam (dus
@@ -2759,19 +2786,22 @@ head -c 8 /dev/random #random cijfer van 8 bytes.
     >werkdirectory als prefix uitgeprobeerd wordt, maar ook een aantal vaste directory's?
 
 ```bash
+CDPATH="/usr:/" #eerst zoeken in /usr, daarna in / (hoofd directory)
+#op deze manier zal het cd commando altijd zoeken vanaf /usr
+#als het opgegeven path niet gevonden wordt, dan wordt er verder gezocht in / (hoofd directory)
 ```
 
 62. >Hoe kun je met eenzelfde opdracht regelmatig heen en terug schakelen tussen twee
     >mappen als actieve directory?
 
 ```bash
-
+cd - #terugkeren naar vorige map
 ```
 
 63. >Je kunt met het commando **read** tegelijkertijd meerdere variabelen inlezen via het
-    >standaard invoerkanaal. Test dit uit met:
+    >**standaard invoerkanaal**. Test dit uit met:
     >read a b c d
-    >Kan je dit aanpassen zodat de gegevens uit een bestand gelezen worden?
+    >Kan je dit aanpassen zodat de gegevens **uit** een bestand gelezen worden?
     >Probeer dit ook eens met een script op te lossen, en merk op dat de variabelen enkel in
     >het script bestaan!
 
@@ -2795,13 +2825,13 @@ root:x:0:0:root:/root:/bin/bash
 [root@localhost ~]# echo $c
 ```
 
-64. >Achterhaal de waarde van de bijzondere variabele IFS. Merk op dat echo $IFS je niet veel
+64. >Achterhaal de waarde van de bijzondere variabele **IFS** (**I**nternal **F**ield **S**eperator). Merk op dat echo $IFS je niet veel
     >wijzer maakt; echo "$IFS" (met aanhalingstekens) verraadt echter al dat er een newline-
     >karakter in de waarde staat. De eigenlijke waarde van IFS kun je vinden met
-    >grep ^IFS < <(set)
+    >**grep ^IFS < <(set)**
     >Zoals je weet uit vorige oefeningen, zorgt $' ' hierin voor interpretatie van de escapes.
-    >Standaard bevat IFS dus een spatie, een tab en een regeleinde. Deze karakters worden
-    >door read gebruikt voor het splitsen van invoervelden, ongeveer zoals o.a. de operator
+    >**Standaard** bevat IFS dus een **spatie**, een **tab** en een **regeleinde**. Deze karakters worden
+    >door read gebruikt voor het **splitsen** van **invoervelden**, ongeveer zoals o.a. de operator
     ><< in C++ en de Scanner-klasse in Java.
     >Je kunt de waarde van IFS ook (tijdelijk) wijzigen, hetzij door een functie te gebruiken,
     >hetzij door de IFS-variabele vóór het commando in te stellen. Gebruik het commando
@@ -2813,7 +2843,7 @@ root:x:0:0:root:/root:/bin/bash
 IFS=$' \t\n' #splitst default op spaties, tabs & newlines
 ```
 
-65. >Het wijzigen van IFS kan voor verwarring zorgen. Voer volgend script uit:
+65. >Het wijzigen van IFS kan voor verwarring zorgen. Voer volgend script uit (zet het in een bestand):
     >IFS=':'
     >x=ik:ben:groot
     >echo x = $x
@@ -2838,18 +2868,19 @@ IFS=$' \t\n'
 ```
 
 66. >Je kunt de standaarduitvoer van een commando ook toekennen aan een variabele.
-    >Daarbij maak je gebruik van command substitution. Dit is vooral zinvol wanneer de
-    >uitvoer van een commando uit slechts één regel bestaat. Indien je slechts een deel van
+    >Daarbij maak je gebruik van **command substitution**. Dit is vooral **zinvol** wanneer de
+    >**uitvoer van een commando uit slechts één regel bestaat**. Indien je slechts een deel van
     >de uitvoer aan de variabele wilt toekennen, dan kun je proberen dit er met cut uit te
     >halen.
     >Voorspel de inhoud van de variabele t na volgende commando's:
-    >\1. t=$(du /etc/passwd)
-    >\2. t=$(cut -f1 < <(du /etc/passwd))
-    >\3. t=$(cut -f1 < <(wc -l /etc/passwd))
-    >\4. t=$( cut -d " " -f2 < <(wc -l /etc/passwd))
-    >\5. t=$(wc -l < /etc/passwd)
-    >\6. tab=( $(wc -l /etc/passwd) )
-    >\7. echo ${tab[1]}
+    >
+    >1. t=$(du /etc/passwd)
+    >2. t=$(cut -f1 < <(du /etc/passwd))
+    >3. t=$(cut -f1 < <(wc -l /etc/passwd))
+    >4. t=$( cut -d " " -f2 < <(wc -l /etc/passwd))
+    >5. t=$(wc -l < /etc/passwd)
+    >6. tab=( $(wc -l /etc/passwd) )
+    >7. echo ${tab[1]}
 
 ```bash
 t=$(du /etc/passwd) #uitvoer van commando komt in variable t = command substitution
@@ -2871,8 +2902,8 @@ echo ${tab[1]}				 #inhoud tabel wordt uitgeschreven
 
 
 
-67. >Normaal worden alle variabelen door de shell als strings beschouwd. Toch kun je met
-    >behulp van een specifiek intern commando rekenkundige bewerkingen op variabelen
+67. >**Normaal** worden alle variabelen door de shell als **strings** beschouwd. Toch kun je met
+    >behulp van een specifiek intern commando **rekenkundige bewerkingen** op variabelen
     >toepassen. Dit laat je niet alleen toe om optellingen (+), aftrekkingen (-),
     >vermenigvuldigingen (*), gehele delingen (/ en %) en machtsverheffingen (**) uit te
     >voeren, maar ook om bitoperaties (<<, >>, &, |, ^, ! en ~) of logische testoperaties (&&
@@ -2889,10 +2920,10 @@ echo ${tab[1]}				 #inhoud tabel wordt uitgeschreven
 
     
 
-68. >Hoe kun je in een script, met behulp van de variabele SECONDS, de uitvoeringstijd
-    >bepalen van een groep commando's? Pas dit bijvoorbeeld toe om de uitvoeringstijd (in
-    >seconden) te bepalen van de tijdrovende instructie
-    >ls -lR / > /dev/null 2>&1
+68. >Hoe kun je in een script, met behulp van de variabele **SECONDS**, de uitvoeringstijd
+    >bepalen van een groep commando's? Pas dit bijvoorbeeld toe om de **uitvoeringstijd** (in
+    >seconden) te **bepalen** van de **tijdrovende instructie**
+    >**ls -lR / > /dev/null 2>&1**
 
 ```bash
 #!/bin/bash
@@ -2910,13 +2941,11 @@ echo $SECONDS
 
 
 
-
-
 ### Argumenten van een script/functie, positionele parameters en speciale parameters
 
->Bij het uitvoeren van een shellscript kun je argumenten opgeven. Het script zal deze
+>Bij het uitvoeren van een shellscript kun je **argumenten** opgeven. Het script zal deze
 >argumenten toekennen aan de positionele parameters $1, $2 enz (of ${1}, ${2} enz). In elk
->script beschik je steeds over de positionele parameters. Als de argumentenlijst leeg is dan
+>script beschik je steeds over de **positionele parameters**. Als de argumentenlijst leeg is dan
 >bestaan de positionele parameters nog steeds, maar ze hebben een lege inhoud. Je kunt de
 >positionele parameters slechts op twee manieren wijzigen:
 >
@@ -2925,15 +2954,12 @@ echo $SECONDS
 >   dubbele streepje wordt hierbij aangeraden om problemen met opties (d.w.z.
 >   argumenten die met een streepje beginnen) te vermijden.
 >- b. Omdat set -- ... de oorspronkelijke positionele parameters overschrijft, is het
->  doorgaans beter om een array te gebruiken om operaties op positionele parameters
->   uit te voeren.c. Met shift n wordt de inhoud van alle positionele parameters i vervangen door de
->   oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
->   verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
->   opgeschoven.
->- c. Met **shift n** wordt de inhoud van alle positionele parameters i vervangen door de
+>  doorgaans **beter** om een **array** te gebruiken om operaties op positionele parameters
+>   uit te voeren.
+> - c. Met **shift n** wordt de **inhoud** van alle **positionele parameters** i **vervangen** door de
 >  oorspronkelijke inhoud van parameters i + n. Hierbij gaan de eerste n waarden
->   verloren. De standaardwaarde van n is 1; standaard wordt dus één plaats
->   opgeschoven.
+>   verloren. De standaardwaarde van n is 1; **standaard wordt dus één plaats**
+>   **opgeschoven**.
 
 
 
@@ -2948,11 +2974,24 @@ echo $SECONDS
 
     
 
-70. >Veronderstel dat een variabele x als waarde de index van een positionele parameter
-    >bevat. Hoe kun je de waarde van deze positionele parameter bekomen?
+70. >Veronderstel dat een variabele x als **waarde** de index van een **positionele parameter**
+    >bevat. Hoe kun je de waarde van deze **positionele parameter** bekomen?
 
 ```bash
-${!x}
+#${!x}
+
+#script
+#!/bin/bash
+echo ${@} #alle params printen
+x=2
+echo "$2"
+echo ${!x}
+
+#output
+[root@localhost bash]# bash pos.sh een twee drie
+een twee drie
+twee
+twee
 ```
 
 71. >Gebruik het script dat 3 argumenten verwacht. Hoe kun je bij het aanroepen van dit
@@ -2963,22 +3002,21 @@ bash 71.sh 1 "" 3
 ```
 
 72. >In Bash zijn speciale variabelen gedefinieerd, waarvan men in shellscripts gebruik kan
-    >maken. Lees de sectie Special Parameters in man bash. Zo staat $0 voor de naam van het
-    >script, $$ voor het (unieke) proces-ID of PID van het script en $# voor het aantal
+    >maken. Lees de sectie Special Parameters in man bash. Zo staat **$0** voor de **naam van het**
+    >**script**, **$$** voor het (unieke) proces-ID of **PID** van het script en **$#** voor het aantal
     >argumenten ervan.
     >Schrijf een script dat zijn eigen naam en proces-ID uitschrijft, evenals zijn totale aantal
     >argumenten, gevolgd door het eerste en het laatste argument.
 
 ```bash
 #!/bin/bash
-
 aantal=$#
 echo naam:${0} pid:$$ aantal params:$aantal
 echo eerste:${1} en laatste:${!aantal}                                     
 ```
 
 ```bash
-[root@localhost ~]# 71 para.sh a b c d e f g
+[root@localhost ~]# bash para.sh a b c d e f g
 naam:para.sh pid:3299 aantal params:7
 eerste:a en laatste:g
 ```
@@ -2989,7 +3027,6 @@ eerste:a en laatste:g
 
 ```bash
 #!/bin/bash
-
 temp="$@" 	#Initiele parameters bewaren
 while [[ -n "$1" ]];
 do
@@ -3009,23 +3046,61 @@ set -- $temp #Parameters terug resetten na het shiften. (positionele parameters 
 5
 ```
 
-74. >Tussen $* en $@ bestaat een subtiel verschil, dat men in shellscripts dikwijls nuttig kan
-    >aanwenden, vooral in combinatie met for- en while-lussen. Maak de volgende twee
+74. >Tussen **$*** en **$@** bestaat een subtiel verschil, dat men in shellscripts dikwijls nuttig kan
+    >aanwenden, vooral in **combinatie** met **for- en while-lussen**. Maak de volgende twee
     >scripts:
     >74a 74b
-    >./74b $*
-    >./74b $@
-    >./74b "$*"
-    >./74b "$@"
-    >IFS=:
-    >echo $#
-    >echo $1
-    >echo $274a 74b
-    >./74b $*
-    >./74b $@
-    >./74b "$*"
-    >./74b "$@"
     >Roep vervolgens 74a op met minimum twee argumenten.
+    >
+    >**Verschil $* en $@**:
+    >
+    >***** Expands  to  the positional parameters, starting from one.  When the expansion is
+    >
+    >**not within double quotes**, each positional parameter expands to a  separate  word
+    >
+    >In contexts where it is performed, those words are subject to further word split‐
+    >
+    >ting and pathname expansion.  When the expansion occurs within double quotes,  it
+    >
+    >expands  to a single word with the value of each parameter separated by the first
+    >
+    >character  of  the  IFS  special  variable.   That  is,  "$*"  is  equivalent  to
+    >
+    >**"$1c$2c..."**, where c is the first character of the value of the IFS variable.  If
+    >
+    >IFS is unset, the parameters are separated by spaces.  If IFS is null, the 
+    >
+    >param‐eters are joined without intervening separators.
+    >
+    >**Geen dubbele quotes? woord voor woord** $1c $2c...
+    >
+    >**Wel dubbeke quotes? 1 woord -> aan elkaar geplakt ** "$1c$2c..."
+    >
+    >
+    >
+    >**@**      Expands  to the positional parameters, starting from one.  In contexts where word
+    >
+    > **splitting** is performed, this expands each  positional  parameter  to  a  separate
+    >
+    > word; if not **within double quotes**, these words are subject to word splitting.  In
+    >
+    >contexts where word splitting is not performed, this expands  to  a  single  word
+    >
+    >with  each  positional parameter separated by a space.  When the expansion occurs
+    >
+    >within double quotes, each parameter expands to a separate word.  That  is,  "$@"
+    >
+    >is  equivalent  to  "**$1" "$2"** ...  If the double-quoted expansion occurs within a
+    >
+    >word, the expansion of the first parameter is joined with the beginning  part  of
+    >
+    >the  original  word,  and  the expansion of the last parameter is joined with the
+    >
+    >last part of the original word.  When there are no  positional  parameters,  "$@"
+    >
+    >and $@ expand to nothing (i.e., they are removed).
+
+
 
 ```bash
 #!/bin/bash
@@ -3034,7 +3109,7 @@ IFS=-
 echo "$*"
 IFS=$' \r\n'
 
-for i in "$@"; do
+for i in "$@"; do #dubbele quotes zijn nodig wanneer er spaties staan tussen argumenten (bijna altijd dus)
         echo $i
 done
 ```
@@ -3047,14 +3122,15 @@ hello world
 ```
 
 75. >Wat geldt voor scripts, geldt ook voor functies. Een functie heeft dus net zoals een script
-    >een exit-status. De return-opdracht zal bij een bash-functie echter de exit-status
+    >een **exit-status**. De return-opdracht zal bij een bash-functie echter de exit-status
     >beïnvloeden en dus in tegenstelling tot wat je verwacht niet de teruggeefwaarde
-    >bepalen. Wil je iets teruggeven, gebruik dan bij het aanroepen van een functie command
-    >substitution en binnen de functie echo/printf. Schrijf een niet-recursieve functie die de
+    >bepalen. Wil je iets teruggeven, gebruik dan bij het aanroepen van een functie **command**
+    >**substitution** en binnen de functie echo/printf. Schrijf een niet-recursieve functie die de
     >faculteit van een getal dat als parameter wordt meegegeven, teruggeeft.
 
 ```bash
 #!/bin/bash
+#exit status van een proces (functie) is altijd een getal tussen 0 en 255
 
 faculteit(){
 	res=1
@@ -3064,7 +3140,7 @@ faculteit(){
 	echo $res
 }
 
-echo Faculteit van $1 is $(faculteit $1)
+echo Faculteit van $1 is $(faculteit $1) #command substitutie
 ```
 
 ```bash
@@ -3095,8 +3171,8 @@ printf "%d %d \n" $a $b
 
 ### Parameter expansion
 
->n de volgende oefeningen leren we een aantal interessante bewerkingen om parameters te
->manipuleren. Het begrip parameter slaat op alle positionele parameters en op alle
+>In de volgende oefeningen leren we een aantal **interessante bewerkingen** om **parameters** te
+>**manipuleren**. Het begrip parameter slaat op alle positionele parameters en op alle
 >variabelen (shellvariabelen of andere). De reeds gekende positionele parameters $1, $2 enz.
 >vormen een belangrijke uitzondering: deze kunnen enkel worden gewijzigd d.m.v. set.
 >Verdere mogelijkheden zoek je op in de sectie Parameter Expansion van man bash.
@@ -3106,23 +3182,23 @@ printf "%d %d \n" $a $b
 77. >De bijzondere notaties ${variabele=waarde} en ${variabele-waarde} bieden een snelle
     >oplossing voor het toewijzen of opvragen van een waarde aan een variabele indien die
     >nog niet gedefinieerd zou zijn.
-    >Indien een variabele wel gedefinieerd is, maar leeg, dan biedt deze notatie geen
+    >Indien een **variabele** wel **gedefinieerd** is, **maar leeg**, dan biedt deze notatie geen
     >oplossing. Welk alternatief heb je hiervoor, dat beide situaties aankan? Schrijf deze zo
     >compact mogelijk.
 
 ```bash
 #!/bin/bash
 x=""
-: ${x:=7} #oplossing
+: ${x:=7} #als variabele x niet bestaat (leeg is), dan is x gelijk aan 7
 echo $x
 ```
 
-78. >Schrijf een shellscript dat de laatste aantal lijnen van het bestand .bash_history in je
+78. >Schrijf een shellscript dat de **laatste aantal lijnen** van het bestand .bash_history in je
     >home directory naar standaarduitvoer uitschrijft. De waarde van aantal wordt als enige
-    >argument meegegeven. Indien deze waarde ontbreekt, moeten er 10 lijnen
-    >uitgeschreven worden. Gebruik het commando tail.
+    >argument meegegeven. Indien deze waarde ontbreekt, moeten er **10** lijnen
+    >uitgeschreven worden. Gebruik het commando **tail**.
     >
-    >Met een goed gekozen delimiter kun je een string in stukken splitsen. In een aantal
+    >Met een goed gekozen delimiter kun je een string in stukken **splitsen**. In een aantal
     >toepassingen is dit niet voldoende of minstens zeer onhandig.
     >Bash kent een beperkt aantal stringoperatoren. Deze stringoperatoren laten o.a. toe de
     >lengte van variabelen/parameters te bepalen, en substrings die beantwoorden aan bepaalde
@@ -3130,25 +3206,25 @@ echo $x
     >regular expressions), maar mogen ook variabelen bevatten.
     >
     >**Bash v1-compatibele manipulaties**
-    >${#variabele} geeft de lengte van de waarde van de variabele in karakters
-    >${variabele#pattern} verwijdert de kortst mogelijke substring vooraan de variabele
+    >${#variabele} geeft de **lengte** van de waarde van de variabele in karakters
+    >${variabele#pattern} **verwijdert de kortst mogelijke substring** **vooraan** de variabele
     >die aan het pattern voldoet
-    >${variabele##pattern} verwijdert de langst mogelijke substring vooraan de variabele
+    >${variabele##pattern} **verwijdert de langst mogelijke substring** **vooraan** de variabele
     >die aan het pattern voldoet
-    >${variabele%pattern} verwijdert de kortst mogelijke substring achteraan de
+    >${variabele%pattern} **verwijdert de kortst mogelijke substring** **achteraan** de
     >variabele die aan het pattern voldoet
-    >${variabele%%pattern} verwijdert de langst mogelijke substring achteraan de
+    >${variabele%%pattern} **verwijdert de langst mogelijke substring** **achteraan** de
     >variabele die aan het pattern voldoet
     >**Vereisen minimaal Bash v2**
-    >${variabele:offset} geeft de deelstring vanaf positie offset.
-    >${variabele:offset:length} geeft de deelstring vanaf positie offset met length tekens.
+    >${variabele:offset} geeft de **deelstring** vanaf positie offset.
+    >${variabele:offset:length} geeft de **deelstring** vanaf positie offset met length tekens.
     >${variabele/pattern/string}
     >geeft de string die ontstaat als je in de variabele de eerste en
     >langste substring die aan pattern voldoet, vervangt door
     >string.
-    >${variabele//pattern/string} geeft de string die ontstaat als je in de variabele alle
+    >${variabele//pattern/string} **geeft** de **string** die ontstaat als je in de variabele alle
     >substrings die aan pattern voldoen, vervangt door string.
-    >${variabele/#pattern/string} geeft de string die ontstaat als je de langste substring vooraan
+    >${variabele/#pattern/string} **geeft** de **string** die ontstaat als je de langste substring vooraan
     >de variabele, die aan pattern voldoet, vervangt door string.
     >${variabele/%pattern/string}
     >geeft de string die ontstaat als je de langste substring
@@ -3164,7 +3240,7 @@ echo $x
 
 ```bash
 #!/bin/bash
-tail -n ${1-10} ~/.bash_history
+tail -n ${1:-10} ~/.bash_history #als param 1 niet bestaan, neem dan 10 als waarde
 ```
 
 79. >Vul een variabele x op met de waarde /usr/share/emacs/24.5/etc/tutorials/TUTORIAL.nl.
@@ -3176,6 +3252,10 @@ tail -n ${1-10} ~/.bash_history
 #!/bin/bash
 x="/usr/share/emacs/24.5/etc/tutorials/TUTORIAL.nl"
 printf "directory=%s bestandsnaam=%s\n" ${x%/*} ${x##*/}
+
+
+${variabele##pattern} verwijdert de langst mogelijke substring vooraan de variabele
+${variabele%pattern} verwijdert de kortst mogelijke substring achteraan de variabele die aan het pattern voldoet
 ```
 
 80. >Vul een variabele x op met de regel "dit is een <b>eenvoudige</b> en <b>nuttige</b>
@@ -3188,8 +3268,19 @@ printf "directory=%s bestandsnaam=%s\n" ${x%/*} ${x##*/}
     
     #met Bash v1
     temp=${x%%</*} 			#verwijdert de langst mogelijke substring achteraan de variabele die aan het pattern </* voldoet
+    						#verwijdert dus "</b> en <b>nuttige</b> oefening" => "dit is een <b>eenvoudige"
+    echo $temp
+    
+    
     vet1=${temp#*>}			#verwijdert de kortst mogelijke substring vooraan de variabele die aan het pattern *> voldoet
-    rest=${x##*$vet1}		#verwijdert de langst mogelijke substring vooraan de variabele die aan het pattern *eenvoudige voldoet
+    						#verwijdert dus "dit is een <b>" => "eenvoudige"
+    echo $vet1
+    
+    
+    rest=${x##*$vet1}		#verwijdert de langst mogelijke substring vooraan de variabele die aan het pattern *eenvoudige voldoet	.
+    						#verwijder dus "dit is een <b>eenvoudige" => "</b> en <b>nuttige</b> oefening'"
+    echo $rest
+    
     temp=${rest%</*}		#verwijdert de kortst mogelijke substring achteraan de variabele die aan het pattern </* voldoet
     vet2=${temp##*>}		#verwijdert de langst mogelijke substring vooraan de variabele die aan het pattern *> voldoet
     echo "$vet1 *** $vet2"
@@ -3201,7 +3292,9 @@ printf "directory=%s bestandsnaam=%s\n" ${x%/*} ${x##*/}
     vet2=${temp/<\/b>*/""}
     echo "$vet1 *** $vet2"
     ```
-
+    
+    
+    
 81. > Indien je in de stringoperatoren de variabele $@ of $* gebruikt, kun je op een relatief
     >eenvoudige manier de laatste positionele parameter opvragen met:
     >**echo ${@:$#:1}**
@@ -3210,7 +3303,10 @@ printf "directory=%s bestandsnaam=%s\n" ${x%/*} ${x##*/}
 ```bash
 #!/bin/bash
 
-echo "Laatste: ${@:$#:1}"  #van $@ (alle positionele parameters) vertrek je van offset $# (index van laatste pos par) en neem je 1 pos par
+${@: -1:1} #laatste param
+${@: -2:1} #lvooraatste param
+
+echo "Laatste: ${@:$#:1}"  #van $@ (alle positionele parameters) vertrek je van offset $# (index van laatste pos par) en neem je 1 pos
 
 echo "Voorlaatste: ${@:$#-1:1}"
 echo "Twee laatste: ${@:$#-1:2}"
@@ -3222,9 +3318,10 @@ echo "Foute manier voorlaatste verduidelijking: ${onbestaandevar:-2:1}"  # zonde
 
 
 82. >Los vorige vraag op door gebruik te maken van:
-    >\1. het mechanisme van indirecte adressering en
-    >\2. de opdracht eval.
-
+    >
+    >1. het mechanisme van indirecte adressering en
+    >2. de opdracht eval.
+    
     
 
 ```bash
@@ -3252,13 +3349,12 @@ eval echo '$'$(($#-1))
     >declare -p data # ter controle
     >grep ^data= < <(set) # alternatieve controle
     >Vraag volgende informatie op, telkens met één statement:
-    >• alle getallen van deze array
-    >• het aantal getallen in de array
-    >• het getal met index 2 uit de array
-    >• het getal met index 5 uit de array (is leeg in ons voorbeeld)
-    >
-    >• het getal met index 20 uit de array
-    >Pas deze vragen eveneens toe op de builtin array BASH_VERSINFO.
+    >• **alle getallen van deze array**
+    >• **het aantal getallen in de array**
+    >• **het getal met index 2 uit de array**
+    >• **het getal met index 5 uit de array** (is leeg in ons voorbeeld)
+    >• **het getal met index 20 uit de array** (=20)
+    >Pas deze vragen eveneens toe op de builtin array **BASH_VERSINFO**.
 
 ```bash
 #!/bin/bash
@@ -3308,8 +3404,8 @@ regel=($(wc /etc/passwd))
 echo "regel[0]: ${regel[0]}"
 echo "regel[1]: ${regel[1]}"
 echo "regel[@]: ${regel[@]}"
-declare -p regel
-grep ^regel= < <(set)
+declare -p regel #toont info over variabele (wat er in zit)
+grep ^regel= < <(set) #geeft ook value van de variable weer
 ```
 
 86. > Hoe vraag je de bestaande indices van een array op? Hoe genereer je hieruit een tweede
@@ -3354,15 +3450,15 @@ echo ${dagen[$1]}
 
 Dikwijls bestaat de uitvoer van een commando uit één regel, waarvan je slechts het deel, dat
 je nodig hebt in je script wilt opslaan in een variabele. Dit kan op diverse manieren:
-• Gebruik cut met een gepaste delimiter. Deze kan echter slechts uit één teken
+• Gebruik **cut** met een gepaste **delimiter**. Deze kan echter slechts uit één teken
 bestaan. Standaard is de delimiter voor dit commando een tabkarakter.
-• Sla de volledige regel op in een variabele en gebruik stringoperatoren om het
+• Sla de volledige regel op in een variabele en gebruik **stringoperatoren** om het
 interessante deel af te zonderen.
-• Gebruik de opdracht read, die – op basis van IFS – een regel opsplitst en de delen
-ervan aan variabelen toekent. De inputregel moet hierbij komen van
+• Gebruik de opdracht **read**, die – op basis van IFS – een regel opsplitst en de delen
+ervan aan **variabelen** toekent. De inputregel moet hierbij komen van
 standaardinvoer. Indien de invoer doorgepipet wordt, dan zijn de variabelen enkel
 gekend in de nieuwe shell.
-• Gebruik arrays om de alle delen van de regel op te slaan in arrayelementen – alweer
+• Gebruik **arrays** om de alle delen van de regel op te slaan in arrayelementen – alweer
 op basis van IFS – en verwijs met de juiste indices naar de gewenste delen.
 De variabele IFS is standaard ingesteld op whitespace, dus spaties, tabs en regeleinden. Je
 kunt deze echter ook zelf wijzigen, zowel interactief als binnen een script; in dit laatste geval
@@ -3377,16 +3473,16 @@ is de wijziging enkel van kracht binnen het script.
 
 
 
-n een script kunnen if-testen dikwijls vervangen worden door alternatieven op basis van de
-&&- en/of ||-operatoren. Maak daar nuttig gebruik van om je code bondig te houden.
+In een script kunnen if-testen dikwijls vervangen worden door alternatieven op basis van de
+**&&- en/of ||**-operatoren. Maak daar nuttig gebruik van om je code bondig te houden.
 
 
 
-89. >Ontwikkel een shellscript dat als (enige) parameter een bestandsnaam heeft. Als output
-    >moet het script het gemiddelde aantal karakters per regel en het gemiddelde aantal
-    >woorden per regel uitschrijven. Gebruik de output van het commando wc en probeer
+89. >Ontwikkel een shellscript dat als (enige) parameter een **bestandsnaam** heeft. Als output
+    >moet het script het **gemiddelde aantal karakters per regel en het gemiddelde aantal**
+    >**woorden per regel uitschrijven**. Gebruik de output van het commando **wc** en probeer
     >met de diverse methodes die hierboven aangehaald werden (behalve de tweede) om
-    >deze output op te splitsen.
+    >deze output op te **splitsen**.
     >Opgelet: de shell behandelt alle getallen als integers. Niettemin kun je er, met behulp
     >van wat wiskunde, voor zorgen dat delingen correct worden afgerond. Hoe?
 
@@ -3395,9 +3491,9 @@ n een script kunnen if-testen dikwijls vervangen worden door alternatieven op ba
 ```bash
 #!/bin/bash
 
-if (($#!=1));then
-	echo geen parameter meegegeven! >&2 #file descriptro 2. Foutmelding
-	exit1
+if (($#!=1));then 						#geen bestand opgegeven of te veel paramters.
+	echo geen parameter meegegeven! >&2 #file descriptor 2. Foutmelding
+	exit 1
 fi
 
 if [[ ! -f "$1" ]]; then
@@ -3414,7 +3510,7 @@ echo gemoddeld aantal karakters per lijn: $((kars/lijnen))
 
 
 90. >Wat moet je doen opdat de read-instructie lijnen niet alleen in woorden zou opsplitsen
-    >op basis van spaties, tabs en regeleinden, maar ook op basis van :-tekens?
+    >op basis van spaties, tabs en regeleinden, maar ook op basis van **:-tekens**?
 
 ```bash
 IFS=: read a b > /etc/passwd
@@ -3422,19 +3518,20 @@ IFS=: read a b > /etc/passwd
 
 
 
-91. >Ontwikkel een script om de gebruikersnaam (veld 1 van /etc/passwd) te bepalen aan de
-    >hand van een gebruikers-ID (veld 3 van /etc/passwd) dat je als (enige) parameter aan het
+91. >Ontwikkel een script om de **gebruikersnaam** (veld 1 van /etc/passwd) te bepalen aan de
+    >hand van een **gebruikers-ID** (veld 3 van /etc/passwd) dat je als (enige) parameter aan het
     >script meegegeven hebt.
-    >Je kunt de output van het commando grep zowel met cut, read als met een array
+    >Je kunt de output van het commando grep zowel met **cut**, **read** als met een **array**
     >analyseren.
 
 ```bash
 #!/bin/bash
 if (($#!=1));then
 	echo Fout bij parameters! >&2
+	exit 1
 fi
 
-if [[ "$1" =~ ^[0-9]+$ ]]; then
+if [[ "$1" =~ "^[0-9]+$" ]]; then
 	echo $1 stelt geen getal voor >&2
 	exit 1
 fi
@@ -3498,7 +3595,7 @@ Schrijf eigen versie van commando wc -l
 
 
 
-92. >Ontwikkel een script dat het commando tail n simuleert. Als eerste argument moet een
+92. >Ontwikkel een script dat het commando **tail** n simuleert. Als eerste argument moet een
     >bestandsnaam opgegeven worden en als tweede argument mag het aantal regels
     >opgegeven worden. Ontbreekt het tweede argument, dan worden de 10 laatste regels
     >weergegeven. Realiseer dit op twee manieren:
@@ -3510,35 +3607,39 @@ Schrijf eigen versie van commando wc -l
 
 ```bash
 #!/bin/bash
-if (($#!=1 && $#!=2));then
-	echo "verkeerd aantal parameters" >&2
+
+
+
+#(( $# >= 1 )) || { echo verkeerd aantal parameters >&2 ; exit 1 ; }
+if (($#!=1 && $#!=2));then 
+	echo verkeerd aantal parameters >&2
 	exit 1
 fi
 
-if [[ ! -f "$1"]];then
+
+#[[ -f "$1" ]] || { echo $1 is geen bestand  >&2  ; exit 1 ; } 
+if [[ ! -f "$1" ]];then 
 	echo $1 is geen bestand >&2
 	exit 1
 fi
 
-if [[ -n "$2" && ! "$2" =~ ^[0-9]+$ ]]; then
-	echo "$2 stelt geen getal voor" >&2
-	exit 1
-fi
 
-aantal=${2-10}
-echo $aantal
 
-array=() 
-teller=0
-while read lijn < "$1" ;do
-	array[$teller]="$lijn"
-	((teller++)) #haakjes belangrijk in bash!
+aantal=${2-10}				#${parameter-value}: gebruik parameter $2 als die bestaat, zoniet gebruik value 10
+tel=0
+while IFS='' read lijn ; do		# while lus om file in te lezen regel per regel in $lijn, IFS='' zorgt dat witruimte vooraan niet wordt weggelaten
+    tot[tel % aantal]=$lijn		# $lijn kopieren naar array tot op positie: tel modulo aantal
+    (( tel++ ))
 done < "$1"
 
-for ((i=0;i<aantal;i++)) ;  do
-	echo ${array[ $(( (teller+i)%aantal)) ]}
-done
 
+(( aantal <= tel )) || aantal=$tel	# als aantal>tel (maw er zijn minder lijnen in de file dan gevraagd), wordt aantal ingesteld op aantal lijnen in file (huidige teller)
+
+i=0				
+while (( i < aantal )) ; do		#while lus om de aantal lijnen, opgeslagen in tot, weer te geven
+    echo "${tot[(tel + i) % aantal]}"
+    (( i ++ ))
+done
 ```
 
 
@@ -3829,5 +3930,6 @@ done
 
 ```c
 int dimension = atoi(argv[1]); //( = Asci To Integer) zet string om naar int
+[[ $x =~ "^.$"]] //checken of variabele voldoet aan reguliere expressie
 ```
 
