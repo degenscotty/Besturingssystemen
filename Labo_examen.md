@@ -919,57 +919,66 @@ int main(int argc, char **argv){
 ```c	
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/types.h> 
-#include <sys/stats.h> 
-#include <stdio.h> 
+#include <sys/types.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <string.h>
 
-int main(int argc, char ** argv){ 
+int main(int argc, char **argv)
+{
     unsigned char buffer[BUFSIZ];
- 
-    if (argc==1){ 
-     	int n = read(0,buffer,BUFSIZ); //lezen standaard invoer
-        while(n>0){
-            write(1,buffer,n);
-            n=read(0,buffer,BUFSIZ);
-        }     
-        if(n<0){
+
+    if (argc == 1)
+    {                                    //wanneer er geen params zijn meegegeven
+        int n = read(0, buffer, BUFSIZ); //lezen standaard invoer
+        while (n > 0)
+        {
+            write(1, buffer, n);
+            n = read(0, buffer, BUFSIZ); //n geeft aantal bytes weer
+        }
+        if (n < 0)
+        {
             perror(argv[0]);
-            exit(1); 
+            exit(1);
         }
     }
-    else{
-        
-        for(i=1;i<argc;i++){
-            
-            int fd=open(argv[i],O_RDONLY); 	// bestand Read-only openen
-				if (fd<0){ 					// controleren of bestand is geopend.
-					perror(argv[i]);
-					continue;
-				}
-				int n=read(fd,buffer,BUFSIZ);
-				while (n>0){ //buffer van geopende bestand uitschrijven en het volgende deel ervan inlezen naar de buffer
-					n=write(1,buffer,n);
-					if (n<0){
-						perror(argv[i]);
-						continue;
-					}
-					n=read(fd,buffer,BUFSIZ);
-				}
-				if (n<0){
-					perror(argv[i]);
-					continue;
-				}
-			
-				if (close(fd)<0){
-					perror(argv[i]);
-					continue;
-				}
+    else 								//wanneer er wel params zijn meegegeven
+    {
+        int i;
+        for (i = 1; i < argc; i++)
+        {
+            int fd = open(argv[i], O_RDONLY); // bestand Read-only openen
+            if (fd < 0)
+            { 								// controleren of bestand is geopend.
+                perror(argv[i]);
+                continue; 					//programma mag door gaan
+            }
+            int n = read(fd, buffer, BUFSIZ);
+            while (n > 0)
+            { //buffer van geopende bestand uitschrijven en het volgende deel ervan inlezen naar de buffer
+                n = write(1, buffer, n);
+                if (n < 0)
+                {
+                    perror(argv[i]);
+                    continue;
+                }
+                n = read(fd, buffer, BUFSIZ);
+            }
+            if (n < 0)
+            {
+                perror(argv[i]);
+                continue;
+            }
+
+            if (close(fd) < 0)
+            {
+                perror(argv[i]);
+                continue;
+            }
         }
     }
-   return 0; 
+    return 0;
 }
 ```
 
@@ -1216,18 +1225,18 @@ int main(int argc, char **argv){
 
 ## Deel VI: Processen en POSIX-threads
 
-Een nieuw proces aanmaken gebeurt met de systeemaanroep **fork()**. De systeemaanroep
-maakt een nieuw proces aan, het kind, dat bijna een exacte kopie is van het proces dat de
-systeemaanroep heeft gebruikt, het ouderproces. Na het beëindigen van de systeemaanroep
-beschik je over twee processen, het kind en het ouderproces, die beide de uitvoering
-verderzetten bij het terugkeren van de fork()-systeemaanroep. Beide processen beschikken
-over dezelfde programmatekst maar hebben elk hun eigen kopie van de stapel, de heap, en
-het datasegment. Initieel bevat de stapel, de heap, en het datasegment van het kindproces
+Een **nieuw proces aanmaken** gebeurt met de systeemaanroep **fork()**. De **systeemaanroep**
+maakt een nieuw proces aan, het **kind**, dat bijna een exacte kopie is van het proces dat de
+systeemaanroep heeft gebruikt, het **ouderproces**. Na het beëindigen van de systeemaanroep
+beschik je over **twee processen**, het **kind en het ouderproces,** die beide de uitvoering
+**verderzetten** bij het **terugkeren** van de **fork()-systeemaanroep**. Beide processen beschikken
+over **dezelfde programmatekst** maar hebben elk hun **eigen kopie van de stapel, de heap, en**
+**het datasegment**. Initieel bevat de stapel, de heap, en het datasegment van het kindproces
 dezelfde informatie als de overeenkomstige segmenten van het ouderproces. Om in een
 programma het onderscheid te kunnen maken tussen het kind en het ouderproces moet je
-weten dat de systeemaanroep fork() twee verschillende return-waardes heeft. In het
-kindproces geeft fork() de waarde 0 terug, terwijl in het ouderproces het proces-ID van het
-nieuwe aangemaakte kindproces wordt teruggegeven.
+weten dat de systeemaanroep fork() t**wee verschillende return-waardes heeft**. In het
+**kindproces** geeft **fork()** de waarde **0** terug, terwijl in het **ouderproces** het **proces-ID van** het
+**nieuwe aangemaakte kindproces** wordt teruggegeven.
 
 
 
@@ -1249,17 +1258,41 @@ fork();
 > voeren.
 
 ```bash
-...
+2^3-1 kindprocessen. =7
+
+fork()
+
+p
+\
+c1
+
+fork()
+
+	 p
+  /	   \
+c1		c2
+  \
+   c3
+
+fork()
+			
+	--------p-----------
+    /	   	\			\
+   c1		c2			c4
+  /	  \		  \
+  c3  c5	  c6
+    \
+   	c7
 ```
 
-2. > Schrijf een programma dat drie kindprocessen aanmaakt en zorg ervoor dat ieder
-   > kindproces zijn proces-ID naar het scherm schrijft en daarna stopt. Het proces-ID kan je
-   > m.b.v. de systeemaanroep getpid() opvragen en een proces kan je beëindigen met de
-   > functie exit(int exitstatus). De exitstatus van een correct beëindigd proces is steeds 0
-   > terwijl een waarde verschillend van 0 duidt op een fout.
+2. > Schrijf een programma dat **drie kindprocessen** aanmaakt en zorg ervoor dat ieder
+   > kindproces zijn **proces-ID** naar het scherm **schrijft** en daarna **stopt**. Het proces-ID kan je
+   > m.b.v. de systeemaanroep **getpid()** opvragen en een proces kan je beëindigen met de
+   > functie **exit (int exitstatus).** De **exitstatus** van een **correct beëindigd** proces is steeds **0**
+   > terwijl een waarde **verschillend** van **0** duidt op een **fout**.
 
    > In bovenstaande opdracht kan je nog met een eenvoudige if/else-structuur het onderscheid
-   > maken tussen wat het ouderproces en wat het kindproces moet uitvoeren. Het kindproces
+   > maken tussen wat het **ouderproces** en wat het **kindproces** moet uitvoeren. Het kindproces
    > moet immers alleen maar zijn proces-ID naar het scherm schrijven en zichzelf beëindigen.
    > Wanneer het gaat om meer dan een paar lijnen code, is het interessanter om een nieuw
    > programma te ontwikkelen, eventueel zelfs in een andere programmeertaal, dat je
@@ -1267,29 +1300,97 @@ fork();
    > een programma moet uitvoeren dat reeds bestaat en dat dus niet door jou nog moet
    > worden ontwikkeld. 
    >
-   > Een nieuw programma uitvoeren gebeurt met de systeemaanroep execve(const char*
+   > Een nieuw programma uitvoeren gebeurt met de systeemaanroep **execve**(const char*
    > filename, char *const argv[], char *const envp[]). Execve zal het tekstsegment, het
-   > datasegment, de stapel en de heap van het huidige proces overschrijven met de gegevens
-   > van het uitvoerbaar bestand filename. Argumenten voor het nieuwe programma worden als
-   > tweede parameter argv opgegeven. Als laatste parameter envp kan je een tabel van strings,
+   > datasegment, de stapel en de heap van het huidige **proces** **overschrijven** met de gegevens
+   > van het uitvoerbaar bestand filename. **Argumenten voor het nieuwe programma** worden als
+   > tweede parameter argv opgegeven. Als laatste parameter envp kan je een **tabel van strings**,
    > in de vorm van naam-waardeparen, doorgeven aan het nieuwe programma.
    > Bemerk dat bij de oplijsting van systeemaanroepen met strace execve op de eerste lijn staat.
    > Concreet wil dit zeggen dat van het shellproces een kopie gemaakt wordt en dat
    > onmiddellijk daarna het proces wordt overschreven met de inhoud van de opdracht die je op
    > de opdrachtlijn hebt ingetikt.
-   > Naast het rechtstreeks gebruik van de systeemaanroep execve, bestaan er een aantal
+   > Naast het rechtstreeks gebruik van de systeemaanroep **execve**, bestaan er een aantal
    > bibliotheek-functies die allemaal na een aantal tussenstappen execve zullen aanroepen. Deze
-   > functies beginnen allemaal met het woord exec gevolgd door één of twee letters. Het
+   > functies beginnen allemaal met het woord **exec** gevolgd door één of twee letters. Het
    > verschil met execve zit hem in het aantal parameters en de manier waarop de argumenten
    > aan het nieuwe programma worden doorgegeven. Hieronder vind je een overzicht.
-
-   ```BASH
-   ...
+   >
+   > ![Imgur](https://imgur.com/Io8v4Ky.png)
+   
+   ```c
+   #include <unistd.h>
+   #include <sys/types.h>
+   #include <stdlib.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
+   #include <stdio.h>
+   #include <time.h>
+   #include <pthread.h>
+   #include <string.h>
+   
+   int main(int argc, char **argv)
+   {
+       int pid = fork();
+       if (pid == 0)						//als pid==0 dan ben je bezig in het child proces
+       {
+           printf("this is child \n");
+           return 0;
+       }
+       else if (pid > 0)					//anders in het parent proces
+       {
+           printf("this is parent \n");
+           sleep(60);						//proces staat vrijwillig proces af aan ander proces = wisselen proces
+           return 0;
+       }
+       else 								//kleiner dan 0. Foutmelding
+       {
+           perror(argv[0]);
+       }
+       return 0;
+   }
    ```
-
-3. >Schrijf een C-programma **writestring**.c dat het proces-ID naar het scherm schrijft gevolgd
-      >door de string die als enige parameter wordt meegegeven en vervolgens 10 seconden
-      >wacht vooraleer te eindigen.
+   
+   **Met execv: overschakelen naar ander stukje code binnen kind proces**
+   
+   ```C
+   #include <unistd.h>
+   #include <sys/types.h>
+   #include <stdlib.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
+   #include <stdio.h>
+   #include <time.h>
+   #include <pthread.h>
+   #include <string.h>
+   
+   int main(int argc, char **argv)
+   {
+       int pid = fork();
+       if (pid == 0)							//als pid==0 dan ben je bezig in het child proces
+       {
+           char * args[]={"ls","-l","/",0}; 	//mee te geven argumenten. argv[0] is "ls".  afsluiten met 0
+          	execv("/usr/bin/ls",args);			//path te vinden adhv "whereis ls"
+           return 0;
+       }
+       else if (pid > 0)						//Parent process
+       {
+           waitpid(pid,NULL,0);				//wachten tot dat kindproces klaar is
+           return 0;
+       }
+       else 									//kleiner dan 0. Foutmelding
+       {
+           perror(argv[0]);
+       }
+       return 0;
+   }
+   ```
+   
+   
+   
+3. >Schrijf een C-programma **writestring**.c dat het **proces-ID** naar het **scherm** schrijft gevolgd
+      >door de **string** die als **enige parameter** wordt meegegeven en vervolgens **10 seconden**
+      >**wacht** vooraleer te eindigen.
       >
       >**echo $$** om pid op te vragen van huidige terminal.
       >
