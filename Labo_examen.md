@@ -551,8 +551,8 @@ int main() {
 
 
 Alle systeemaanroepen die een verwijzing nodig hebben naar een open bestand, maken
-gebruik van een **file descriptor**. Een file descriptor is doorgaans een klein positief geheel
-getal dat kan verwijzen naar gewone bestanden maar ook naar directories, sockets, pipes, ....
+gebruik van een **file descriptor**. Een file descriptor is doorgaans een **klein positief geheel**
+**getal dat kan verwijzen naar gewone bestanden** maar ook naar **directories, sockets, pipes**, ....
 Alles wat eigenlijk op het bestandssysteem bestaat kan worden geopend en kan aan een file
 descriptor worden gekoppeld. Bij het starten van een programma zullen drie file descriptors
 van de shell worden overgeërfd. De drie file descriptors verwijzen respectievelijk naar het
@@ -568,23 +568,23 @@ Onderstaande tabel geeft een overzicht.
 
 
 Een bestand openen gebeurt via de systeemaanroep **open(pathname, flags, mode)** die een
-geheel getal, de file descriptor dus, teruggeeft of -1 wanneer er een fout optreedt. De eerste
-paramater die je moet opgeven is het pad naar het bestand. De tweede parameter bevat
+**geheel getal**, de **file descriptor** dus, **teruggeeft** of **-1** wanneer er een **fout** optreedt. De eerste
+paramater die je moet opgeven is het **pad** naar het bestand. De tweede parameter bevat
 een aantal statusvlaggen die bij het openen van het bestand worden geraadpleegd.
-Wanneer je een bestand wil openen om er uitsluitend van te lezen, geef je als flags
-“O_RDONLY” op. Wanneer je naar een bestand wil schrijven en er ook van wil lezen is de
-flags-parameter gelijk aan “O_RDWR”. Combineren van statusvlaggen gebeurt via de
+Wanneer je een bestand wil openen om er uitsluitend van te lezen, geef je als **flags**
+“**O_RDONLY**” op. Wanneer je naar een bestand wil schrijven en er ook van wil lezen is de
+flags-parameter gelijk aan “**O_RDWR**”. Combineren van statusvlaggen gebeurt via de
 logische |-operator. Zo kan je een bestand openen om er naar te schrijven en tevens
 opgeven dat het moet worden aangemaakt wanneer het niet zou bestaan. De flags-
-parameters is in dit geval “O_WRONLY | O_CREAT”. De combinatie “O_WRONLY | O_CREAT
-| O_APPEND” betekent dat het bestand zal worden aangemaakt wanneer het niet bestaat,
+parameters is in dit geval “**O_WRONLY | O_CREAT”**. De combinatie “**O_WRONLY | O_CREAT**
+**| O_APPEND**” betekent dat het bestand zal worden aangemaakt wanneer het niet bestaat,
 dat er enkel naar geschreven zal worden en dat alle data die er naartoe wordt geschreven
-achteraan zal worden toegevoegd. De O_APPEND vlag verzekert dus dat indien het bestand
-reeds zou bestaan, de bestaande inhoud niet zal worden overschreven.
+**achteraan** zal worden **toegevoegd**. De **O_APPEND** vlag verzekert dus dat indien het bestand
+reeds zou bestaan, de bestaande inhoud **niet zal worden overschreven**.
 De laatste parameter van de systeemaanroep open is optioneel en is enkel van belang
-wanneer de O_CREAT vlag is opgegeven.
-Om van een file descriptor te lezen gebruik je de systeemaanroep **read(fd,buffer,count)**.
-Buffer is een void-pointer naar een geheugenlocatie waar de gelezen bytes zullen worden
+wanneer de **O_CREAT** vlag is opgegeven.
+Om van een **file descriptor te lezen** gebruik je de systeemaanroep **read(fd,buffer,count)**.
+Buffer is een **void-pointer** naar een **geheugenlocatie** waar de gelezen bytes zullen worden
 weggeschreven. Count is het aantal bytes die je van de opgegeven file descriptor wil lezen.
 De read-systeemaanroep geeft het aantal gelezen bytes terug en -1 wanneer er bij het lezen
 een fout optreedt.
@@ -596,32 +596,79 @@ of -1.
 
 Tot slot kan je met de systeemaanroep **close(fd)** een filedescriptor sluiten.
 
+**samenvatting system calls:**
+
+> **open(pathname, flags, mode)**
+>
+> **read(fd,buffer,count)**
+>
+> **write(fd,buffer,count)**
+>
+> **close(fd)**
+
+
+
 **Opdrachten**
 
-1. > Schrijf een C-programma dat een bestand van ongeveer 10MB aanmaakt met
+1. > Schrijf een C-programma dat een bestand van (ongeveer) 10MB aanmaakt met
    > willekeurige lettertekens gelegen in het gesloten interval [a..z].
 
 
 
 ```c
-#include <stdio.h>
+#include <unistd.h> //ALTIJD
+#include <sys/types.h> //normaal krijg je ze wel op het examen
 #include <stdlib.h>
-int main()
-{
-    FILE * fp;
-    fp = fopen("output.txt", "w");
-    if (fp != NULL)
-    {
-        for (int i = 0; i < 10000; i++)
-        {
-            char c = 'a' + rand() % 26;
-            fputc(c, fp);
-        }
-        fclose(fp);
-    }
-    return 0;
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <time.h>
+int main(int argc, char **argv){
+	srand(time(0));									//wanneer je willekeurige characters nodig hebt
+	int fd = open("largefile", O_WRONLY|O_CREAT);	 //returnt int en opent bestand in write only 
+													 //creeërt bestand indien het nog niet bestaat
+   
+    if(fd<0){ 										//als de returnwaarde < 1 is, is er een fout opgetreden
+		perror(argv[0]); 							//geeft de error terug
+		return 1; 									//geeft aan aan bash dat er een fout opgetreden is
+	}
+
+	int i;
+	for(i=0; i< 10*1024*1024; i++){
+		char ch = rand()%26 + 'a';				//random char
+		if(write(fd, &ch, 1) < 0){ 				//(fd,buffer,mode) //adres van buffer is &ch //1byte
+			perror(argv[0]); 					//geeft de error terug omdat hij niks geschreven heeft
+			return 1;							//geeft aan aan bash dat er een fout opgetreden is
+		}
+	}
+	
+	if(close(fd) < 0){ 							//file descriptor altijd weer sluiten!
+		perror(argv[0]);
+		return 1;
+	}
+	
 }
 ```
+
+**Deze aanpak is heel traag omdat er veel I/O opdrachten zijn. Dit kan geoptimaliseerd worden:**
+
+```C
+int i,j;
+char buffer[1024];
+for(i=0; i< 10*1024; i++){
+	
+    for(j = 0; j < 1024; j++){
+		buffer[j] = rand()%26 + 'a';
+	}
+	
+    if(write(fd, buffer, 1) < 0){
+		perror(argv[0]); //geeft de error terug omdat hij niks geschreven heeft
+		return 1;
+	}
+}
+```
+
+
 
 2. > Tot nog toe werd er niets gezegd over de optimale buffergrootte. De bedoeling is een C-
    > programma te ontwikkelen dat het hierboven aangemaakte bestand verschillende keren
@@ -655,57 +702,142 @@ double time=(clock()-start)/CLOCKS_PER_SEC;
 ```
 
 ```c	
-#include <stdio.h>
+#include <unistd.h> 
+#include <sys/types.h> 
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <time.h>
 #include <pthread.h>
-#include <string.h>
-
-int main()
-{
-    FILE *fp = fopen("output.txt", "r");
-    int BUF_SIZ = 1;
-    if (fp != NULL)
-    {
-        while (BUF_SIZ < 8192)
-        {
-            char symbol;
-            double start = clock();
-            char *buffer = malloc(BUF_SIZ * sizeof(char));
-            while ((symbol = getc(fp)) != EOF)
-            {
-                strcat(buffer, &symbol);
-                buffer = realloc(buffer,BUF_SIZ * sizeof(char));
-            }
-            double time = (clock() - start) / CLOCKS_PER_SEC;
-            printf("BUF_SIZ=%d Time=%d", BUF_SIZ, time);
-            free(buffer);
-            BUF_SIZ *= 2;
-        }
-        fclose(fp);
-    }
-    return 0;
+int main(int argc, char **argv){
+	
+	int fd = open("largefile", O_RDONLY)
+	if(fd<0){
+		perror(argv[0]); 
+		return 1;
+	}
+	
+	int i;
+	
+	char buffer[8192];								//buffergrootes van 1 -> 8192. Zonder malloc
+	for(i = 1; i<8192; i<<1){ 						//left shift == maal 2
+		double start=clock();
+		
+		if(lseek(fd,0, SEEK_SET) < 0;{			 	 //gebruik lseek om de file descriptor terug aan het begin (0) te zetten
+            										 //SEEK_SET = absolute waarde meegegeven van adres waar het moet staan
+			perror(argv[0]);
+			return 1;
+		}
+		  				
+		int n = read(fd,buffer,i);  				//lees altijd i bytes in totdat er geen meer zijn
+		while(n > 0){
+			n = read(fd,buffer,i);
+		}
+        
+		if(n<0){
+			perror(argv[0]);
+			return 1;
+		}
+		printf("BUF_SIZ=%5d Time=%10.2f\n", i, (clock() - start) / CLOCKS_PER_SEC))
+	}
+	
+    
+	if(close(fd) < 0){
+		perror(argv[0]);
+		return 1;
+	}
 }
 ```
 
-3. > De clock-functie en de macro **CLOCKS_PER_SEC** vind je in de bibliotheek **pthread.h** Doe nu hetzelfde maar voor de write-systeemaanroep. Maak voor iedere verschillende buffergrootte een bestand aan van ongeveer 10MB (cfr. vraag 1). Nadat je de tijd voor een gegeven buffergrootte hebt opgemeten moet je vanzelfsprekend het aangemaakte bestand terug verwijderen. Een bestand verwijderen kan je doen m.b.v. de unlink-
-   > systeemaanroep.
+3. > De clock-functie en de macro **CLOCKS_PER_SEC** vind je in de bibliotheek **pthread.h** Doe nu hetzelfde maar voor de write-systeemaanroep. Maak voor iedere verschillende buffergrootte een bestand aan van ongeveer 10MB (cfr. vraag 1). Nadat je de tijd voor een gegeven buffergrootte hebt opgemeten moet je vanzelfsprekend het aangemaakte bestand terug **verwijderen**. Een bestand verwijderen kan je doen m.b.v. de **unlink**-
+   > **systeemaanroep**.
+   >
+   > **Een leesopdracht is sneller dan een schrijfopdracht.**
 
 ```c	
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <string.h>
 
-int main()
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <time.h>
+#include <pthread.h>
+
+void maak_buffer(char *buffer, int n)
 {
-    #todo
-    return 0;
+    int i = 0;
+    for (i = 0; i < n; i++)
+    {
+        buffer[i] = rand() % 26 + 'a';
+    }
+    return;
+}
+
+int main(int argc, char **argv)
+{
+    srand(time(0));
+    char buffer[8192]; //buffergrootes van 1 -> 8192. Zonder malloc
+    int i;
+    for (i = 1; i < 8192; i << 1)
+    { //left shift == maal 2
+        double start = clock();
+        printf("%d",i);
+        int fd = open("largefile", O_WRONLY | O_CREAT);
+        if (fd < 0)
+        {
+            perror(argv[0]);
+            return 1;
+        }
+        maak_buffer(buffer, i);
+        int tot = 0;
+        int n = write(fd, buffer, i); 			//lees altijd i bytes in totdat er geen meer zijn
+        while (n < (10 * 1024 * 1024 - i))
+        {
+            tot += n;
+            maak_buffer(buffer, i);
+            n = write(fd, buffer, i);
+        }
+
+        if (n < 0)
+        {
+            perror(argv[0]);
+            return 1;
+        }
+
+        maak_buffer(buffer, i);
+        n = write(fd, buffer, i);
+        tot += n;
+        if (n < 0)
+        {
+            perror(argv[0]);
+            return 1;
+        }
+
+        if (close(fd) < 0) 						//bestand sluiten alvorens verwijderen
+        {
+            perror(argv[0]);
+            return 1;
+        }
+
+        if (unlink("largefile") < 0) 			//bestand verwijderen
+        {
+            perror(argv[0]);
+            return 1;
+        }
+
+        printf("Totaal=%d BUF_SIZ=%5d Time=%10.2f\n", tot, i, (clock() - start) / CLOCKS_PER_SEC);
+    }
 }
 ```
 
-4. > Herneem vraag 3 maar voeg aan de flags-parameter de O_SYNC vlag toe. Dit laatste zorgt
-   > ervoor dat er noch in USER-mode noch in KERNEL-mode zal worden gebufferd en dat de
-   > bytes rechtstreeks naar de schijf zullen worden geschreven.
+4. > Herneem vraag 3 maar voeg aan de flags-parameter de **O_SYNC** vlag toe. Dit laatste zorgt
+   > ervoor dat er **noch** in **USER-mode** noch in **KERNEL-mode** zal worden gebufferd en dat de
+   > **bytes rechtstreeks naar de schijf zullen worden geschreven.**
+   >
    > Ter info, de vaste schijf beschikt om performantieredenen over een bepaalde
    > hoeveelheid write-back-cache-geheugen waar gegevens van I/O- schrijfopdrachten
    > tijdelijk worden bewaard. Dit betekent dat er bij een eventuele spanningsonderbreking
@@ -715,15 +847,67 @@ int main()
    > voeren.
 
 ```c	
-#include <stdio.h>
+#include <unistd.h> 
+#include <sys/types.h> 
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <time.h>
 #include <pthread.h>
-#include <string.h>
 
-int main()
-{
-    #todo
-    return 0;
+void maak_buffer(char *buffer, int n){
+	int i;
+	for(i = 0; i < n; i++){
+		buffer[i] = rand()%26 + 'a';
+    }
+}
+
+
+int main(int argc, char **argv){
+	srand(time(0));
+	int i;
+	char buffer[8192];
+	for(i = 1; i<8192; i<<1){
+		double start=clock();
+	
+		int fd = open("largefile", O_WRONLY|O_CREAT|O_SYNC); //dit opent de file in read only
+        													//syncronised I/O. buffer iedere keer flushen
+	
+		if(fd<0){
+			perror(argv[0]); 
+			return 1;
+		}
+		maak_buffer(buffer,i);
+		
+		
+		int n = write(fd,buffer,i);
+		int tot=0;
+	
+		while( tot<  (10*1024*1024) - i){ 					//je doet -i omdaje moet controleren op de laatste schrijfopdracht
+			tot+= n;
+			maak_buffer(buffer,i);
+			n = write(fd,buffer,i);
+		}
+		maak_buffer(buffer,i);
+		n = write(fd,buffer,i);
+		tot+= n;
+		if(n<0){
+			perror(argv[0]);
+			return 1;
+		}
+		
+		if(close(fd) < 0){ 								//bestand sluiten alovers te verwijderen
+			perror(argv[0]);
+			return 1;
+		}
+		
+		if(unlink("largefile") < 0 ){
+			perror(argv[0]);
+			return 1;
+		}
+		printf("Totaal=%d BUF_SIZ=%5d Time=%10.2f\n",tot, i, (clock() - start) / CLOCKS_PER_SEC);
+	}
 }
 ```
 
@@ -3657,12 +3841,12 @@ while : ; do : ; done
     >...
     >Indien toestel xxxxxxxx actief is, wordt het commando ping beantwoord met regels van
     >de vorm:
-    >Pinging xxxxxxxx [141.96.126.137] with 32 bytes of data:
-    >Reply from 141.96.126.137: bytes=32 time=1322ms TTL=124
+    >**Pinging xxxxxxxx [141.96.126.137] with 32 bytes of data:**
+    >**Reply from 141.96.126.137: bytes=32 time=1322ms TTL=124**
     >Je kunt niet-actieve toestellen herkennen aan het feit dat het commando niet wordt
-    >beantwoord zoals bij actieve. De foutboodschappen die dan gegenereerd worden zijn
-    >divers. Maak een Bash-script dat uit ping.out een inventaris opmaakt van alle niet-
-    >actieve toestellen (één lijn per toestel). Het script moet ook een samenvattende regel
+    >beantwoord zoals bij actieve. De **foutboodschappen** die dan gegenereerd worden zijn
+    >divers. Maak een Bash-script dat uit ping.out een inventaris opmaakt van **alle niet-**
+    >**actieve toestellen** (één lijn per toestel). Het script moet ook een samenvattende regel
     >weergeven die zowel het aantal actieve als het totaal niet-aantal toestellen vermeldt.
     >Zorg ervoor dat het script onafhankelijk is van de precieze foutboodschappen die niet-
     >actieve toestellen produceren. Construeer twee oplossingen, al dan niet gebruikmakend
@@ -3671,24 +3855,25 @@ while : ; do : ; done
 ```bash
 #!/bin/bash
 
+declare -A array #associatieve array (=dictonaiy) = hash table
+
 while read lijn; do
-	if [[ "$lijn" =~ ^Pinging ]]; then
+	if [[ "$lijn" =~ ^Pinging ]]; then #als lijn start met "Pinging"
 		read pinging comp rest <<< "$lijn" #lezen van string <<<, lezen van bestand <	
-		echo $comp
-		array["$comp"]=1 #sleutel moet sowiso een waarde bevatten
+		array["$comp"]="request timed out" #sleutel moet sowiso een waarde bevatten
 	fi
-	if [[ "$lijn" =~ ^Reply ]]
+	if [[ "$lijn" =~ ^Reply ]]; then
 		unset array["$comp"] #laatstse keer da comp variabele is ingevuld er uit gooien.
 	fi
 done < ping.out
 
 for i in ${!array[@]}; do
-	echo $i ${array[$1]}
+	echo $i ${array[$i]} #request timed out
 done
 ```
 
-95. >Gebruik (enkel) het bestand /etc/passwd om voor alle groepsnummers het aantal
-    >gebruikers met hetzelfde primaire groepsnummer te tellen. Realiseer dit op twee
+95. >Gebruik (enkel) het bestand /etc/passwd om voor alle **groepsnummers** het aantal
+    >**gebruikers** met **hetzelfde primaire groepsnummer** te **tellen**. Realiseer dit op twee
     >manieren:
     >• Gebruik een while-lus met een read-commando om het bestand te overlopen
     >en arrays om de gegevens op te slaan.
@@ -3698,23 +3883,26 @@ done
 ```bash
 #!/bin/bash
 
-array=()
+declare -A array #associatieve array = hash table
 
-while IFS=: read naam x uid gid rest; do #splitsen op : -> Internal Field Seperator IFS=:
-	if [[ -z "${array[$gid]}" ]]; then
-		array[$gid]=1
-	else
-		((array[$gid]++))
-	fi
+cd #zorgen dat we op het juiste pad zitten
 
+while read lijn; do
+    IFS=':' 
+    read naam x uid gid rest <<< "$lijn"
+    if [[-z ${array[$gid]} ]]; then
+        array[$gid]=1
+    else
+        ((array[$gid]++))
+    fi
 done < /etc/passwd
 
-for i in ${!array[@]};do
-	echo "$i: ${array[$i]}"
+for i in ${!array[@]}; do
+    echo $i ${array[$i]};
 done
 ```
 
-96. >Gebruik de bestanden /etc/group en /etc/passwd om een overzicht te maken van alle
+96. >Gebruik de bestanden **/etc/group** en **/etc/passwd** om een overzicht te maken van alle
     >groepen, gevolgd door de volledige lijst van gebruikers die deze groep als primaire groep
     >hebben. Gebruik een while-lus met een read-commando om het bestand /etc/group te
     >overlopen en grep om de gebruikers op te sporen
@@ -3725,7 +3913,7 @@ done
 while IFS=: read naam x gid rest ; do
 	array=( $(grep -E "^.*:x:.*:$gid:" /etc/passwd | cut -d : -f1) )
 	echo "$naam: ${array[@]}"
-	unset array #tabel terug leegmaken
+	unset array #tabel terug leegmaken om geheugen vrij te maken
 done < /etc/group
 ```
 
@@ -3740,14 +3928,14 @@ done < /etc/group
 >
 > **[[ -n "${ array["$i"] }" ]]** checken of inhoud non-zero is
 >
-> **[[ -z "${ array["$i"] }" ]]** checken of inhoud 0 (zero) is
+> **[[ -z "${ array["$i"] }" ]]** checken of inhoud 0 (zero/leeg) is
 >
 > **$** staat voor "vervang door"
 
 
 
-100. >Ontwikkel een script dat alle parameters uitschrijft die meer dan één keer
-     >voorkomen in de argumentenlijst van het script. De volgorde waarin de minstens dubbel
+100. >Ontwikkel een script dat **alle parameters uitschrijft** die **meer dan één keer**
+     >**voorkomen in de argumentenlijst** van het script. De volgorde waarin de minstens dubbel
      >voorkomende parameters worden uitgeschreven heeft geen belang (sorteren mag),
      >maar je moet er wel voor zorgen dat parameters die meer dan twee keer voorkomen
      >toch slechts eenmaal weggeschreven worden. Laat als eerste parameter ook eventuele
@@ -3798,15 +3986,15 @@ done
 
 
 
-101. >Ontwikkel een script dat een beperkte versie van het commando wc simuleert. Het
-     >script moet het aantal regels en de bestandsnaam afdrukken van elk bestand dat als
-     >parameter meegegeven wordt. Het script mag enkel interne Bash-instructies (if, for,
+101. >Ontwikkel een script dat een beperkte versie van het commando **wc** simuleert. Het
+     >script moet het **aantal regels** en de **bestandsnaam** afdrukken **van elk bestand dat als**
+     >**parameter meegegeven wordt**. Het script mag enkel interne Bash-instructies (if, for,
      >case, let, while, read enz.) gebruiken, en behalve echo geen externe commando's; het
-     >gebruik van awk, sed, perl en wc in het bijzonder is niet toegelaten. Je zult bijgevolg elk
+     >gebruik van **awk, sed, perl en wc in het bijzonder is niet toegelaten**. Je zult bijgevolg elk
      >bestand regel voor regel moeten inlezen en deze tellen. Het script moet bovendien een
-     >samenvattende regel weergeven met het totale aantal regels. Indien geen enkele
-     >parameter meegegeven wordt, neem je alle bestanden in de huidige werkdirectory in
-     >beschouwing. Los dit zo beknopt mogelijk op met de speciale notaties voor shell-
+     >samenvattende regel weergeven met het **totale aantal regels**. **Indien geen enkele**
+     >**parameter meegegeven wordt, neem je alle bestanden in de huidige werkdirectory in**
+     >**beschouwing**. Los dit zo beknopt mogelijk op met de speciale notaties voor shell-
      >variabelen
 
 
@@ -3855,18 +4043,18 @@ printf "%4d %4d %4d %s" $tot_lijnen $tot_woorden $tot_kars $total
 
 
 
-103. >Enerzijds kun je met behulp van het commando ps -e informatie opvragen over alle
-     >processen die actief zijn. De vier kolommen in de output tonen respectievelijk het
-     >proces-ID (PID), de TTY device file van de (pseudo-)terminal, de CPU time, en het
-     >commando dat het proces opgestart heeft. Anderzijds kun je met behulp van het
-     >commando kill -KILL pid een proces met willekeurig proces-ID afbreken. Ontwikkel een
-     >script dat alle processen afbreekt waarvan het commando één van de strings bevat die
-     >als parameters bij het oproepen van het script meegegeven wordt. Indien geen enkele
-     >parameter meegegeven wordt, moet het script een gesorteerde lijst weergeven van alle
-     >unieke commandonamen van actieve processen. Behalve de interne instructies (if, for,
+103. >Enerzijds kun je met behulp van het commando **ps -e** informatie opvragen over alle
+     >processen die actief zijn. De **vier kolommen** in de output tonen respectievelijk het
+     >proces-ID (**PID**), de **TTY** device file van de (pseudo-)terminal, de **CPU** time, en het
+     >**commando** dat het proces opgestart heeft. Anderzijds kun je met behulp van het
+     >commando kill -**KILL** pid een proces met willekeurig proces-ID afbreken. Ontwikkel een
+     >**script** dat **alle processen afbreekt** waarvan het commando **één van de strings bevat die**
+     >**als parameters bij het oproepen** van het script meegegeven wordt. Indien **geen enkele**
+     >**parameter** meegegeven wordt, moet het script een **gesorteerde lijst weergeven van alle**
+     >**unieke commandonamen** van actieve processen. Behalve de interne instructies (if, for,
      >case, let, while, read enz.) mag je ook de externe commando's grep, sort en uniq
-     >gebruiken. Om problemen te vermijden, schrijf je bij het testen de kill-opdracht uit naar
-     >standaarduitvoer i.p.v. deze daadwerkelijk uit te voeren.
+     >gebruiken. Om problemen te vermijden, **schrijf je bij het testen de kill-opdracht uit naar**
+     >**standaarduitvoer i.p.v.** deze daadwerkelijk uit te voeren.
 
      ```bash
      #!/bin/bash
@@ -3895,31 +4083,30 @@ printf "%4d %4d %4d %s" $tot_lijnen $tot_woorden $tot_kars $total
      		done
      	done < <(ps -e)
      fi
-     
      ```
-
+     
 104. > **WAS EEN VRAAG OP HET EXAMEN VORIG JAAR**
           >
-          > Ontwikkel een script dat (zonder getopt te gebruiken) alle opties die aan het script
-          > worden meegegeven naar standaarduitvoer wegschrijft, één per regel. Je moet dus alle
+          > Ontwikkel een script dat (zonder getopt te gebruiken) alle **opties die aan het script**
+          > **worden meegegeven naar standaarduitvoer wegschrijft**, één per regel. Je moet dus alle
           > karakters die voorkomen in parameters die beginnen met een minteken verzamelen, en
           > deze één voor één verwerken. Bekommer je niet om opties die meerdere keren zouden
-          > voorkomen. Voor de argumentenlijst -Ec -rq /etc/passwd -a moet het script dus als
-          > uitvoer E, c, r, q en a produceren.
+          > voorkomen. Voor de argumentenlijst **-Ec -rq /etc/passwd -a** moet het script dus als
+          > uitvoer **E, c, r, q** en a produceren.
 
 ```bash
 #!/bin/bash
 
-while [[ -n "$1" ]]; do
+while [[ -n "$1" ]]; do #zolang $1 bestaat
 	case "$1" in
-		-?*)  while read -N1 kar; do
+		-?*)  while read -N1 kar; do										#-teken gevolgd door 1 of meerdere random chars
 					[[ "$kar" != $'\n' && "$kar" != "-"  ]] && echo $kar
 				done <<< "$1"
-				;;
-		[!-]*) echo ongeldige optie >&2
+				;; #=break
+		[!-]*) echo ongeldige optie >&2 									#begint niet met het minteken (is dus geen optie)
 			   exit 1
 			   ;;
-	esac
+	esac #einde case
 	shift #$1 wordt $2
 done
 ```
