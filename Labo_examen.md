@@ -1371,6 +1371,8 @@ fork()
        {
            char * args[]={"ls","-l","/",0}; 	//mee te geven argumenten. argv[0] is "ls".  afsluiten met 0
           	execv("/usr/bin/ls",args);			//path te vinden adhv "whereis ls"
+           									//keert niet meer terug wanneer execv succesvol uitgevoerd wordt.
+           									//Alles onder execv wordt niet meer uitgevoerd in dat geval.
            return 0;
        }
        else if (pid > 0)						//Parent process
@@ -1385,6 +1387,266 @@ fork()
        return 0;
    }
    ```
+   
+   **Examenvraag vorig jaar: Voer base64 uit op elke meegegeven argument(bestand) (theorie les7)**
+   
+   ```C
+   #include <unistd.h> 
+   #include <sys/types.h> 
+   #include <stdlib.h>
+   #include <sys/stat.h>
+   #include <fcntl.h>
+   #include <stdio.h>
+   #include <time.h>
+   #include <pthread.h>
+   #include <string.h>
+   int main(int argc, char **argv){
+   	
+   	int pids[argc];    								 //maak voor elk argument een kindproces aan.
+   
+   
+   	for(i = 1; i < argc; i++){
+   		pids[i] = fork(); 							//voor elk argument een nieuw kindproces aanmaken
+   		if(pids[i] < 0){
+   			perror(argv[i]);
+   			return 1;
+   		}
+   		else if (pids[i] == 0){
+   			//CHILD
+   			char *args[] = {"base64", argv[i],0}; 	//de p in execvp zorgt er voor dase je ook path variabele kan geven
+   			if(execvp("base64", args) < 0){ 		//in plaats van het volledige path
+   				perror(argv[i]);
+   				return 1;
+   			}
+   		}
+   	}
+   	
+   	for(i = 1; i < argc; i++){
+   		waitpid(pids[i],NULL,0); 					//parent proces moet wachten tot elk kind proces klaar is
+   	}
+   	return 0;
+   }
+   ```
+   
+   **oef interprocescommunicatie (pip') (theorie les7)**
+   
+   ```C
+   int main(int argc, char **argv){
+   	int fd[2]; 							//de pipe
+   	
+   	if(pipe(fd) < 0){ 					//maakt de pipe
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	
+   	int pid=fork(); 					//maak de child
+   	if(pid<0){							//bij fout
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	else if(pid == 0){ 					
+   		close(fd[1]);					//in de child de fd om naar te schrijven sluiten. Enkel nog lees fd gebruiken
+   		int ontvangengetal;
+   		read(fd[0], &ontvangengetal, sizeof(int));
+   		printf("%d", ontvangengetal);
+   		return 0;
+   	}
+   	
+   	close(fd[0]);						//in de parent de fd sluiten om te lezen. Kan enkel nog maar de schrijf fd gebruiken
+   	int getal = 165465465;
+   	write(fd[1], &getal, sizeof(int));
+   	waitpid(pid, NULL,0);
+   }
+   ```
+   
+   
+   
+   **Extra oef: Pipe in 2 richtingen (= 2pipes) (theorie les 7, 01:10)** 
+   
+   ```C
+   #include <unistd.h>
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <sys/wait.h>
+   #include <fcntl.h>
+   #include <stdlib.h>
+   #include <stdio.h>
+   #include <time.h>
+   #include <errno.h>
+   
+   int main(int argc, char **argv){
+   	int fd_PC[2];
+   	int fd_CP[2];
+   	if (pipe(fd_PC)<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	if (pipe(fd_CP)<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	int pid=fork();
+   	if (pid<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	else if (pid==0){
+   		//CHILD
+   		close (fd_PC[1]);
+   		close( fd_CP[0]);
+   		int getal;
+   		read(fd_PC[0],&getal,sizeof(int));  
+   		close(fd_PC[0]);
+   		getal++;
+   		write(fd_CP[1],&getal,sizeof(int));
+   		close(fd_CP[1]);
+   		return 0;
+   	
+   	}
+   	close(fd_PC[0]);
+   	close(fd_CP[1]);
+   
+   	int getal=144;
+   	write(fd_PC[1],&getal,sizeof(int));
+   	close(fd_PC[1]);
+   	read(fd_CP[0],&getal,sizeof(int));
+   	close(fd_CP[0]);
+   	printf("%d\n",getal);
+   	waitpid(pid,NULL,0);
+   
+   	return 0;
+   }
+   ```
+   
+   **Extra oef Parent met 2 childs met pipes tussen (theorie les 7, 01:25)**
+   
+   ```C
+   #include <unistd.h>
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <sys/wait.h>
+   #include <fcntl.h>
+   #include <stdlib.h>
+   #include <stdio.h>
+   #include <time.h>
+   #include <errno.h>
+   
+   int main(int argc, char **argv){
+   	int fd_PC1[2];
+   	int fd_C1C2[2];
+   	int fd_PC2[2];
+   	if (pipe(fd_PC1)<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	if (pipe(fd_C1C2)<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   	if (pipe(fd_PC2)<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   
+   	int pid=fork();
+   	if (pid==0){
+   		//CHILD1
+   		close(fd_PC1[1]);
+   		close(fd_PC2[0]);
+   		close(fd_PC2[1]);
+   		close(fd_C1C2[0]);
+   		int g;
+   		read(fd_PC1[0],&g,sizeof(int));
+   		g*=2;
+   		write(fd_C1C2[1],&g,sizeof(int));
+   		return 0;
+   	}
+   	
+   	int pid2=fork();
+   	if (pid2==0){
+   		//CHILD2
+   		close(fd_PC2[1]);
+   		close(fd_PC1[0]);
+   		close(fd_PC1[1]);
+   		close(fd_C1C2[1]);
+   		int g,g2;
+   		read(fd_PC2[0],&g2,sizeof(int));
+   		read(fd_C1C2[0],&g,sizeof(int));
+   		printf("%d\n",g*2+g2);
+   		return 0;
+   	}
+   	//PARENT
+   	close(fd_PC1[0]);
+   	close(fd_PC2[0]);
+   	close(fd_C1C2[0]); //parent heeft geen baat bij deze pipe
+   	close(fd_C1C2[1]); //parent heeft geen baat bij deze pipe
+   	int g,g2;
+   	g=144;
+   	g2=288;
+   	write(fd_PC1[1],&g,sizeof(int));
+   	write(fd_PC2[1],&g2,sizeof(int));
+   
+   	waitpid(pid,NULL,0);
+   	waitpid(pid2,NULL,0);
+   	return 0;
+   }
+   ```
+   
+   **Vraag die hij (bijna) elk jaar stelt: cmd1 | cmd2. Opdrachten aan elkaar kleven adhv een pipe (theorie les 7, 01:42)**
+   
+   ```c
+   #include <unistd.h>
+   #include <sys/types.h>
+   #include <sys/stat.h>
+   #include <sys/wait.h>
+   #include <fcntl.h>
+   #include <stdlib.h>
+   #include <stdio.h>
+   #include <time.h>
+   #include <errno.h>
+   
+   // ls -l / | wc -l  (child 1 | child 2)
+   
+   int main(int argc, char **argv){
+   	int fd_C1C2[2];
+   	if (pipe(fd_C1C2)<0){
+   		perror(argv[0]);
+   		return 1;
+   	}
+   
+   	int pid=fork();
+   	if (pid==0){
+   		//CHILD1
+   		//close(1); //sluit output (write)
+   		//dup(fd_C1C2[1]); //schrijffiledescriptor == 1
+   		dup2(fd_C1C2[1],1); //kopieert de ene fd naar de andere (oldfd,newfd)
+   		close(fd_C1C2[0]);
+   		char *args[]={"ls","-l","/",0};
+   		execvp("ls",args);
+   		return 0;
+   	}
+   	
+   	int pid2=fork();
+   	if (pid2==0){
+   		//CHILD2
+   		//close(0); //sluit input (read)
+   		//dup(fd_C1C2[0]);   //leesfiledescriptor == 0
+           dup2(fd_C1C2[0],0);
+   		close(fd_C1C2[1]);
+   		char *args[]={"wc","-l",0};
+   		execvp("wc",args);
+   		return 0;
+   	}
+   	//PARENT
+   	close(fd_C1C2[0]);
+   	close(fd_C1C2[1]);
+   	waitpid(pid,NULL,0);
+   	waitpid(pid2,NULL,0);
+   	return 0;
+   }
+   ```
+   
+   
    
    
    
@@ -1469,7 +1731,7 @@ fork()
 
 
 
-4. >Schrijf een C++-programma met als naam watchfiled.cc dat alle bestanden in de gaten
+4. >Schrijf een C++-programma met als naam **watchfiled.cc** dat alle bestanden in de gaten
    >houdt die opgesomd zijn in het tekstbestand watchfile.txt. Telkens wanneer een
    >opgesomd bestand in het tekstbestand wordt gewijzigd, wordt een boodschap naar het
    >scherm geschreven. Het C++-programma loopt in een oneindige lus die telkens het
@@ -1482,7 +1744,7 @@ fork()
    #niet te kennen "Dat zijn C++ vragen. Dat ga ik u niet aandoen." ~ Wim
    ```
 
-5. >Pas watchfiled.cc aan zodat nu ook rekening wordt gehouden met kindprocessen die
+5. >Pas **watchfiled.cc aan** zodat nu ook rekening wordt gehouden met kindprocessen die
    >beëindigd worden. Een kindproces voert watchfile uit en zal beëindigd worden wanneer
    >het bestand bv. verwijderd of verplaatst wordt. De bedoeling is ook dat de
    >bestandsnaam van het verwijderde/verplaatste bestand in watchfile.txt wordt
@@ -1974,6 +2236,644 @@ fork()
       ```
       
       
+      
+      #### Posix threads (pthreads)
+      
+      >De POSIX Pthreads standaard is de de-facto **standaard** voor het **programmeren** van
+      >**multithreaded programma’s** in een POSIX-compatibele omgeving. Deze standaard
+      >specificeert de **interface** om **threads** te **creëren** en te **manipuleren**. Als bibliotheek zijn
+      >pthreads op de meeste platformen beschikbaar. De voornaamste primitieven zijn het
+      >opstarten van een thread(**pthread_create**) en het wachten op een thread(**pthread_join**). De
+      >standaard is vanzelfsprekend veel ruimer dan bovenvermelde functies.
+      >Voor onderstaande opdrachten zijn de functies pthread_create en pthread_join van groot
+      >belang. De syntax van beide functies kan je hieronder vinden:
+      >**int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)**
+      >**(void *), void *arg);**
+      >
+      >**int pthread_join(pthread_t thread, void**** **retval);**
+
+**Opdrachten**
+
+
+
+1. >Schrijf een programma dat gebruikmaakt van **vier threads** die elk een verschillend cijfer
+   >naar het scherm schrijven. Wanneer een thread het bijhorend cijfer 100 keer naar het
+   >scherm heeft geschreven, stopt de thread.
+
+   ```C
+   #include <pthread.h>
+   #include <stdio.h>
+   
+   
+   typedef struct { //struct voor de argumenten van de worker
+   	int getal;
+   	void (*f)(int);
+   } args;
+   
+   
+   void * worker (void * p){ //maak de worker functie en zorg dat die generiek is (met structs)
+   	int *getal = (int*)p
+   	int i;
+   	for( i = 0; i < 100; i++){
+   		printf("%d" , * getal)
+   	}
+   	return 0;
+   }
+   
+   int main(){
+   	pthread_t threads[4]; 	
+   	int i;
+   	for(i = 0; i < 4; i++){
+   		pthread_create(&threads[i],NULL, worker, (int*)&i); //threads worden aangemaakt en automatisch gestart
+           //hier nog geen join anders worden threads sequentieël uitgevoerd = nutteloos
+   	}
+       
+   	for(i = 0; i < 4; i++){
+   		pthread_join(threads[i],NULL);
+   	}
+   }
+   ```
+   
+   
+   
+2. > **Genereer 1.000.000 willekeurige reële getallen** die je bijhoudt in een **tabel**. Schijf nu
+   > twee functies die zoeken naar respectievelijk het **kleinste getal** en **het grootste getal** en
+   > deze getallen als **return-waarde** teruggeven. Schrijf nu een hoofdprogramma dat
+   > **gelijktijdig zoekt** naar het **grootste** en het **kleinste** getal in een tabel van 1.000.000 reële
+   > getallen. Schrijf beide getallen naar het scherm.
+
+   **Extra uitleg workers: Les8 01:03**
+   
+   ````C
+   #include <pthread.h>
+   #include <stdio.h>
+   #include <stdlib.h>
+   
+   
+   typedef struct { 							//parameters van de worker
+   	double *array;
+   	int n;
+   	double (*f)(double*, int);
+   } arg;
+   
+   double grootste (double *array, int n){
+   	double grootste = array[0]
+   	int i;
+   	for(i = 1; i < n; i++){
+   		if(array[i] > grootste){
+   			grootste = array[i];
+   		}
+   	}
+   	return grootste;
+   }
+   double kleinste(double *array, int n){
+   	double kleinste = array[0]
+   	int i;
+   	for(i = 1; i < n; i++){
+   		if(array[i] < kleinste ){
+   			kleinste = array[i];
+   		}
+   	}
+   	return kleinste ;
+   }
+   
+   void * worker (void * p){
+   	arg *a = (arg*)a;
+   	//prinf is de easy oplossing het moet dus anders
+   	//printf("%f", a->f(a->array, a->n));
+   
+   	//dus doe het zo met malloc
+   	double *returnwaarde = malloc(sizeof(double));
+   	*returnwaarde = a->f(a->array, a->n);
+   	return (void*) returnwaarde ; 
+   }
+   
+   void vulop (double * array, int n){
+   	int i;
+   	for(i = 0; i < n; i++){
+   		array[i] = i;
+   	}
+   }
+   
+   int main(){
+   	double array[1000000];
+   	pthread_t tread_kleinse, thread_hoogste;
+   
+   	vulop(array,1000000);
+   	arg arg_kl, arg_gr;
+   	
+   	arg_kl.array = array;
+   	arg_kl.n = 1000000;
+   	arg_kl.f = kleinste;
+   	
+   	arg_gr.array = array;
+   	arg_gr.n = 1000000;
+   	arg_gr.f = grootste;
+   	pthread_create(&thread_kl, NULL, worker,(void*)&arg_kl);
+   	pthread_create(&thread_hoogste, NULL, worker,(void*)&arg_gr);
+   
+   	//lees de returnwaarde
+   	double *g,*k;	
+   
+   	pthread_join(thread_kl, (void**) &k);
+   	pthread_join(thread_gr, (void**) &g);
+   	printf("grootste %d" , *g);
+   	printf("kleinste %d" , *k);
+   	
+   	free(g);
+   	free(k);
+   	return 0;
+   }
+   ````
+   
+   
+   
+3. >Multithreading kan ook leiden tot snelheidswinst. Een mooi voorbeeld hiervan is bv. een
+      >**matrixvermenigvuldiging**. Om de snelheidswinst op te merken maak je best gebruik van
+      >twee vierkante matrices met **1000 rijen** en **1000 kolommen**. Ook gebruik je best vier tot
+      >acht threads om de het resultaat te berekenen. Gebruik voor de dimensie en ook voor
+      >het aantal threads constanten.
+      >Wanneer er bijvoorbeeld acht threads worden gebruikt, kan je het resultaat als volgt
+      >berekenen. De eerste thread laat je de 0de, de 8ste, de 16de, ... rij van het resultaat
+      >bepalen. De tweede thread ontfermt zich over de 1ste, 9de, 17de, ... rij van het resultaat.
+      >Iedere thread berekent dus DIM/8 rijen van het eindresultaat waarbij de rijen op een
+      >afstand van het aantal threads van elkaar liggen.
+      >Om het opvullen van een matrix vlot te laten verlopen, geef je het element op ide rij en
+      >op de jde kolom de waarde i+j. Dit kan eenvoudig worden geprogrammeerd a.d.h.v. een
+      >dubbele for-lus. Doe dit voor beide matrices en merk op dat je dus identieke matrices
+      >met elkaar vermenigvuldigt.
+      >Schrijf ook een programma dat geen Pthreads gebruikt om duidelijk het verschil in
+      >snelheid te zien.
+      
+      ```c
+      int matrix[2][2]; // {{1,2},{3,4}};
+      int fucntie(int ** matrix) //werkt niet
+      int functie( int (* matrix)[2]) //klopt wel
+      ```
+      
+      
+      
+      ```c
+      #include <pthread.h>
+      #include <unistd.h>
+      #include <stdio.h>
+      #include <stdlib.h>
+      
+      #define N 2000
+      
+      int A[N][N];
+      int B[N][N];
+      int C[N][N];
+      
+      typedef struct {
+      	int startrij;
+      	int (*a)[N];
+      	int (*b)[N];
+      	int (*c)[N];
+      	void (*f)(int, int (*)[N],int (*)[N],int (*)[N]);
+      } arg;
+      
+      void vermenigvuldig(int startrij, int (*a)[N],int (*b)[N],int (*c)[N]){
+      	int i,j,k;
+      	for(i=startrij;i<N;i+=6){
+      		for (j=0;j<N;j++){
+      			int som=0;
+      			for(k=0;k<N;k++){
+      				som+=a[i][k]*b[k][j];
+      			}
+      			c[i][j]=som;
+      		}
+      	}
+      }
+      
+      void *worker(void *p){
+      	arg *a=(arg*)p;
+      	a->f(a->startrij, a->a,a->b,a->c);
+      	return NULL;
+      }
+      
+      
+      void schrijf_matrix (int (*m)[N]){
+      	int i,j;
+      	for(i=0;i<N;i++){
+      		for(j=0;j<N;j++){
+      			printf("%d ",m[i][j]);
+      		}
+      		printf("\n");
+      	}
+      }
+      
+      void maak_matrix(int (*m)[N]){
+      	int i,j;
+      	int teller=1;
+      	for(i=0;i<N;i++){
+      		for(j=0;j<N;j++){
+      			m[i][j]=teller++;
+      		}
+      	}
+      }
+      
+      int main(){
+      	pthread_t threads[6];
+      	arg args[6];	
+      	maak_matrix(A);
+      	maak_matrix(B);
+      	int i;
+      	for (i=0;i<6;i++){
+      		args[i].startrij=i;
+      		args[i].a=A;
+      		args[i].b=B;
+      		args[i].c=C;
+      		args[i].f=vermenigvuldig;
+      		pthread_create(&threads[i],NULL,worker,(void*)&args[i]);
+      	}
+      	for(i=0;i<6;i++){
+      		pthread_join(threads[i],NULL);
+      	}
+      	schrijf_matrix(C);
+      	return 0;
+      }	
+      
+      ```
+      
+      4. >Omdat iedere aangemaakte thread beschikt over zijn eigen stapel, kunnen ook
+         >recursieve functies parallel worden uitgevoerd. 
+      
+         ```bash
+         #Valt weg want nog geen sorteren gezien
+         ```
+      
+         
+
+**Thread synchronisatie**
+
+>Bovenstaande opdrachten hebben één ding gemeenschappelijk, nl. iedere thread loopt
+>onafhankelijk van de andere threads. Sommige toepassingen vergen echter dat threads
+>onderling moeten kunnen samenwerken en eventueel gebruik moeten maken van dezelfde
+>gedeelde bronnen. Soms kan het ook gebeuren dat een bepaald stuk code maar door één
+>thread tegelijkertijd mag uitgevoerd worden, een zogenaamde kritische sectie. Om dit te
+>kunnen doen bestaan er Mutexen en Semaforen. Het verschil tussen beide is dat mutexen
+>een gedeelde bron beschermen en dus fungeren als vergrendelingsmechanisme daar waar
+>semaforen dienst doen als signaleringsmechanisme. Doordat semaforen gebruikmaken van
+>berichten/signalen, is het gebruik ervan dus veel algemener dan dat van mutexen.
+
+
+
+**Gebruik van mutexen**
+
+
+
+**Gebruik van POSIX semaforen**
+
+
+
+> Er worden twee soorten semaforen onderscheiden, nl. unnamed en named semaforen. Net
+> zoals named pipes worden named semaforen gebruikt voor IPC tussen niet gerelateerde
+> processen. Voor communicatie tussen threads en gerelateerde processen volstaan unnamed
+> semaforen. Wanneer semaforen worden gebruikt voor IPC tussen gerelateerde processen,
+> moeten ze worden bijgehouden in een gedeelde virtuele geheugenpagina die kan worden
+> aangevraagd via de systeemaanroep mmap. Tussen threads volstaat het wanneer unnamed
+> semaforen globaal worden gedeclareerd of op de heap worden geplaatst.
+> Een semafoor initialiseren gebeurt via:
+
+```c
+#include <semaphore.h>
+int sem_init(sem_t *sem, int pshared, unsigned int value);
+```
+
+>**pshared** is 0 wanneer de semafoor gedeeld wordt onder threads en is verschillend van nul
+>wanneer het gaat om een semafoor die gedeeld wordt onder gerelateerde processen. Dit
+>argument geeft onrechtstreeks ook aan waar de semafoor *sem resideert. Bij threads
+>volstaat het om een semafoor globaal te declareren of via malloc aan te maken op de heap.
+>Voor processen daarentegen moet er gebruikgemaakt worden van een pagina in de virtuele
+>adresruimte (zie later).
+>
+>De werking van een semafoor is vrij eenvoudig. Bij initialisatie wordt aan de semafoor een
+>waarde toegekend die niet negatief mag worden. Wanneer een proces of een thread een
+>semafoor tegenkomt die een negatieve waarde heeft, wordt de uitvoering stopgezet tot
+>wanneer de waarde terug positief wordt. De onderstaande operaties zullen de waarde van
+>de semafoor *sem respectievelijk decrementeren en incrementeren.
+
+```c
+int sem_wait(sem_t *sem);
+int sem_post(sem_t *sem);
+```
+
+>Wanneer een semafoor een waarde heeft die gelijk is aan 0, zal de functie sem_wait() de
+>uitvoering van de actieve thread of het actieve proces blokkeren tot wanneer de waarde
+>strikt positief wordt. In dat geval wordt de waarde van de semafoor door de functie
+>sem_wait() gedrecrementeerd.
+>Bij een aanroep van de sem_post() functie wordt de waarde van de semafoor
+>geïncrementeerd en wordt het proces of de thread die momenteel aan het wachten is
+>geactiveerd. Indien er meerdere processen of threads wachtende zijn, bepaalt de scheduler
+>welk proces of welke thread de uitvoering mag verderzetten.
+>Een unnamed semafoor wordt vernietigd door de onderstaande functie:
+
+```c
+int sem_destroy(sem_t *sem);
+```
+
+>Een **semafoor** moet worden vernietigd vooraleer dat het geheugen waarin hij resideert
+>wordt vrijgegeven. Dit gebeurt bv. wanneer een functie waarin de semafoor werd
+>aangemaakt, terugkeert naar de oproepende instantie. Bij het gebruik van een gedeelde
+>virtuele geheugenpagina tussen processen, moet de semafoor vernietigd worden wanneer
+>er geen enkel proces nog gebruik van maakt en vooraleer het geheugen via de
+>systeemaanroep munmap terug wordt vrijgegeven.
+
+**Opdrachten**
+
+1. >Schrijf een programma dat gebruikmaakt van 8 threads voor de verkoop van tickets. Het
+   >totaal aantal tickets wordt bijgehouden in een globale variabele waar iedere thread
+   >automatisch toegang tot heeft. Iedere thread voert dezelfde functie uit, nl. een functie
+   >die door een oneindige lus loopt waar telkens één ticket verkocht wordt. Van zodra alle
+   >tickets de deur uit zijn, rapporteert iedere thread het totale aantal tickets dat hij
+   >verkocht heeft. Om threadwissels te verzekeren plaats je in de oneindige lus de opdracht
+   >sleep(rand()%3) die een delay van 0, 1 of 2 seconden veroorzaakt. Maak gebruik van een
+   >mutex om de gedeelde bron, i.e. de globale variabele te beschermen. Bekijk ook wat er
+   >gebeurt wanneer de gedeelde bron niet wordt vergrendeld.
+
+   ```bash
+   ```
+
+2. >Herneem opdracht 1 maar maak nu gebruik van semaforen om de gedeelde bron te
+      >beschermen. Aangezien er maar twee toestanden mogelijk zijn, spreekt men hier van
+      >een binaire semafoor.
+
+   ```c
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <sys/stat.h>
+   #include <pthread.h>
+   #include <sys/types.h>
+   #include <sys/wait.h>
+   #include <fcntl.h>
+   #include <pthread.h>
+   #include <semaphore.h>
+   #include <unistd.h>
+   
+   #define N 10
+   
+   int tickets=100;
+   
+   sem_t sem;
+   
+   
+   void* worker(void* p){
+   	int verder=1;
+   	while (verder){
+   		sem_wait(&sem);
+   		if (tickets>0) {
+   			sleep(rand()%3);
+   			tickets--;
+   			printf("%d sold 1 ticket\n", gettid());
+   		}
+   		else verder=0;
+   		sem_post(&sem);
+   	}
+   	return NULL;
+   }
+   
+   int main(){
+   	sem_init(&sem,0,1);
+   	pthread_t threads[N];
+   	int i;
+   	for(i=0;i<N;i++){
+   		pthread_create(&threads[i],NULL,worker,NULL);
+   	}
+   	for(i=0;i<N;i++){
+   		pthread_join(threads[i],NULL);
+   	}
+   	sem_destroy(&sem);
+   	return 0;
+   }
+   ```
+
+   **Gebruik van shared memory en memory mapped I/O**
+   
+   > IPC kan gebeuren d.m.v. pipes, semaforen of shared memory. Om in de virtuele adresruimte
+   > van een proces een geheugenmapping aan te maken, wordt gebruikgemaakt van de
+   > syteemaanroep mmap.
+   
+   ```c
+   #include <sys/mman.h>
+   void *mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
+   int munmap(void *addr, size_t length);
+   ```
+   
+   >De parameter addr is het adres in de virtuele adresruimte waar je de mapping wil plaatsen.
+   >Het is aangewezen om als waarde van addr NULL te kiezen waardoor de kernel een geschikt
+   >adres zal zoeken voor de gevraagde mapping.
+   >De length-parameter is de grootte van de mapping in bytes. Doorgaans zal de kernel dit
+   >afronden naar een veelvoud van de paginagrootte (cfr. de return-waarde van
+   >sysconf(_SC_PAGESIZE)).
+   >Het prot-argument geeft aan welke toegangsrechten er aan de geheugenmapping gekoppeld
+   >zullen worden. Mogelijke waarden zijn PROT_NONE, PROT_READ, PROT_WRITE en
+   >PROT_EXEC. Bij PROT_NONE is er geen toegang tot de geheugenruimte, bij PROT_READ mag
+   >de inhoud gelezen worden, bij PROT_WRITE mag de inhoud gewijzigd worden en tot slot
+   >mag bij PROT_EXEC de inhoud uitgevoerd worden.
+   
+   >De flags-parameter is doorgaans één van onderstaande:
+   MAP_PRIVATE
+   Maakt een private geheugenmapping aan waarbij eventuele aanpassingen
+   onzichtbaar zullen zijn voor andere processen die van dezelfde mapping
+   gebruikmaken. Bij een bestandsmapping zullen aanpassingen niet naar het
+   onderliggend bestand geschreven worden.
+   MAP_SHARED
+   Maakt een gedeelde mapping aan. Aanpassingen zullen zichtbaar zijn bij andere
+   processen die van dezelfde mapping gebruikmaken. Bij een bestandsmapping zullen
+   de aanpassingen naar het onderliggende bestand geschreven worden. Deze zullen
+   echter niet onmiddellijk naar het bestandssysteen worden geschreven maar op een
+   moment waarop de kernel dit het meest opportuun acht.
+   De fd-parameter is de file descriptor die aan de geheugenmapping gekoppeld moet worden.
+   
+   > Zoals de naam doet vermoeden is de offset-parameter het startpunt van de mapping in het
+   > bestand. Wanneer voor de offset de waarde 0 gekozen wordt en als length de grootte van
+   > het bestand, wordt een volledige mapping van het bestand bekomen.
+   > Mmap geeft bij succes het startadres van de geheugenmapping als return-waarde.
+   > Munmap doet het tegenovergestelde van mmap en verwijdert de geheugenmapping
+   
+   **Bestandmappings**
+   
+   >Om een bestandsmapping te bekomen moet met de systeemaanroep open een file
+   >descriptor gevraagd worden en moet deze vervolgens gebruikt worden bij de
+   >systeemaanroep mmap. Na het uitvoeren van mmap mag de file descriptor met close
+   >gesloten worden.
+   >Het spreekt voor zich dat de toegangsparameters bij het openen van de descriptor en bij de
+   >mapping consistent moeten zijn. Het zou onlogisch zijn mocht je bij de mapping
+   >PROT_WRITE vermelden, terwijl de fd-parameter bekomen werd met O_RDONLY.
+   
+   **Memory-mapped I/O**
+   
+   >Aangezien een bestand in het geheugen kan worden geladen, kunnen een aantal I/O-
+   >operaties vervangen worden door geheugenoperaties. Dit heeft volgende voordelen:
+   >
+   >1. De systeemaanroepen read en write veroorzaken achter de schermen twee
+   >     dataoverdrachten. De eerste tussen het bestand en de kernel buffer cache, een
+   >     tweede tussen de kernel buffer cache en een buffer in user-space. De tweede
+   >     overdracht wordt door gebruik te maken van geheugenmapping overbodig. Bij input
+   >     is de data onmiddellijk na de mapping voorhanden en bij output worden de
+   >     wijzigingen door de kernel, weliswaar niet ogenblikkelijk, naar het bestand
+   >     weggeschreven.
+   >2.  Zoals in punt 1 geschetst kan de er wat tijd bespaard worden door het aantal data-
+   >     overdrachten te halveren. Bovendien is het ook zo dat er bij een read/write-operatie
+   >     data zal bijgehouden worden in twee buffers, nl. één in de kernel en één in user-
+   >     space. Bij een geheugenmapping is er enkel nog een buffer nodig in de kernel
+   >     waardoor er dus ook op het geheugenverbruik kan bespaard worden.
+   >     Performantiewinst is het meest waarschijnlijk bij random I/O-operaties in een groot bestand.
+   >     Bij sequentiële toegang zal er weinig tot geen performantiewinst bekomen worden omdat
+   >     bij beide technieken het volledige bestand één keer in het geheugen zal worden geladen.
+   >     Hierdoor zal het uitsparen van een dataoverdracht en een beetje geheugen niet opwegen
+   >     tegen de tijd die verloren gaat aan disk I/O.
+
+**Let wel, het gebruik van virtueel geheugen heeft ook grote nadelen. Voor kleine I/O-
+operaties is de kost van memory-mapped I/O aanzienlijk (mapping, unmapping,
+paginafouten, aanpassen van de MMU TLB, ...)**
+
+
+
+**Opdrachten**
+
+1. >Schrijf een eigen versie van cat waarbij er nu gebruikgemaakt wordt van memory-
+   >mapped I/O.
+
+   ```c
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <sys/stat.h>
+   #include <pthread.h>
+   #include <sys/types.h>
+   #include <sys/wait.h>
+   #include <fcntl.h>
+   #include <pthread.h>
+   #include <semaphore.h>
+   #include <unistd.h>
+   #include <sys/mman.h>
+   
+   int main(int argc, char **argv){
+   	int fd=open(argv[1],O_RDONLY);
+   	if (fd<0){
+   		perror(argv[1]);
+   		exit(1);
+   	}
+   	struct stat s;
+   	if (fstat(fd,&s)<0){
+   		perror(argv[1]);
+   		exit(1);
+   	}	
+   	unsigned char *p=mmap(NULL,s.st_size,PROT_READ,MAP_PRIVATE,fd,0);
+   	if (p<0){
+   		perror(argv[1]);
+   		exit(1);
+   	}
+   	if (close(fd)<0){ //fd sluiten want niet meer nodig
+   		perror(argv[1]);
+   		munmap(p,s.st_size); //mapping ondgedaan maken
+   		exit(1);
+   	}
+   	unsigned char *hulp=p; //kopie nemen anders zal de munmap verkeerd pointen
+   	int i=0;
+   	int total=0;
+   	unsigned buffer[BUFSIZ];
+   	for(i=0;i<s.st_size-BUFSIZ;i+=BUFSIZ){
+   		write(1,hulp,BUFSIZ);
+   		total+=BUFSIZ;
+   		hulp+=BUFSIZ;
+   	}
+   	write(1,hulp,s.st_size-total);
+   	munmap(p,s.st_size);
+   	return 0;
+   }
+   ```
+   
+   **Extra oefening uit theorie Les 9 (01:40): Oefening met pipes maar nu adhv semaforen en mmap. Zie Parent met 2 childs met pipes tussen (theorie les 7, 01:25)**
+   
+   ```C
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include <sys/stat.h>
+   #include <pthread.h>
+   #include <sys/types.h>
+   #include <sys/wait.h>
+   #include <fcntl.h>
+   #include <pthread.h>
+   #include <semaphore.h>
+   #include <unistd.h>
+   #include <sys/mman.h>
+   #include <string.h>
+   
+   typedef struct {
+   	int g;
+   	int g2;
+   	sem_t semP_C1; //3 semaforen
+   	sem_t semC1_C2;
+   	sem_t semP_C2;
+   } data ;
+   
+   int main(int argc, char** argv){
+   	data* d=mmap(NULL,sizeof(data),PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED,-1,0);
+   	if (d<0){
+   		perror(argv[0]);
+   		exit(1);
+   	}
+   	sem_init(&(d->semP_C1),1,0);
+   	sem_init(&(d->semC1_C2),1,0);
+   	sem_init(&(d->semP_C2),1,0);
+   	
+   	int pid=fork();
+   	if (pid==0){
+   		//CHILD1
+   		sem_wait(&(d->semP_C1)); //blokkeren
+   		d->g*=2;
+   		sem_post(&(d->semC1_C2)); //unlocken
+   		return 0;
+   	}
+   	
+   	int pid2=fork();
+   	if (pid2==0){
+   		//CHILD2
+   		sem_wait(&(d->semP_C2));
+   		sem_wait(&(d->semC1_C2));
+   		printf("Het resultaat van g*2+g2 is %d\n",d->g+d->g2);
+   		return 0;
+   	}
+   	
+       //parent
+   	printf("Geef g....:\n");
+   	scanf("%d",&(d->g));
+   	sem_post(&(d->semP_C1));
+   	
+   	printf("Geef g2....:\n");
+   	scanf("%d",&(d->g2));
+   	sem_post(&(d->semP_C2));
+   
+   	waitpid(pid,NULL,0); //wachten op child processen
+   	waitpid(pid2,NULL,0);
+   	sem_destroy(&(d->semP_C1)); //semaforen vernietigen
+   	sem_destroy(&(d->semC1_C2));
+   	sem_destroy(&(d->semP_C2));
+   	
+   	munmap(d,sizeof(data));
+   	return 0;
+   }
+   
+   
+   ```
+   
+   
+   
+2. >**Interprocescommunicatie** m.b.v. **semaforen** kwam tot nu toe nog niet aan bod.
+      >Schrijf een C-programma dat **200 kindprocessen** aanmaakt die elk een uniek getal
+      >genereren. Het pid van het proces dat het grootste getal gegenereerd heeft, alsook
+      >het getal zelf, wordt door alle kindprocessen naar het scherm geschreven. Om een
+      >nieuw **shared memory** object te maken kan je de systeemaanroep **shm_open**
+      >gebruiken. Deze aanroep geeft een getal terug dat je bij mmap kan gebruiken als file
+      >descriptor. De initiële grootte van het shared memory object is 0. Om het shared
+      >memory object een grootte te geven kan je de systeemaanroep ftruncate gebruiken.
+
+   ```c
+   ```
+
+
 
 ## Deel VII: Programmeren in Bash
 

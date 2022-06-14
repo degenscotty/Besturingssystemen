@@ -509,7 +509,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 
 30. >Wat is het verschil tussen coöperatieve- en preempted multitasking? Wanneer kan een proces
-    >preemptief worden onderbroken? (p51)
+    >preemptief worden onderbroken? (p51, theorieles week4: 01:19)
 
 **Coöperatieve multitasking:** Op systemen zonder timeslicing moet een thread vrijwillig de controle over de processor afgeven (met de yield methode) om andere threads een kans te geven.
 
@@ -967,18 +967,43 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 
 
+### Theorie lessen
+
+**Les 1:** Inleiding + basisbegrippen computerarchitectuur + functie & kenmerken van moderne besturingssystemen
+
+**Les 2:**  multitasking  + kernel architectuur + uitleg basis comando's find
+
+**Les 3:**  Hoofdstuk 2 processenbeheer
+
+**Les 4:**  Vervolg proceswissel + threads + demo multithreaded applicatie via pthread (01:10)
+
+**Les 5:** Uitleg Labo Deel V: I/O-Systeemaanroepen
+
+**Les 6:** Uitleg Labo Deel VI: Processen en POSIX-threads (pthreads)
+
+**Les 7:**  Vervolg processen: demo base64, demo interprocescommunicatie (adhv pipe)
+
+**Les 8:** Threads: Mutithreading (met workers) + Inter thread communicatie
+
+**Les 9:** Mutexen, Semaforen , shared memory (mmap) & interprocescommunicatie  (adhv semaforen)
+
+**Les 10:** Hoofdstuk 4 geheugenbeheer
+
+
+
 
 
 ### Begrippen
 
-**Besturingssysteem**:
+**Besturingssysteem**: Meer eenvoudige, gelaagde interface naar gebruikers en programmeurs toe. Beheert bronnen (processor, geheugen & I/O apparaten)
 
-**Kernel**:
+**Kernel**: Core, Centrale deel van besturingsssysteem
 
-**Subsysteem**:
+**Subsysteem**: Een Subsysteem is een interface om een vreemd systeem op een host te kunnen runnen. Zo zorgt WSL dat Windows een Linux besturingssysteem kan draaien.
 
-**NT**:
+**NT**: New technology (Windows)
 
-**Executive**:
+**Executive**: Deel van het NT besturingssysteem dat in kernelmodus wordt uitgevoerd. Heeft volledige toegang tot systeemgegevens en hardware. 
 
 **System Call**: Een **systeemaanroep**, of **system call**, is een verzoek van een computerprogramma aan het besturingssysteem om een bepaalde taak uit te voeren voor het programma. Alle systeemaanroepen samen vormen de interface (de API) van het besturingssysteem of de kernel.
+
