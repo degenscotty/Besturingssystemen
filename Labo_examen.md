@@ -23,8 +23,9 @@
 > - Labo 9: **Deel 5**: Uitleg nmap + oef 5 **cat**, oef 6 **cp** & oef 7 **watchfile.**
 > - Labo 10: **Deel 6:** Processen en POSIX-threads
 > - Labo 11: **Deel 6**: Shared memory & threads (oef **6b** & **6c**)
-
-
+> - Booster 1: Examenvraag vorig jaar : Commando **tee** , vraag **111** & vraag **112**
+> - Booster 2: **Zelftest2**
+> - Booster 3: Commando **wc -l** met pipes als IPC + Omzettingen binair naar hex/oct
 
 ## Deel I: Inleiding
 
@@ -3635,6 +3636,8 @@ adm
     >
     >bv. **echo ok | tee f1 f2 f3** (schrijft "ok" (afkomstig van standaard invoer adhv pipe) naar f1,f2 & f3)
     
+    **Dit was een examenvraag vorig jaar**
+    
     
 
 ```c
@@ -3650,12 +3653,12 @@ int main(int argc, char **argv) {
     int *fds = malloc(sizeof(int) * (argc - 1)); //aantal output files tellen: elke opgegeven parameter is een file
     int teller = 0;
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-") == 0) {
-            fds[teller++] = 1;
+        if (strcmp(argv[i], "-") == 0) { //check of dat er een minteken is meegegevens
+            fds[teller++] = 1;			//fd voor standaard uitvoer meegeven
             continue;
         }
         fds[teller] = open(argv[i], O_WRONLY | O_CREAT); // bestanden aanmaken indien ze niet bestaan
-        if (fds[teller] < 0) {
+        if (fds[teller] < 0) { 							
             perror(argv[i]);
             continue;
         }
@@ -3665,12 +3668,12 @@ int main(int argc, char **argv) {
 
     /* 2. inlezen van stdin en wegschrijven naar elke uitvoer filedescriptor */
 
-    char buffer[BUFSIZ];
+    char buffer[BUFSIZ]; 							//BUFSIZ is ideale grootte voor I/O opdrachten
 
     int n = read(0, buffer, BUFSIZ);
     while (n != 0) {
-        for (int i = 0; i < teller; i++) {
-            write(fds[i], buffer, n);
+        for (int i = 0; i < teller; i++) {  		
+            write(fds[i], buffer, n);				//schrijf naar elk bestand
         }
         n = read(0, buffer, BUFSIZ);
     }
@@ -5119,5 +5122,332 @@ done
 ```c
 int dimension = atoi(argv[1]); //( = Asci To Integer) zet string om naar int
 [[ $x =~ "^.$"]] //checken of variabele voldoet aan reguliere expressie
+```
+
+
+
+
+
+**De opdrachten break en continue**
+
+
+
+>Lussen kunnen vroegtijdig afgebroken worden met behulp van de instructie **break**. Als de
+>shell op een break stuit, dan wordt de huidige for-, while-, of until-lus beëindigd en gaat de
+>verwerking verder bij de eerste opdracht na done.
+>De **continue**-instructie heeft een vergelijkbare functie. Deze zorgt ervoor dat de volgende
+>iteratie van de huidige lus onmiddellijk begint. Als je lussen genest hebt en meer dan één lus
+>wilt afbreken, dan kun je break en continue een numerieke parameter meegeven, die duidt
+>op het aantal geneste lussen; break 1 en break zijn bijgevolg equivalent.
+
+
+
+111. > Ontwikkel een script dat een recursieve versie van het UNIX commando **wc** simuleert. Behalve de interne instructies (if, for, case, let, while, read enz.) mag je ook de externe commando's **echo**, **wc** en **find** gebruiken. Het script kan opgeroepen worden met 0 tot 3 opties (-l, -w en -c, niet noodzakelijk in die volgorde), gevolgd door een willekeurig aantal parameters. Indien er geen enkele optie meegegeven wordt, wordt aangenomen dat alle drie de opties werden vermeld. De parameters kunnen zowel bestandsnamen als namen van directory's zijn; worden geen parameters meegegeven, dan neemt het script de werkdirectory in beschouwing. De optie -l staat voor het afdrukken van het aantal regels,
+     -w voor het aantal woorden en -c voor het aantal karakters. Deze aantallen worden
+     berekend.
+     • voor elk bestand dat als parameter meegegeven wordt,
+     • voor elk bestand in de tree van een directory die als parameter meegegeven
+     wordt en
+     • tot slot voor alle bestanden samen.
+
+```bash
+#!/bin/bash
+
+# wordcount recursief schrijven
+#trap { rm -f $temp; exit 1; } SIGINT # proberen
+
+function printerr() {
+    echo "Usage wc [-l] [-w] [-c] [file|directory] [file2|directory2] ..." >&2 # naar error uitvoer
+}
+
+while [[ -n "$1" ]]; do
+# hier wordt veronderstelt dat de opties als eerst komen en nadien de bestanden
+    case "$1" in
+            -l) lijnen=1
+                ;;
+            -w) woorden=1
+                ;;
+            -c) kars=1
+                ;;
+            [^-]*)  break # nu kom je naam van file tegen #[[ ! -f "$1" && ! -d "$1" ]] && {printerr; exit 1; }
+                ;;
+            -*) printerr # oproepen functie -> geen haakjes
+                exit 1
+                ;;
+    esac
+    shift
+done
+
+[[ -z $woorden && -z $lijnen && -z $kars ]] && { kars=1; woorden=1; lijnen=1; }
+
+#echo $@
+bestanden=${@:-.} # mag geen parameters meer bevatten
+
+temp=$(mktemp 'XXXXXX')
+
+for i in $bestanden; do
+    [[ -f "$i" ]] && wc "$i" >> $temp #bij bestanden
+    [[ -d "$i" ]] && find "$i" -type f -print0 |xargs -n 1 -0 wc >> $temp #directories. alle bestanden ophalen met find
+done
+
+#cat $temp
+
+totaal_lijnen=0
+totaal_woorden=0
+totaal_chars=0
+
+while read lijn woord chars bestand; do
+    ((totaal_lijnen+=lijn))
+    ((totaal_woorden+=woorden))
+    ((totaal_chars+=chars))
+    [[ -n "$lijnen" ]] && printf "%7d" $lijn
+    [[ -n "$woorden" ]] && printf "%7d" $woord
+    [[ -n "$kars" ]] && printf "%7d" $chars
+    printf "%10s\n" $bestand
+done < "$temp"
+
+# formatering van de tekst -> printf
+[[ -n "$lijnen" ]] && printf "%7d" $totaal_lijnen
+[[ -n "$woorden" ]] && printf "%7d" $totaal_woorden
+[[ -n "$kars" ]] && printf "%7d" $totaal_chars
+printf "%10s\n" total
+
+rm $temp
+```
+
+
+
+112. >Het bestand pagefile.out bevat de uitvoer van een Windows batch file:
+     >dir \\AL005951\c$\pagefile.sys
+     >dir \\AL005952\c$\pagefile.sys
+     >
+     >...
+     >Elk van de 2.901 dir-opdrachten werd beantwoord met regels van de vorm:
+     >C:\WINDOWS\system32>dir \\AL005951\c$\pagefile.sys
+     >Volume in drive \\AL005951\c$ is WINNT
+     >Volume Serial Number is D0A0-4386
+     >Directory of \\AL005951\c$
+     >02/08/00 02:12 146.800.640 pagefile.sys
+     >1 File(s) 146.800.640 bytes
+     >577.850.880 bytes free
+     >De regel met de woorden bytes free vermeldt de beschikbare ruimte op het volume C:.
+     >Maak een script dat een tekstbestand genereert met de namen van alle toestellen die
+     >minder dan 80 MB vrij hebben op de C: schijf, één per regel.
+
+```bash
+#!/bin/bash
+
+
+while read -r lijn; do # -r negeert de backslash \
+    array=($lijn)
+    if [[ ${array[0]} =~ ^Directory ]]; then
+        comp=${array[-1]}
+        comp=${comp%c$}
+        comp=${comp//\\/}
+        echo $comp;
+    fi
+    if [[ ${array[2]} =~ "free" ]]; then
+        grootte=${array[0]//./}
+        if((grootte<80*1024*1024)); then #80 mb
+            echo $comp
+        fi
+    fi
+done < pagefile.out
+
+```
+
+
+
+## Extra oefeningen booster sessie 3
+
+
+
+> Schrijf een C-programma 2.c dat van een **aantal bestanden** de **hexadecimale** uitvoer naar het scherm **schrijft**. De namen van de bestanden worden via de opdrachtlijn meegegeven. Met het minteken, dat slaat op standaard invoer, hoef je geen rekening te houden.
+>
+> De hexadecimale uitvoer bekom je door elke byte van ieder invoerbestand om te zetten naar twee hexadecimale cijfers. Alle hexadecimale tekens worden na mekaar naar het scherm geschreven.  Wanneer de gebruiker op de opdrachtlijn â€œ./2 bestand1 bestand2â€ intikt, wordt in de veronderstelling dat deze bestanden bestaan, de inhoud van de bestanden bestand1 en bestand2 in hexadecimale vorm naar het scherm geschreven. Wanneer een bestand niet bestaat, wordt er een foutboodschap getoond.
+
+**Invoer omzetten naar binair:**
+
+```c
+int main(int argc, char **argv)
+{
+    unsigned char in = 0x5a;
+    unsigned char out[8]; //8 characters
+
+    for (int i = 0; i < 8; i++)
+    {
+        out[7 - i] = '0' + in % 2; //2=binair
+        in /= 2;
+    }
+    write(1,out,8);
+    return 0;
+}
+```
+
+**Invoer omzetten naar hexadecilaal:**
+
+```c
+int main(int argc, char **argv)
+{
+    unsigned char in = 0x5a;
+    unsigned char out[2]; //2 characters
+
+    char omz[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    out[0] = omz[in % 16]; //16=hexadecimaal
+    out[1] = omz[in / 16];
+
+    write(1, out, 2);
+
+    return 0;
+}
+```
+
+**Omzetten naar octaal**
+
+```c
+int main(int argc, char **argv)
+{
+    unsigned char in = 0x5a;
+    unsigned char out[3];  //3 characters
+
+    for (int i = 0; i < 3; i++)
+    {
+        out[2 - i] = '0' + in % 8; //8=octaal
+        in /= 8;
+    }
+    write(1,out,3);
+    return 0;
+}
+```
+
+**Oplossing**
+
+```bash
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <sys/mman.h>
+#include <semaphore.h>
+#include <pthread.h>
+
+int main(int argc, char** argv){
+	unsigned char in[BUFSIZ];
+	unsigned char out[BUFSIZ*2];
+	char omz[16]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+	for(int i=1;i<argc;i++){
+		int fd=open(argv[i],O_RDONLY);
+		if (fd<0){
+			perror(argv[i]);
+			continue;
+		}
+		int n=read(fd,in,BUFSIZ);
+		while (n>0){
+			int teller=0;
+			for(int i=0;i<n;i++){
+				unsigned char byte=in[i];
+				out[teller]=omz[byte/16];
+				out[teller+1]=omz[byte%16];
+				teller+=2;
+			}
+			write(1,out,teller);
+			n=read(fd,in,BUFSIZ);
+		}
+		if (n<0){
+			perror(argv[i]);
+			continue;
+		}
+		if (close(fd)<0){
+			perror(argv[i]);
+			continue;
+		}
+	}
+	
+	return 0;
+}
+```
+
+
+
+
+
+**Opgave 2**
+
+
+
+![Imgur](https://imgur.com/ZfYzsgh.png)
+
+```bash
+#!/bin/bash
+
+declare -A array
+
+function printErr(){
+	echo "Usage ..." >&2
+}
+
+function test_s(){
+	[[ -n ${array["-s"]} ]] && { printErr ; exit 1 ; }
+	array["-s"]=1
+}
+
+function test_k(){
+	[[ -n ${array["-k"]} ]] && { printErr ; exit 1 ; }
+	array["-k"]=1
+}
+
+function test_f(){
+	[[ -n ${array["-f"]} ]] && { printErr ; exit 1 ; }
+	array["-f"]=1
+	[[ ! -f "$1" ]] && { printErr ; exit 1 ; } 
+}	
+
+function test_p(){
+	[[ -n ${array["-p"]} ]] && { printErr ; exit 1 ; }
+	array["-p"]=1
+	[[ ! $1 =~ ^[0-9]+%$ ]] && { printErr ; exit 1 ; } 
+}	
+
+while [[ -n "$1" ]]; do
+       case "$1" in 
+	       -s|--size) test_s
+		          ;;
+	       -f|--file) shift
+		          test_f "$1"			   	
+		          ;;
+	       -k|--key) test_k
+		          ;;
+	       -p)  shift
+		    test_p "$1"
+		          ;;
+	       [^-]*) printErr
+		      exit 1
+		      ;;
+	       -?*) while read -N1 kar;do
+		       [[ "$kar" == "-" || "$kar" == $'\n' ]] && continue
+		       case $kar in 
+			       s)    test_s
+			             ;;
+			       k)    test_k
+				     ;;
+			       f)    [[ ! "$1" =~ f$ ]] && { printErr ; exit 1 ; }
+				     shift
+				     test_f "$1"   
+				     ;;
+			       p)    [[ ! "$1" =~ p$ ]] && { printErr ; exit 1 ; }
+				     shift
+				     test_p "$1"
+				     ;;
+		       esac
+		    done <<< "$1" 
+		      ;;
+       esac
+       shift
+done	
 ```
 
