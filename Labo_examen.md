@@ -1689,7 +1689,7 @@ fork()
       >   int main(int argc, char *argv[] {
       >       int pid=fork();
       >       if(pid==0){
-      >           char *args[]={"writestring","sfdfdfdfdfd",(char*)0); 
+      >           char *args[]={"writestring","writestring hello",(char*)0); 
       >   		if(execv("writestring",args) <0){
       >               perror("writestring");
       >               exit(1);
@@ -1719,7 +1719,7 @@ fork()
       >   int main(int argc, char *argv[] {
       >       int pid=fork();
       >       if(pid==0){
-      >       	if(execl("writestring","writestring","sfdfdfdfdfd",(char*)0)<0){
+      >       	if(execl("writestring","writestring","writestring hello",(char*)0)<0){
       >       	  	perror("writestring");
       >       	  	exit(1);
       >       	}
