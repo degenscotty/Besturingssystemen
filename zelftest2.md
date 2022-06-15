@@ -399,10 +399,63 @@ done < "$1"
 19. >Schrijf in C een eigen versie van het commando du. De bestandsgrootte kan je
     >opvragen met de syscall stat.
 
-    ```bash
+    ```c
+    #include <sys/stat.h>
+    #include <stdio.h>
+    #include <dirent.h>
+    #include <fcntl.h>
     
+    #define PATH_MAX 4096
+    
+    void checkDir(const char *);
+    
+    void loopDir(DIR *, const char *);
+    
+    struct stat st;
+    
+    void loopDir(DIR *dir, const char *base) {
+        struct dirent *ent;
+    
+        while ((ent = readdir(dir)) != NULL) {
+            if (ent->d_name[0] == '.') {
+                continue;
+            }
+    
+            char fname[PATH_MAX];
+            snprintf(fname, sizeof(fname), "%s/%s", base, ent->d_name);
+    
+            stat(fname, &st);
+    
+            if (!S_ISREG(st.st_mode)) { // is een regulier bestand
+                printf("%llu\t%s\n", st.st_blocks, fname);
+            } else { // is een directory
+                checkDir(fname);
+            }
+        }
+    }
+    
+    void checkDir(const char *dirName) {
+        DIR *dir = opendir(dirName);
+        if (dir != NULL) {
+            loopDir(dir, dirName);
+            closedir(dir);
+        } else {
+            stat(dirName, &st);
+            printf("%llu\t%s\n", st.st_blocks, dirName);
+        }
+    }
+    
+    int main(int argc, char *argv[]) {
+        if (argc == 1) {
+            checkDir(".");
+        }
+        for (int i = 1; i < argc; ++i) {
+            checkDir(argv[i]);
+        }
+        return 0;
+    }
     ```
-
+    
 20. >Schrijf in C een eigen versie van het commando “wc -l” dat van de laatste 100
     >bytes van de bestanden die meegegeven worden op de commandolijn het
     >aantal lijnen bepaalt. In BASH zou je dit als volgt schrijven .... tail -c 100
