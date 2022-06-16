@@ -431,8 +431,8 @@ sys     0m0.001s
 
 ### Strace
 
-Soms kan het interessant zijn om te weten welke systeemaanroepen een programma
-gebruikt. Bekijk de uitvoer van “strace cat /etc/passwd”. Dit geeft een sequentieel overzicht
+Soms kan het interessant zijn om te weten welke **systeemaanroepen** een programma
+gebruikt. Bekijk de uitvoer van **“strace cat /etc/passwd**”. Dit geeft een sequentieel overzicht
 van alles wat bij het uitvoeren van “cat /etc/passwd” gebeurt. Wanneer je een overzicht wil
 krijgen van welke systeemaanroepen er gebruikt worden en hoeveel keer ze werden
 opgeroepen, dan kan je aan strace de optie “-c” meegeven.
@@ -440,17 +440,17 @@ opgeroepen, dan kan je aan strace de optie “-c” meegeven.
 **Overige interessante hulpprogramma’s**
 
 **nm**
-Met het commando nm kan je symboolinformatie opvragen van uitvoerbare bestanden en
+Met het commando nm kan je **symboolinformatie** opvragen van uitvoerbare bestanden en
 libraries. Wil je weten van welke functies de Linux C API (glibc) de uitvoerbare code bevat?
 Voer in een terminal dan nm /lib/libc.so.6 uit en alle lijnen waar een t of T bij vermeld staat
 zijn C-functies waarvan je de code via deze bibliotheek kan vinden.
 
 **ldd**
-Met ldd kan je van ieder uitvoerbaar bestand dat dynamisch gelinkt werkt opvragen van
+Met **ldd** kan je van ieder uitvoerbaar bestand dat dynamisch gelinkt werkt opvragen van
 welke shared libraries het afhankelijk is.
 
 **objdump**
-Wil je een uitvoerbaar bestand terug omzetten naar assembleertaal, dan kan je handig
+Wil je een uitvoerbaar bestand terug omzetten naar **assembleertaal**, dan kan je handig
 gebruikmaken van objdump met de optie -d (disassembly). Wil je de uitvoer zien in Intel
 syntax, voeg dan gerust de optie -M intel toe. Bij een uitvoerbaar bestand is het entrypoint,
 het punt waar het besturingssysteem code begint uit te voeren, de subroutine _start. Vanuit
@@ -469,11 +469,11 @@ modules, of drivers, die momenteel door het systeem gebruikt worden.
 **Opdracht**
 
 > De bedoeling is een **eigen versie van het commando “lspci -n”** te programmeren in de
-> programmeertaal C. Dit commando overloopt alle mogelijke PCI-adressen en gaat na of er
+> programmeertaal C. Dit commando **overloopt alle mogelijke PCI-adressen** en gaat na of er
 > zich een apparaat bevindt. Bevindt er zich een apparaat, dan wordt het adres (busnummer,
 > devicenummer en functienummer) naar het scherm geschreven, samen met het vendorID en
 > het deviceID.
-> Info en werkwijze
+> I**nfo en werkwijze**
 > Om een register van een bepaald apparaat, aangesloten op de PCI-bus, aan te spreken
 > moet je te beschikken over het busnummer, devicenummer, functienummer en tot slot
 > het registernummer.
@@ -672,9 +672,9 @@ for(i=0; i< 10*1024; i++){
 
 
 2. > Tot nog toe werd er niets gezegd over de optimale buffergrootte. De bedoeling is een C-
-   > programma te ontwikkelen dat het hierboven aangemaakte bestand verschillende keren
-   > inleest en dit met buffergroottes van 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048,
-   > 4096 en tot slot 8192 bytes. De uitvoer van het programma moet er ongeveer zo uitzien:
+   > programma te ontwikkelen dat het **hierboven aangemaakte bestand verschillende keren**
+   > **inleest en dit met buffergroottes van 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048,**
+   > **4096 en tot slot 8192 bytes**. De uitvoer van het programma moet er ongeveer zo uitzien:
 
 ```bash	
 BUF_SIZ= 1 Time=3.60
@@ -797,7 +797,8 @@ int main(int argc, char **argv)
         int tot = 0;
         int n = write(fd, buffer, i); 			//lees altijd i bytes in totdat er geen meer zijn
         while (n < (10 * 1024 * 1024 - i))
-        {
+        {	 
+            printf("%d",tot);
             tot += n;
             maak_buffer(buffer, i);
             n = write(fd, buffer, i);
@@ -984,12 +985,12 @@ int main(int argc, char **argv)
 ```
 
 6. >Schrijf een eigen versie van de opdracht **cp** waar twee argumenten op de opdrachtlijn
-   >worden verwacht. Het eerste argument is het bronbestand en het tweede het
-   >doelbestand. Wanneer de eerste parameter een directory is, wordt een foutboodschap
-   >naar het scherm geschreven en stopt het programma met exit-status 1. Wanneer het
-   >tweede argument een directory is, wordt opnieuw gestopt met een passende
-   >foutboodschap en met exit-status 1. Om na te gaan of een argument een directory is, kan je gebruikmaken van de
-   >systeemaanroep stat. Om een programma te stoppen met exit-status 1 maak je best
+   >worden verwacht. Het **eerste argument is het bronbestand** en het **tweede het**
+   >**doelbestand**. Wanneer de eerste parameter een **directory is, wordt een foutboodschap**
+   >**naar het scherm geschreven en stopt het programma met exit-status 1**. **Wanneer het**
+   >**tweede argument een directory is, wordt opnieuw gestopt met een passende**
+   >**foutboodschap en met exit-status 1.** Om na te gaan of een argument een directory is, kan je gebruikmaken van de
+   >systeemaanroep **stat**. Om een programma te stoppen met exit-status 1 maak je best
    >gebruik van de bibliotheekfunctie exit die dan achter de schermen de systeemaanroep
    >_exit aanroept.
 
@@ -1062,9 +1063,6 @@ int main(int argc, char **argv)
    
    	if (close(fd_in)<0){
    		perror(argv[1]);
-   		if (close(fd_out)<0){
-   			perror(argv[2]);
-   		}
    		exit(1);
    	}
    
@@ -1405,7 +1403,6 @@ fork()
    	
    	int pids[argc];    								 //maak voor elk argument een kindproces aan.
    
-   
    	for(i = 1; i < argc; i++){
    		pids[i] = fork(); 							//voor elk argument een nieuw kindproces aanmaken
    		if(pids[i] < 0){
@@ -1492,7 +1489,6 @@ fork()
    		return 1;
    	}
    	else if (pid==0){
-   		//CHILD
    		close (fd_PC[1]);
    		close( fd_CP[0]);
    		int getal;
@@ -1592,6 +1588,93 @@ fork()
    	return 0;
    }
    ```
+   
+   **Zelfde oefening als hierboven maar uitgewerkt met semafore ipv pipes (theorie les 9, 01:40)**
+   
+   ```c
+   #include <sys/mman.h>
+   #include <unistd.h>
+   #include <stdio.h>
+   #include <pthread.h>
+   #include <semaphore.h>
+   #include <sys/types.h>
+   #include <fcntl.h>
+   #include <string.h>
+   #include <sys/wait.h>
+   #include <sys/stat.h>
+   #include <stdlib.h>
+   
+   typedef struct
+   {
+       int g;
+       int g2;
+       sem_t P_C1;
+       sem_t P_C2;
+       sem_t C1_C2;
+   } data;
+   
+   int main(int argc, char **argv)
+   {
+   
+       data *d = mmap(NULL, sizeof(data), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+   	//memory map om data tussen processen te delen
+       
+       sem_init(&d->P_C1, 1, 1);
+       sem_init(&d->P_C2, 1, 1);
+       sem_init(&d->C1_C2, 1, 1);
+   
+       int pid = fork();
+   
+       if (pid < 0)
+       {
+           printf("pid");
+           perror(argv[0]);
+           exit(1);
+       }
+       else if (pid == 0) //Child 1
+       {
+   
+           sem_wait(&d->P_C1); //wachten op data afkomstig van parent semafoor
+           d->g *= 2;
+           sem_post(&d->C1_C2); //kanaal mag weer openen om data te versturen
+           return 0;
+       }
+   
+       int pid2 = fork();
+   
+       if (pid2 < 0)
+       {
+           perror(argv[0]);
+           exit(1);
+       }
+       else if (pid2 == 0) //Child 2
+       {
+           sem_wait(&d->P_C2); //wachten op data afkomstig van deze semaforen
+           sem_wait(&d->C1_C2);
+           printf("g*2+g2: %d", d->g * 2 + d->g2);
+           return 0;
+       }
+   
+       //parent
+   
+       d->g = 5;
+       d->g2 = 7;
+   
+       sem_post(&d->P_C1);
+       sem_post(&d->P_C2);
+   
+       waitpid(pid, NULL, 0);
+       waitpid(pid2, NULL, 0);
+   
+       sem_close(&d->P_C1);
+       sem_close(&d->P_C2);
+       sem_close(&d->C1_C2);
+   
+       return 0;
+   }
+   ```
+   
+   
    
    **Vraag die hij (bijna) elk jaar stelt: cmd1 | cmd2. Opdrachten aan elkaar kleven adhv een pipe (theorie les 7, 01:42)**
    
@@ -1915,8 +1998,8 @@ fork()
       			//CHILD
       			srand(getpid());
       			d->numbers[i]=rand();
-      			sem_post(&(d->sem_CP[i]));
-      			sem_wait(&(d->sem_PC[i]));
+      			sem_post(&(d->sem_CP[i])); //teken geven dat d is ingesteld.
+      			sem_wait(&(d->sem_PC[i])); //wachten op signaal van parent om door te gaan.
       			if (d->winner==getpid()){
       				printf("I'm the winner...\n");
       			}
@@ -1929,7 +2012,7 @@ fork()
       	}
       
       	for(int i=0;i<N;i++){
-      		sem_wait(&(d->sem_CP[i]));
+      		sem_wait(&(d->sem_CP[i])); //wachten op signaal om door te gaan
       	}
       
       	int index=0;
@@ -1941,7 +2024,7 @@ fork()
       	d->winner=d->pids[index];
       
       	for(int i=0;i<N;i++){
-      		sem_post(&(d->sem_PC[i]));
+      		sem_post(&(d->sem_PC[i])); //unlockt parent (kan door gaan)
       	}
       
       
