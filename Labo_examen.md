@@ -1591,7 +1591,7 @@ fork()
    
    **Zelfde oefening als hierboven maar uitgewerkt met semafore ipv pipes (theorie les 9, 01:40)**
    
-   ```c
+   ```bash
    #include <sys/mman.h>
    #include <unistd.h>
    #include <stdio.h>
@@ -2012,7 +2012,7 @@ fork()
       	}
       
       	for(int i=0;i<N;i++){
-      		sem_wait(&(d->sem_CP[i])); //wachten op signaal om door te gaan
+      		sem_wait(&(d->sem_CP[i])); //wachten op signaal van child om door te gaan
       	}
       
       	int index=0;
@@ -2024,7 +2024,7 @@ fork()
       	d->winner=d->pids[index];
       
       	for(int i=0;i<N;i++){
-      		sem_post(&(d->sem_PC[i])); //unlockt parent (kan door gaan)
+      		sem_post(&(d->sem_PC[i])); //signaal geven naar child dat winnaar bekend is.
       	}
       
       
@@ -2373,7 +2373,7 @@ fork()
    	}
        
    	for(i = 0; i < 4; i++){
-   		pthread_join(threads[i],NULL);
+   		pthread_join(threads[i],NULL); 
    	}
    }
    ```
