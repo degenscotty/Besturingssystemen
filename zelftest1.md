@@ -159,15 +159,18 @@
    Bij het aanmaken van een directory worden automatisch twee hardlinks
    toegevoegd, nl “.” En “..”. De “.” is een hardlink naar de nieuwe map, de “..”
    is een verwijzing naar de bovenliggende map.
+   
+   
+   
    **Symlink, softlink of logische link...**
    Bij een symlink wordt een nieuwe inode aangemaakt met een **verwijzing**
-   naar de naam van het filesysteemobject. Een verwijzing **naar de naam**, niet
+   naar de **naam van het filesysteemobject**. Een verwijzing **naar de naam**, niet
    naar de inode! Dit is duidelijk zichtbaar bij een “ls -l” opdracht aangezien je
    uiterst links lrwxrwxrwx zal terugvinden en uiterst rechts “linknaam ->
    naam”.
-
+   
    **Hardlinks hebben als nadeel:**
-
+   
    - Niet mogelijk voor directories. Anders kan je lussen maken in je
      bestandssysteem. Een opdracht zoals find kan het verschil niet zien
      tussen de link en het origineel aangezien er gewoon geen verschil is.
@@ -268,13 +271,13 @@
     **?** één willekeurig teken
     **[ ... ]** een karakter uit het bereik dat zich tussen de vierkante haken bevindt
     **[ ^...]** een karakter dat zich niet in het bereik bevindt
-    **[!...]** hetzelfde als **[ ^...]]**
+    **[!...]** hetzelfde als **[ ^...]**
 
     
 
 14. >Hoe kan je met het commando “**ls -l**” een overzicht geven van alle
     >bestandsnamen die bestaan uit minstens **twee letters gevolgd door een cijfer**
-    >gevolgd door een willekeurig aantal karakters?
+    >**gevolgd door een willekeurig aantal karakters**?
 
     ```bash
     ls -l ??[1-9]*
@@ -294,7 +297,7 @@
 
 16. >Maak met touch een bestand aan met als naam **passwd** in je huidige
     >werkdirectory. Zoek nu met het commando **find** naar alle bestands- en
-    >directorynamen, te beginnen bij /, die beginnen met het woord pass gevolgd
+    >directorynamen, te beginnen bij /, die beginnen met het woord **pass** gevolgd
     >door 0 of meerdere willekeurige tekens? Zorg dat find hier het ***-teken** omzet
     >naar 0 of meerdere willekeurige tekens.
 
@@ -357,9 +360,12 @@
     
 
 20. >Waarvoor dient **/dev/null**? Hoe kan je de **gebufferde uitvoer** van een
-    >willekeurige opdracht **naar /dev/null schrijven**? Hoe kan je de **niet-gebufferde**
-    >uitvoer van een willekeurige opdracht naar **/dev/null schrijven**? Hoe kan je
-    >ervoor zorgen dat ze nu allebeide naar /dev/null worden gestuurd?
+    >willekeurige opdracht **naar /dev/null schrijven**? 
+    >
+    >Hoe kan je de **niet-gebufferde**
+    >uitvoer van een willekeurige opdracht naar **/dev/null schrijven**? 
+    >
+    >Hoe kan je ervoor zorgen dat ze nu **allebeide** naar /dev/null worden gestuurd?
 
     Dit speciale device dient als **prullenbak** voor als je niet geïnteresseerd bent in
     de uitvoer van een opdracht.
@@ -369,8 +375,6 @@
 
     De **niet-gebufferde** uitvoer kan je naar /dev/null schrijven door:
     **du /proc 2>/dev/null**
-
-    
 
     **Allebei** naar /dev/null kan door:
     **du /proc >/dev/null 2>&1**
@@ -440,7 +444,7 @@
     >aan het besturingssysteem heeft gericht worden naar stderr gestuurd.
     >Herschijf de bovenstaande opdracht zodat nu **uitvoer van shuf naar /dev/null
     >wordt gestuurd** en waarbij de systeemaanroepen kunnen worden overlopen
-    >door een pipe naar het commando less.
+    >door een **pipe** naar het commando less.
 
     ```bash
     strace shuf -i 1-10 -n5 2>&1 >/dev/null|less
@@ -509,10 +513,10 @@
     >zet je het om naar een strikt **positief getal**? (unsigned dus)
 
     **head -c4 /etc/random | od -td4**
-    De uitvoer van de opdracht hierboven is niet zo goed omdat de adresprefix
+    De uitvoer van de opdracht hierboven is niet zo goed omdat de **adresprefix**
     er nog voor staat. Dit kan je weglaten door de optie -An toe te voegen.
     **head -c4 /etc/random | od -An -td4**
-    Voor een unsigned int:
+    Voor een **unsigned** int:
     **head -c4 /etc/random | od -An -tu4**
 
     

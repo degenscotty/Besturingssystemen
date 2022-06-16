@@ -78,7 +78,7 @@ ctrl+Z
    > scherm (**standaard uitvoer)**.
    > Probeer dit nu ook uit met de opdracht “**mail root@localhost**”. Hier zal eerst
    > gevraagd worden om het **onderwerp** van het bericht in te geven, gevolgd door
-   > het **bericht** zelf. Wanneer je het einde van de invoer aangeeft, zal een mail
+   > het **bericht** zelf. Wanneer je het **einde** van de **invoer** aangeeft, zal een mail
    > verstuurd worden naar de gebruiker root op het lokale toestel. De gebruiker root
    > kan zijn mail lezen door de opdracht **mail** uit te voeren zonder parameters.
    > Hierdoor kom je terecht in een interactieve omgeving waar je een overzicht krijgt
@@ -258,7 +258,7 @@ man 2 read #2 duidt op System Calls
     
     
 
-## Deel II:  Compileren in de Shell (kwam niet aan bod tijdens de labo's)
+## Deel II:  Compileren in de Shell (werd tussendoor in de labo's/theorie uitgelegd)
 
 In Linux is het vrij eenvoudig om een C of C++ programma te compileren zonder gebruik te
 maken van een IDE. Het enige wat je nodig hebt is een eenvoudige tekstverwerker. In een
