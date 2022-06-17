@@ -2345,36 +2345,59 @@ fork()
    >scherm heeft geschreven, stopt de thread.
 
    ```C
-   #include <pthread.h>
+   #include <sys/mman.h>
+   #include <unistd.h>
    #include <stdio.h>
+   #include <pthread.h>
+   #include <semaphore.h>
+   #include <sys/types.h>
+   #include <fcntl.h>
+   #include <string.h>
+   #include <sys/wait.h>
+   #include <sys/stat.h>
+   #include <stdlib.h>
    
+   typedef struct
+   {
+       int getal;
+       void (*f)(int);
+   } arg;
    
-   typedef struct { //struct voor de argumenten van de worker
-   	int getal;
-   	void (*f)(int);
-   } args;
-   
-   
-   void * worker (void * p){ //maak de worker functie en zorg dat die generiek is (met structs)
-   	int *getal = (int*)p
-   	int i;
-   	for( i = 0; i < 100; i++){
-   		printf("%d" , * getal)
-   	}
-   	return 0;
+   void *worker(void *p)
+   {
+       arg *a = (arg *)p;
+       a->f(a->getal);
+       return NULL;
    }
    
-   int main(){
-   	pthread_t threads[4]; 	
-   	int i;
-   	for(i = 0; i < 4; i++){
-   		pthread_create(&threads[i],NULL, worker, (int*)&i); //threads worden aangemaakt en automatisch gestart
-           //hier nog geen join anders worden threads sequentieël uitgevoerd = nutteloos
-   	}
-       
-   	for(i = 0; i < 4; i++){
-   		pthread_join(threads[i],NULL); 
-   	}
+   void printgetal(int g)
+   {
+       int i;
+       for (i = 0; i < 100; i++)
+       {
+           printf("%d", g);
+       }
+   }
+   
+   int main(int argc, char **argv)
+   {
+       pthread_t threads[4];
+       int getallen[4];
+       for (int i = 0; i < 4; i++)
+       {
+           arg args[4];
+           args[i].getal = i; //per thread een nieuw getal.
+           args[i].f = printgetal;
+           printf("creating thread %d", i);
+           pthread_create(&threads[i], NULL, worker, &args[i]);
+       }
+   
+       for (int i = 0; i < 4; i++)
+       {
+           pthread_join(threads[i], NULL);
+       }
+   
+       return 0;
    }
    ```
    
