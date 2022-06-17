@@ -2372,6 +2372,7 @@ fork()
    
    void printgetal(int g)
    {
+   
        int i;
        for (i = 0; i < 100; i++)
        {
@@ -2382,13 +2383,11 @@ fork()
    int main(int argc, char **argv)
    {
        pthread_t threads[4];
-       int getallen[4];
+       arg args[4];
        for (int i = 0; i < 4; i++)
        {
-           arg args[4];
            args[i].getal = i; //per thread een nieuw getal.
            args[i].f = printgetal;
-           printf("creating thread %d", i);
            pthread_create(&threads[i], NULL, worker, &args[i]);
        }
    
@@ -2412,84 +2411,94 @@ fork()
    **Extra uitleg workers: Les8 01:03**
    
    ````C
-   #include <pthread.h>
+   #include <sys/mman.h>
+   #include <unistd.h>
    #include <stdio.h>
+   #include <pthread.h>
+   #include <semaphore.h>
+   #include <sys/types.h>
+   #include <fcntl.h>
+   #include <string.h>
+   #include <sys/wait.h>
+   #include <sys/stat.h>
    #include <stdlib.h>
    
+   typedef struct
+   {
+       int *getallen;
+       int (*f)(int *, int);
+   } args;
    
-   typedef struct { 							//parameters van de worker
-   	double *array;
-   	int n;
-   	double (*f)(double*, int);
-   } arg;
-   
-   double grootste (double *array, int n){
-   	double grootste = array[0]
-   	int i;
-   	for(i = 1; i < n; i++){
-   		if(array[i] > grootste){
-   			grootste = array[i];
-   		}
-   	}
-   	return grootste;
-   }
-   double kleinste(double *array, int n){
-   	double kleinste = array[0]
-   	int i;
-   	for(i = 1; i < n; i++){
-   		if(array[i] < kleinste ){
-   			kleinste = array[i];
-   		}
-   	}
-   	return kleinste ;
+   void *worker(void *p)
+   {
+       args *arg = (args *)p;
+       int *getal = malloc(sizeof(int));
+       *getal = arg->f(arg->getallen, 20);
+       return (void *)getal;
    }
    
-   void * worker (void * p){
-   	arg *a = (arg*)a;
-   	//prinf is de easy oplossing het moet dus anders
-   	//printf("%f", a->f(a->array, a->n));
-   
-   	//dus doe het zo met malloc
-   	double *returnwaarde = malloc(sizeof(double));
-   	*returnwaarde = a->f(a->array, a->n);
-   	return (void*) returnwaarde ; 
+   int berekenGrootste(int *getallen, int n)
+   {
+       int g = getallen[0];
+       for (int i = 0; i < n; i++)
+       {
+           if (getallen[i] > g)
+           {
+               g = getallen[i];
+           }
+       }
+       return g;
    }
    
-   void vulop (double * array, int n){
-   	int i;
-   	for(i = 0; i < n; i++){
-   		array[i] = i;
-   	}
+   int berekenKleinste(int *getallen, int n)
+   {
+       int k = getallen[0];
+       for (int i = 0; i < n; i++)
+       {
+           if (getallen[i] < k)
+           {
+               k = getallen[i];
+           }
+       }
+       return k;
    }
    
-   int main(){
-   	double array[1000000];
-   	pthread_t tread_kleinse, thread_hoogste;
+   void vulop(int *getallen, int n)
+   {
+       for (int i = 0; i < n; i++)
+       {
+           getallen[i] = rand();
+       }
+   }
    
-   	vulop(array,1000000);
-   	arg arg_kl, arg_gr;
-   	
-   	arg_kl.array = array;
-   	arg_kl.n = 1000000;
-   	arg_kl.f = kleinste;
-   	
-   	arg_gr.array = array;
-   	arg_gr.n = 1000000;
-   	arg_gr.f = grootste;
-   	pthread_create(&thread_kl, NULL, worker,(void*)&arg_kl);
-   	pthread_create(&thread_hoogste, NULL, worker,(void*)&arg_gr);
+   int main(int argc, char **argv)
+   {
+       int getallen[20];
+       vulop(getallen, 20);
    
-   	//lees de returnwaarde
-   	double *g,*k;	
+       pthread_t kleinste;
+       pthread_t grootste;
    
-   	pthread_join(thread_kl, (void**) &k);
-   	pthread_join(thread_gr, (void**) &g);
-   	printf("grootste %d" , *g);
-   	printf("kleinste %d" , *k);
-   	
-   	free(g);
-   	free(k);
-   	return 0;
+       args argk;
+       argk.f = berekenKleinste;
+       argk.getallen = getallen;
+       args argG;
+       argG.f = berekenGrootste;
+       argG.getallen = getallen;
+   
+       pthread_create(&kleinste, NULL, worker, (args *)&argk);
+       pthread_create(&grootste, NULL, worker, (args *)&argG);
+   
+       int *r1;
+       int *r2;
+   
+       pthread_join(kleinste, (void **)&r1);
+       pthread_join(grootste, (void **)&r2);
+   
+       printf("kleinste:%d\n", *r1);
+       printf("grootste:%d\n", *r2);
+   
+       return 0;
    }
    ````
    
