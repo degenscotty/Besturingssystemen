@@ -4,21 +4,17 @@
 
 1. > Wat is het verschil tussen **symmetrische** en **asymmetrische** **multiprocessing**? (p15)
 
+### Asymmetrisch
+
 In een **asymmetrische** multiprocessor wordt de kernel van het besturingssysteem altijd uitgevoerd op een bepaalde **master processor**. Deze is verantwoordelijk voor **scheduling** en heeft **volledige controle over het volledige geheugen** en andere bronnen. 
 
-De **andere processoren** kunnen alleen gebruikersprogramma’s en hulpprogramma’s van het besturingssysteem uitvoeren. Heeft een andere processor een dienst nodig (bijvoorbeeld I/O oproep) dan moet die een verzoek sturen naar de master en wachten tot die dienst is uitgevoerd. 
+De **andere processoren** kunnen alleen gebruikersprogramma’s en hulpprogramma’s van het besturingssysteem uitvoeren. Heeft een andere processor een **dienst** nodig (bijvoorbeeld I/O oproep) dan moet die een verzoek sturen naar de master en wachten tot die dienst is uitgevoerd. 
 
+| voordelen                                                    | nadelen                                             |
+| ------------------------------------------------------------ | --------------------------------------------------- |
+| vereist weinig aanpassingen aan een besturingssysteem dat reeds multitasking voor 1 processor mogelijk maakt. | master wordt **bottleneck** voor het ganse systeem. |
 
-
-**pro's asymmetrischemultiprocessor :**
-
-- vereist weinig aanpassingen aan een besturingssysteem dat reeds multitasking voor 1 processor mogelijk maakt.
-
-**con's asymmetrischemultiprocessor :**
-
-- master wordt bottleneck voor het ganse systeem.
-
-
+### Symmetrisch
 
 Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elke processor**:
 
@@ -26,18 +22,10 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
 
 **ofwel** voert elke processor een volledige kopie van het besturingssysteem uit
 
-
-
-**pro's symmetrische multiprocessor :**
-
-- Symmetrische multiprocessing biedt  ruime mogelijkheden op het gebied van beschikbaarheid (fouttolerantie) en stapsgewijze uitbreidingsmogelijkheden. (Als een processor uitvalt heeft dit weinig invloed op het systeem, het wordt enkel langzamer.)
-
-
-
-**con's symmetrische multiprocessor :**
-
-- stelt hogere eisen aan het besturingssysteem voor communicatie tussen de processoren en het syncen van het aanspreken op bronnen.
-- geheugenbeheer veel complexer wanneer processoren aanvullend over een eigen cache bezitten.
+| voordelen                                                    | nadelen                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Symmetrische multiprocessing biedt  ruime mogelijkheden op het gebied van beschikbaarheid (fouttolerantie) en stapsgewijze uitbreidingsmogelijkheden. (Als een processor uitvalt heeft dit weinig invloed op het systeem, het wordt enkel langzamer.) | stelt hogere eisen aan het besturingssysteem voor communicatie tussen de processoren en het syncen van het aanspreken op bronnen. |
+|                                                              | geheugenbeheer veel complexer wanneer processoren aanvullend over een eigen cache bezitten. |
 
 ![Imgur](https://imgur.com/acPC69G.png)
 
@@ -51,7 +39,7 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
    
    **AchtergrondInfo:**
    
-   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid bij UNIX kan een systeemaanroep rechtstreeks vanuit een programma in C of C++ worden gegenereerd. Programma’s die voor systeemaanroepen louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de POSIX-standaard voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
+   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid. Bij **UNIX** kan een **systeemaanroep** **rechtstreeks vanuit een programma in C of C++** worden gegenereerd. Programma’s die voor systeemaanroepen louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de **POSIX-standaard** voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
    
    
    
@@ -75,98 +63,103 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
 
 ![img](https://lh5.googleusercontent.com/aBIQVSLXnUbCuKsdFuCfGwN1DHdFs4cPF1U3naXs67PDsyMTG-ItftH5yAC-m4TO5tY4c-kpdA5IFzzeRxRmfBkxTE3dsqC34r9Lf4kO0qraZKn3MMLewcacg3rJ18v2NLtRA6xdMa3AXXUP_A)
 
-   - tot voor kort het meest gebruikte ontwerp
-   - weinig aandacht voor structuur
-      **voordelen:**
-   - volledige kernel wordt uigevoerd in dezelfde gedeeelde geheugenruimte, zonder restricties voor toegang tot hardware
-   - vrijwel elke procedure binnen de kernel kan een andere oproepen
-   - zeer efficient
-      **nadelen:**
-   - gesloten voor uitbreiding. Nood aan fouten verbeteren en nieuwe functies toevoegen. Nood aan een meer modulair ontwerp.
+Tot voor kort het meest gebruikte ontwerp. wordt nu minder gebruikt.
 
- **2. Modulaire kernel:** 
+
+
+| Voordelen                                                    | Nadelen                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| volledige kernel wordt uigevoerd in dezelfde gedeeelde geheugenruimte, zonder restricties voor toegang tot hardware | **gesloten voor uitbreiding.** Nood aan fouten verbeteren en nieuwe functies toevoegen. Nood aan een meer modulair ontwerp. |
+| vrijwel elke procedure binnen de kernel kan een andere oproepen | weinig aandacht voor structuur                               |
+| zeer **performant**                                          |                                                              |
+
+
+
+   **2. Gelaagde kernel:**
+
+![img](https://lh6.googleusercontent.com/TJ7Xh4CCT3LJss9ITT26jUGx52mz6UdLKQuFhoNIHWjQwiVbiR4CESheyVcTileY2-ZKvtCbl9YNmHuUJ6Mv2baYfrRwXssXMsp6Lx0CZgurm5SXEZ4BZ2NsvRdoWlyXCNeJ9WbOAXd2oeKOEw)
+
+**Modules** worden verdeeld, **duidelijk hiërarchisch gescheiden lagen**. Interactie met de **hardware** bevindt zich op het onderste niveau, de **gebruikersinterface** op het **hoogste**. Wordt **niet veel gebruikt in moderne systemen** om problemen met het definiëren van de lagen en de communicatie ertussen te vermijden
+
+| voordelen                                               | nadelen                                                      |
+| ------------------------------------------------------- | ------------------------------------------------------------ |
+| **Verbergen** van de **complexiteit** tussen elke laag. | **Elke laag** heeft **toegang tot hardware**. Eventuele fout in 1 laag kan de integriteit van het volledig systeem in gevaar brengen. |
+|                                                         | verandering in ene laag vergt aanpassingen aan andere lagen dankzij tussenliggende lagen. |
+|                                                         | beveiliging is lastig te bouwen in dit model                 |
+|                                                         | Volledige kernel blijft draaien in de kernelmodus            |
+
+**3. Micro kernel:**
+
+![img](https://lh3.googleusercontent.com/DVZmwD1WnQ0qZxw68VTnkeg7LUNyOIucCmxEkNk18cpXRu930eysvY9YxS45sUCbPx9z0IDZihK6FqI8eC61wakoFDi7Q74MVm9RfQisZ1MQWPzqueBPD6P97xqnobk6y7urOQnpOb4B-DyAGQ)
+
+   - Ook wel **client-server model** genoemd. Wordt **niet veel gebruikt** in moderne systemen om problemen met het definiëren van de lagen en de communicatie ertussen te vermijden.
+
+| voordelen                                                    | nadelen                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Enkel essentiële functies van het besturingssysteem, toegewezen aan de kernel. Kernel wordt zo **klein** mogelijk gehouden | mircrokernel systemen blijken in praktijk te **weinig performant**. Berichtuitwissel belast het systeem te veel waardoor een systemcall langer duurt. |
+| Geschikt voor een **gedistribueerde** omgeving               |                                                              |
+| Alle **hardware** **afhankelijkheid** bevindt zich in de **microkernel** |                                                              |
+
+ **4. Modulaire kernel:** 
 
 
 
 ![img](https://lh3.googleusercontent.com/InwZz3xPn8P72n-kbTckY1vNxTd8O6Xi78D_uhhJnG-xioTAMbDtl_FK2lYzZYVUy2kVUFQXXkpe9G1myTTrY437XD1zbARXy1jQpFb76avJkHkii28Gm2bkkc5Tfe96C1TEN6WxgSbLwNerRw)
 
-Ontwikkelaars zijn afgestapt van de doorgedreven gelaagde of microkernel benaderingen. In veel moderne systemen gebruikt men verschillende modules, maar vermijdt men problemen met het definiëren van lagen en communicatie ertussen. Elke module wordt monolitisch geïmplementeerd en staat in voor specifieke functionaliteiten.
+Ontwikkelaars zijn afgestapt van de doorgedreven gelaagde of microkernel benaderingen. In veel moderne systemen gebruikt men verschillende **modules**, maar **vermijdt men problemen met het definiëren van lagen en communicatie ertussen**. Elke module wordt monolitisch geïmplementeerd en staat in voor specifieke functionaliteiten.
 
-   **3. Gelaagde kernel:**
 
-![img](https://lh6.googleusercontent.com/TJ7Xh4CCT3LJss9ITT26jUGx52mz6UdLKQuFhoNIHWjQwiVbiR4CESheyVcTileY2-ZKvtCbl9YNmHuUJ6Mv2baYfrRwXssXMsp6Lx0CZgurm5SXEZ4BZ2NsvRdoWlyXCNeJ9WbOAXd2oeKOEw)
 
-   - verschillende modules (lagen)
-   - interfaces tussen lagen
-   - elk niveau voert een deel van de functies van het besturingssysteem uit
-   - interactie met hardware op het onderste niveau
-   - UI op het hoogste niveau
-      **nadelen:**
-   - Elke laag heeft toegang tot hardware. Eventuele fout in 1 laag kan de integriteit van het volledig systeem in gevaar brengen.
-   - verandering in ene laag vergt aanpassingen aan andere lagen dankzij tussenliggende lagen.
-   - beveiliging is lastig te bouwen in dit model
+| voordelen                                                    | nadelen |
+| ------------------------------------------------------------ | ------- |
+| geen rekening houden met comunicatie tussen veschillende modules. |         |
+| modules kunnen **dynamisch** in en uitgeladen worden         |         |
 
-   4. **Micro kernel:**
 
-![img](https://lh3.googleusercontent.com/DVZmwD1WnQ0qZxw68VTnkeg7LUNyOIucCmxEkNk18cpXRu930eysvY9YxS45sUCbPx9z0IDZihK6FqI8eC61wakoFDi7Q74MVm9RfQisZ1MQWPzqueBPD6P97xqnobk6y7urOQnpOb4B-DyAGQ)
 
-   - aka client-server-model
-   - enkel essentiële functies toewijzen aan kernel. Kernel wordt zo klein mogelijk gehouden.
-   - andere diensten worden verzorgd door processen (servers). Deze worden in gebruikersmodus uitgevoerd.
-   - server processen hebben geen rechtsreekte toegang tot hardware. Ze werken samen door berichten door te sturen via kernel.
-   - servers (modules) kunnen gelijk wanneer toegevoegd/verwijderd worden.
-   - bestaande functionaliteiten kunnen weggelaten worden om gereduceerde implementaties te creeëren.
-   - dankzij OO technieken kunnen servers modulair uitgebreid worden zonder de integriteit van het OS in gevaar te brengen.
-   - alle harware afhankelijkheid bevindt zich in micro kernel.
-   - zeer geschikt voor gedistribueerde omgevingen.
 
-     **nadelen:**
-
-   - mircrokernel systemen blijken in praktijk te weinig performant. Berichtuitwissel belast het systeem te veel waardoor een systemcall langer duurt.
 
 5. > Gegeven onderstaande figuur: Geef van elke component in de “executive” aan wat de werking ervan is. (p20)
 
 ![img](https://lh3.googleusercontent.com/AxHqYJph7WnRQYFglNKHVYyFvV3VUqYUJxaUrCjWVfqu9C1Kt_WTA63f13kv-237xqRuwhRLBwWtUidsODkuOw69Ag2gv3PB37beQPl3WHn2ee0EY4hiTu1klefrGtvqLWSXHGUiuDWc_aalCg)
 
-**Executive** = deel van het NT besturingssysteem dat in kernelmodus wordt uitgevoerd. Heeft volledige toegang tot systeemgegevens en hardware. De executive is opgebouwd met een gelaagde structuur.
-
-
-
-**Hardware Abstraction Layer (HAL):**
-
-Voert een **vertaling** uit tussen **algemene opdrachten** en **instructies eigen aan een specifieke processor**. De **hogere niveaus** zijn eerder **afhankelijk** van **HAL-interfaces** dan van specifieke hardware. De HAL biedt ook ondersteuning voor symmetrische multiprocessing. 
-
-**Microkernel:**
-
-Beheert de **scheduling** en **synchronisatie** van processen. Het handelt **traps** en **interrupts** af. Het zorgt ook voor herstel na een stroomonderbreking. De microkernel is **altijd in het geheugen geladen** en **kan nooit door andere componenten onderbroken worden**.
-
-
+**Executive** = deel van het NT besturingssysteem dat in **kernelmodus** wordt uitgevoerd. Heeft volledige toegang tot systeemgegevens en hardware. De executive is opgebouwd met een gelaagde structuur.
 
 **Executive diensten:**
 
 = NT-modules die in kernelmodus uitgevoerd worden. De I/O-manager verwerkt de verzoeken.
 
-- **I/O-manager:** 
+
+
+**1. Hardware Abstraction Layer (HAL):**
+
+Voert een **vertaling** uit tussen **algemene opdrachten** en **instructies eigen aan een specifieke processor**. De **hogere niveaus** zijn eerder **afhankelijk** van **HAL-interfaces** dan van specifieke hardware. De HAL biedt ook ondersteuning voor symmetrische multiprocessing. 
+
+**2. Microkernel:**
+
+Beheert de **scheduling** en **synchronisatie** van processen. Het handelt **traps** en **interrupts** af. Het zorgt ook voor herstel na een stroomonderbreking. De microkernel is **altijd in het geheugen geladen** en **kan nooit door andere componenten onderbroken worden**.
+
+**3. I/O-manager:** 
 
 Verwerkt I/O-verzoeken.
 
-- **Cache Manager:**
+**4. Cache Manager:**
 
 Beheert de schijfcache. (File system cache op de figuur)
 
-- **Security Reference Monitor**:
+**5. Security Reference Monitor**:
 
 Verantwoordelijk voor controleren van alle toegang. Kijken naar permissies.
 
-- **Object Manager:** 
+**6. Object Manager:** 
 
 Maakt en verwijdert objecten.
 
-- **Process Manager:**
+**7. Process Manager:**
 
-Beheert proces- en threadobjecten. Het schedulen gebeurd door microproces.
+Beheert proces- en threadobjecten. 
 
-- **Virtual Memory Manager:**
+**8. Virtual Memory Manager:**
 
 Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat hierdoor hardwareafhankelijke code.
 
@@ -175,9 +168,9 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 6. > Wat is het verschil tussen een programma en een proces? Wat zijn de vorige definities van een proces? (p28)
 
-      Een **proces** is een uitvoering van een afzonderlijk programma (=actieve entiteit). Aan een proces worden ook bronnen toegekend (vb ruimte in hoofdgeheugen, secundaire adresruimte,..). 
+      Een **proces** is een uitvoering van een afzonderlijk programma (=**actieve** entiteit). Aan een proces worden ook bronnen toegekend (vb ruimte in hoofdgeheugen, secundaire adresruimte,..). 
 
-      Een **programma** is een verzameling van instructies (= een passieve entiteit).
+      Een **programma** is een verzameling van instructies (= een **passieve** entiteit).
 
       Een besturingssyteem met multitasking geeft aan elk proces op ieder ogenblik de illusie van een induviduele programmateller, die bepaalt wat de volgende instructie is die de processor voor dat programma moet uitvoeren.
 
@@ -185,7 +178,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 7. > Waarom is het model met twee procestoestanden actief en niet actief niet interessant? Wat is het probleem dat je hier zal tegenkomen? (p30)
 
-      Het model is **te eenvoudig**. Sommige processen in de toestand niet-actief zijn gereed om te worden uitgevoerd, terwijl anderen wachten, bijvoorbeeld op de voltooiing van een I/O-bewerking. De scheduler moet in de wachtrij **telkens opnieuw op zoek gaan naar een proces** dat niet moet wachten. Stel dat een process wacht op data van de harde schijf om ingeladen te worden, dan zou het een verspilling zijn van processortijd om gewoon actief te wachten. Daarom is het aangewezen om de toestand **niet-actief** op te **splitsen** in "**ready**" en "**blocked**.
+      Het model is **te eenvoudig**. Sommige processen in de toestand niet-actief zijn gereed om te worden uitgevoerd, terwijl anderen **wachten**, bijvoorbeeld op de voltooiing van een I/O-bewerking. De scheduler moet in de wachtrij **telkens opnieuw op zoek gaan naar een proces** dat niet moet wachten. Stel dat een process wacht op data van de harde schijf om ingeladen te worden, dan zou het een verspilling zijn van processortijd om gewoon actief te wachten. Daarom is het aangewezen om de toestand **niet-actief** op te **splitsen** in "**ready**" en "**blocked**.
 
    Stel dat een process wacht op data van de harde schijf om ingeladen te worden, dan zou het een verspilling zijn van processortijd om gewoon actief te wachten. Het is dan handig om nog een extra status toe te voegen namelijk “**blocked**” waarbij dat process niet meer gekozen kan worden uit de prioriteitswachtrij. Blocked processen kunnen **ready** worden dan door een trigger, vb een IO-aanvraag of een kindproces.
 
@@ -195,7 +188,9 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
    ![img](https://lh6.googleusercontent.com/O3AZcB13s4jX_T9GdQroFmbTxHFdqeky1r6VA00WrkFbIXMKComc-41NIpQZo3l36J0Bg0p3kVE9v7f993AVOHoWKVNVFjLY7nFQce2KQuCD7Ulfk0gf2rp2k5gsGAkFbo_0JGnp3bsIsO_4Zg)
 
-8. >  Geef alle toestanden waarin een thread zich kan bevinden? Bespreek wanneer een thread van de ene toestand in de andere zal terechtkomen. (p30)
+8. >  Geef alle toestanden waarin een thread zich kan bevinden? Bespreek wanneer een thread van de ene toestand in de andere zal terechtkomen. (=p30)
+
+(= vereenvoudigd toestanddiagram van een proces)
 
 **Nieuw (new)**
 
@@ -203,7 +198,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 **Gereed (ready)**
 
-- Gereed → Actief: De scheduler kiest één van de processen in de toestand 'gereed' om uit te voeren.
+- Gereed → Actief: De **scheduler** kiest één van de processen in de toestand 'gereed' om uit te voeren.
 
 **Actief (running)**
 
@@ -225,7 +220,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 
 
-6. >Voor processen hebben we een model met 7 toestanden, dewelke? Teken het toestandsdiagram en
+9. >Voor processen hebben we een model met 7 toestanden, dewelke? Teken het toestandsdiagram en
       >geef aan hoe en wanneer er van toestand zal worden gewisseld. (p32)
 
       - **New**: Processen die gecreëerd zijn door het besturingssysteem, maar nog niet toegevoegd zijn aan de lijst met uitvoerbare processen.
@@ -242,19 +237,27 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
       **![img](https://lh3.googleusercontent.com/mSqzSFaZlacflLZtqa4jEgV0jr2NjaavJTuVQJu5V--CJkgeEeR18E_aZUu_-8JK37sEQ-gnzoXVMyWc6i0YBql3kljwvE91Rx_HmFdXbYkHF8czont0t64u9_fwS3_cGEwdW5y3WQhOLedpPw)**
 
-      
+      **Achtergrondinfo:**
 
-7. > Wat wordt er bedoeld met het **procesbeeld**? Geef aan hoe dit er uitziet en beschrijf ook wat er zich
+      Hoofdgeheugen is **beperkt**. Processen in toestand nieuw worden daarom **opgehouden** (te weinig geheugen). Processor heeft groot van de tijd **niks te doen** (door bijvoorbeeld veel **blocked** processen die wachten op een I/O bewerking). Daarom een nieuw wachtrij (suspended) op de **schijf**. OS zal een deel van de geblokkeerde processen naar die wachtrij verplaatsen. Zo komt er **ruimte vrij in het hoofdgeheugen**. Het OS kan de uitvoering vervolgs voortzetten met een ander proces uit de suspended wachtrij of een **nieuw** proces. Dit vergroot de kans dat de processor bezig gehouden wordt. 
+      
+      (= **swapping techniek**)
+      
+      Swapping is zelf een I/O bewerking. Wel een schijf I/O berwerking = snelste I/O. Swapping zal door een betere mix van processen de prestaties meestal verbeteren.
+      
+      
+      
+10. > Wat wordt er bedoeld met het **procesbeeld**? Geef aan hoe dit er uitziet en beschrijf ook wat er zich
       > in elk deel bevindt. Het PCB mag je hier buiten beschouwing laten. (p33)
 
       **Procesbeeld** (= Proces Image):  Verzameling bestaande uit het **programma**, de **gegevens** en de **stackgebieden** van een proces. Voor uitvoering van het proces gaan we er vooralsnog van uit dat het gehele procesbeeld in het hoofdgeheugen geladen wordt. Bij een onderbroeken toestand wordt het procesbeeld als een aaneengesloten blok in het secundaire geheugen opgeslagen.
 
       **Delen:** 
-   
+
    In gewone **gebruikersmodus** ga je gebruik maken van de **User Stack**, om bijvoorbeeld lokale variabelen in op te slaan, voor het aanroepen van functies en procedures en voor het doorgeven van attributen aan die functies en procedures.
-   
+
    Als je **kernel** dingen wil uitvoeren ga je die uitvoeren in kernel mode en ga je daarvoor de **Kernel Stack** gebruiken. 
-   
+
    In de gedeelde adresruimte  (**Shared Adress Space**) worden dingen geplaatst die gedeeld worden zoals bijvoorbeeld de C-API.
 
 

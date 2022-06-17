@@ -2971,8 +2971,6 @@ paginafouten, aanpassen van de MMU TLB, ...)**
    	munmap(d,sizeof(data));
    	return 0;
    }
-   
-   
    ```
    
    
@@ -2982,8 +2980,8 @@ paginafouten, aanpassen van de MMU TLB, ...)**
       >genereren. Het pid van het proces dat het grootste getal gegenereerd heeft, alsook
       >het getal zelf, wordt door alle kindprocessen naar het scherm geschreven. Om een
       >nieuw **shared memory** object te maken kan je de systeemaanroep **shm_open**
-      >gebruiken. Deze aanroep geeft een getal terug dat je bij mmap kan gebruiken als file
-      >descriptor. De initiële grootte van het shared memory object is 0. Om het shared
+      >gebruiken. Deze aanroep geeft een getal terug dat je bij mmap kan gebruiken als **file**
+      >**descriptor**. De initiële grootte van het shared memory object is 0. Om het shared
       >memory object een grootte te geven kan je de systeemaanroep ftruncate gebruiken.
 
    ```c
@@ -3043,7 +3041,7 @@ of rm -- -rf (-- = einde opties) #verwijderen
 -rf = combinatie
 ```
 
-4. >Welke opties moet je toevoegen aan het commando wc om enkel de **grootte** van een bestand te tonen zonder extra informatie?
+4. >Welke opties moet je toevoegen aan het commando **wc** om enkel de **grootte** van een bestand te tonen zonder extra informatie?
 
 ```bash
 -c  of --bytes
@@ -3065,9 +3063,15 @@ of rm -- -rf (-- = einde opties) #verwijderen
 
 6. > Wat doet het commando sync?
 
-```bash
-synchroniseert gecachete writes (schrijf opdrachten) naar storage om buffers leeg te maken.
-```
+   **Sync** zal alle **buffers naar I/O-devices gaan flushen**. I/O-opdrachten worden
+   door hun traag karakter **beter gegroepeerd** om efficiëntie redenen. Het is
+   **beter om 1 I/O-opdracht te hebben van 1000 bytes dan 1000 opdrachten
+   van 1 bytes!** Door het uitstellen van I/O-opdrachten treedt er ook een
+   probleem op, nl. de toestand in het geheugen wijkt hoe langer hoe meer af
+   van wat er zich in op het I/O-device bevindt! Het OS moet hiermee rekening
+   houden en wanneer je wil dat het “nu” gebeurt, gebruik je **sync**!
+
+
 
 7. >Hoe kan je met het commando dd een afbeelding maken van een USB-pen? Welke  
    >device-file heb je hiervoor nodig?  Bekijk de uitvoer van de opdracht “fdisk -l
@@ -3101,7 +3105,7 @@ Sector size (logical/physical): 4096 bytes / 4096 bytes
 I/O size (minimum/optimal): 4096 bytes / 4096 bytes
 ```
 
-8. >Hoe kan je met dd een kopie maken van de eerste 512 bytes van de vaste schijf? Bekijk  
+8. >Hoe kan je met dd een kopie maken van de **eerste 512 bytes** van de **vaste schijf**? Bekijk  
    >met het commando strings  welke tekststrings in die 512 bytes verscholen zitten
 
 ```bash
@@ -3130,19 +3134,17 @@ genisoimage [options] -o output.iso /root
 11. >Bij vraag 10 zal je merken dat de namen van de bestanden/directories werden gewijzigd.
     >Je kunt dit vermijden door de image in Joliet-formaat weg te schrijven.
     >**Naast reguliere expressies** kent Unix ook **patterns** om een verzameling strings te beschrijven.
-    >De mogelijkheden van standaard patterns zijn veel **beperkter** dan bv. reguliere expressies en 
-    >
-    >worden gebruikt zowel in opdrachten als in shellscripts. In recente Bash-versies werden deze
+    >De mogelijkheden van standaard patterns zijn veel **beperkter** dan bv. reguliere expressies en worden gebruikt zowel in opdrachten als in shellscripts. In recente Bash-versies werden deze
     >patterns uitgebreid. Extended pattern matching kan worden aangezet met de opdracht
     >“shopt –s extglob”. Bij het uitvoeren van een commando met een pattern wordt eerst een lijst met
     >bestandsnamen gegenereerd die aan het opgegeven patroon voldoen. Dit wordt meestal
     >“**Pathname Expansion**” genoemd. Meer uitleg kan je vinden in de man-pagina van Bash
     >onder de rubriek “Pathname Expansion”.
-
+    
     **Pathname Expansion:**
 
     - adhv Curly braces
-    
+
     ```bash
     [root@localhost ~]# echo txt{1,2,3,4}
     txt1 txt2 txt3 txt4
@@ -3208,14 +3210,14 @@ genisoimage [options] -o output.iso /root
     >bestaan?
 
     ```bash
-    printf "%s\n" ?
+    printf "%s\n" ? #of ls ?
     ```
 
 16. >Vraag een lijst met bestandsnamen die uit precies twee karakters bestaan. Vergelijk de
     >uitvoer met die van de vorige opgave.
 
     ```bash
-    $ printf "%s\n" ??
+    printf "%s\n" ??
     ```
 
 **notities** (labo2)
@@ -3368,7 +3370,7 @@ cat /dev/null #prullenbak is leeg
 27. > Ga na wat het effect is van cat /dev/null > test.txt
 
 ```bash
-Maakt bestand leeg. (want prullenbak is leeg)
+Maakt bestand leeg. (want prullenbak is leeg). schrijft inhoud van lege prullenbak naar test.txt
 ```
 
 28. >Veronderstel dat een of ander programma continu informatie wegschrijft in een
@@ -4711,7 +4713,7 @@ declare -p regel #toont info over variabele (wat er in zit)
 grep ^regel= < <(set) #geeft ook value van de variable weer
 ```
 
-86. > Hoe vraag je de bestaande indices van een array op? Hoe genereer je hieruit een tweede
+86. > Hoe vraag je de bestaande **indices** van een array op? Hoe genereer je hieruit een tweede
     > array, geïndexeerd door opeenvolgende gehele getallen en met als waarden de indices
     > van een eerste? Pas toe op de array uit vorige oefening, en op de builtin array
     > BASH_VERSINFO.
@@ -4793,16 +4795,8 @@ In een script kunnen if-testen dikwijls vervangen worden door alternatieven op b
 
 ```bash
 #!/bin/bash
-
-if (($#!=1));then 						#geen bestand opgegeven of te veel paramters.
-	echo geen parameter meegegeven! >&2 #file descriptor 2. Foutmelding
-	exit 1
-fi
-
-if [[ ! -f "$1" ]]; then
-	echo $1 is geen bestand >&2
-    exit 1
-fi
+(( ${#} != 1)) && echo er moet exact 1 parameter meegegeven worden >&2 && exit 1;
+[[ ! -f "$1" ]] && echo meegegeven parameter is geen geldig bestand >&2 && exit 1;
 
 #array( $(wc "$1") )
 read lijnen woorden kars naam < <(wc "$1")
