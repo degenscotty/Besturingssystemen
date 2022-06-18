@@ -943,7 +943,7 @@ De blijkbaar meest efficiënte oplossing, voorgesteld door donald Knuth, plaatst
 50. >Bespreek de werking van paginering (zonder virtueel geheugen). Wat is het verschil tussen
     >paginering en vaste partitionering? Hoe gebeurt de adresvertaling bij paginering (maak een schets)?  (p118)
 
-Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een gelijke, relatief kleine grootte) en alle **procesbeelden in pagina’s ter grootte van de frames**. De procespagina’s worden toegewezen aan frames van het hoofdgeheugen. Kleinere processen vereisen minder frames, grotere processen vereisen er meer. Het besturingssysteem houdt een **lijst van vrije frames** bij, en een pagina table voor elk proces (in het procesbeeld van het proces zelf). Deze bevat de **framelocatie** van elke pagina van het proces: elke ingang in de paginatabel bevat het nummer van het frame in het hoofdgeheugen dat de corresponderende pagina bevat.
+Bij de **paginering** verdeelt men het **hoofdgeheugen** in **frames** (stukken met een **gelijke**, relatief **kleine** grootte) en alle **procesbeelden in pagina’s ter grootte van de frames**. De procespagina’s worden toegewezen aan frames van het hoofdgeheugen. Kleinere processen vereisen minder frames, grotere processen vereisen er meer. Het besturingssysteem houdt een **lijst van vrije frames** bij, en een **pagina table** voor elk proces (in het procesbeeld van het proces zelf). Deze bevat de **framelocatie** van elke pagina van het proces: elke ingang in de paginatabel bevat het nummer van het frame in het hoofdgeheugen dat de corresponderende pagina bevat.
 
 ![img](https://lh6.googleusercontent.com/7jQN3iEGtnryZalWRjl-OSC8ZBqVZScxssG3wgU-5u4iyAcBzpaV8Sprhb4aq4m_SVDcpPm2ldUMYv5UoEIXzZXcEhUxtKDL7xE7bcHXCaKeG_DHEy_27z-6u1_rKtiY52rTtFasXVc44Iy-OQ)
 
@@ -972,16 +972,24 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
     >
     >Hoe gebeurt de adresvertaling bij segmentatie (maak een schets)? (p119)
 
-**Segmentatie** lijkt op **dynamisch partitionering**, zoals **paginering** lijkt op **vaste partitionering**. Bij segmentatie wordt het programma en de gegevens **niet uniform** verdeeld in blokken. Elk logisch adres bestaat uit twee onafhankelijke dimensies: een **segmentnummer** en een **relatieve positie binnen het segment**. Het hoofdgeheugen blijft **1-dimensionale, lineaire, rij adressen, vertrekkend van 0**. De **koppeling** tussen het **tweedimensionale** en **eendimensionale** geheugen beeld gebeurt aan de hand van een **segmenttabel**. Het besturingssysteem houdt een segmenttabel bij voor elk proces, die de fysieke locatie van elk segment van het proces bevat.
+**Segmentatie** lijkt op **dynamisch partitionering**, zoals **paginering** lijkt op **vaste partitionering**. Bij segmentatie wordt het programma en de gegevens **niet uniform** verdeeld in blokken. 
 
+Elk **logisch adres** bestaat uit twee onafhankelijke dimensies: 
 
+- een **segmentnummer** 
+
+- een **relatieve positie binnen het segment**
+
+Het hoofdgeheugen blijft **1-dimensionale, lineaire, rij adressen, vertrekkend van 0**. De **koppeling** tussen het **tweedimensionale** en **eendimensionale** geheugen beeld gebeurt aan de hand van een **segmenttabel**. Het besturingssysteem houdt een segmenttabel bij voor elk proces, die de fysieke locatie van elk segment van het proces bevat.
+
+**![img](https://lh5.googleusercontent.com/NZDR4lF0wjg_TTGcsb2QNkvgGPOlO48953nUmEEVG396KyBvsqcYpFDS7hnLN5Yw0g9z56akAoUQdGPFLXugOHkbrTk5tBhEixLH-Z3ehdsCO__AVvYWA_knM9FMB_hBSH1m7jbxgvza8oTB3w)**
 
 **Segmentatie** vs **dynamisch partitionering:** 
 
 | Segmentatie                                                  | dynamisch partitionering |
 | ------------------------------------------------------------ | ------------------------ |
-| Processen kunnen meerdere partities in het hoofdgeheugen bezetten, die niet aaneengesloten hoeven te zijn. |                          |
-| Vermijdt interne fragmentatie, maar is onderhevig aan externe fragmentatie (check-boarding) (minder groot dan bij dynamisch partitionering) | externe fragmentatie     |
+| Processen kunnen meerdere partities in het hoofdgeheugen bezetten, die **niet aaneengesloten** hoeven te zijn. |                          |
+| **Vermijdt interne fragmentatie**, maar is onderhevig aan externe fragmentatie (check-boarding) (minder groot dan bij dynamisch partitionering) | externe fragmentatie     |
 
 
 
@@ -1014,7 +1022,7 @@ door ongelijke grootte is er geen eenvoudige relatie tussen logische en relatiev
 
 1. Op basis van de **paginatabel** kan de processor vaststellen of alle geheugen verwijzingen betrekking hebben op de locaties die zich in de **residente set** bevinden. 
 2. Wordt er een logisch adres tegengekomen dat zich niet in het hoofdgeheugen (residente set) bevindt, dan genereert de processor een **interrupt** die een geheugentoegang fout aangeeft.
-3. Het **besturingssysteem** neemt op dat ogenblik de **besturing over**, en plaatst een I/O verzoek om het stuk van het procesbeeld met het virtuele adres dat de toegangsfout veroorzaakte, binnen te halen in het hoofdgeheugen. 
+3. Het **besturingssysteem** neemt op dat ogenblik de **besturing over**, en plaatst een **I/O verzoek** om het stuk van het procesbeeld met het virtuele adres dat de toegangsfout veroorzaakte, binnen te halen in het hoofdgeheugen. 
 4. Is het gewenste stuk eenmaal binnengehaald in het hoofdgeheugen, dan wordt opnieuw een **interrupt** gegeneerd
 5. .Het besturingssysteem kan hierdoor de **paginatabellen** bijwerken.
 6. En het betrokken proces terug in de gereed **wachtrij** plaatsen.
@@ -1041,8 +1049,8 @@ door ongelijke grootte is er geen eenvoudige relatie tussen logische en relatiev
     >bedoeld met “**thrashing**”?  **Hoe** kan het besturingssysteem oordeelkundig **inschatten** welke pagina’s
     >in de toekomst nodig zullen zijn en welke niet? (p122)
 
-- gemiddelde tijd tussen 2 paginafouten **(L)**
-- gemiddelde tijd die nodig is om pagina te vervangen **(S)**
+- gemiddelde tijd tussen 2 **paginafouten** **(L)**
+- gemiddelde tijd die nodig is om pagina te **vervangen** **(S)**
 
 **Trashing**: De processor **besteedt meer tijd aan het swappen van stukken dan aan het uitvoeren van instructie**. Het is essentieel dat besturingssystemen op basis van de historiek in het recente verleden, oordeelkundig kunnen inschatten welke stukken niet meer en welke stukken waarschijnlijk wel nog gebruikt zullen worden in de nabije toekomst.
 
