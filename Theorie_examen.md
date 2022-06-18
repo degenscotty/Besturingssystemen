@@ -12,7 +12,7 @@ De **andere processoren** kunnen alleen gebruikersprogramma’s en hulpprogramma
 
 | voordelen                                                    | nadelen                                             |
 | ------------------------------------------------------------ | --------------------------------------------------- |
-| vereist weinig aanpassingen aan een besturingssysteem dat reeds multitasking voor 1 processor mogelijk maakt. | master wordt **bottleneck** voor het ganse systeem. |
+| vereist **weinig aanpassingen aan een besturingssysteem** dat reeds multitasking voor 1 processor mogelijk maakt. | master wordt **bottleneck** voor het ganse systeem. |
 
 ### Symmetrisch
 
@@ -39,7 +39,7 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
    
    **AchtergrondInfo:**
    
-   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid. Bij **UNIX** kan een **systeemaanroep** **rechtstreeks vanuit een programma in C of C++** worden gegenereerd. Programma’s die voor systeemaanroepen louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de **POSIX-standaard** voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
+   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid. Bij **UNIX** kan een **systeemaanroep** **rechtstreeks vanuit een programma in C of C++** worden gegenereerd. Programma’s die voor **systeemaanroepen** louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de **POSIX-standaard** voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
    
    
    
@@ -125,7 +125,7 @@ Ontwikkelaars zijn afgestapt van de doorgedreven gelaagde of microkernel benader
 
 5. > Gegeven onderstaande figuur: Geef van elke component in de “executive” aan wat de werking ervan is. (p20)
 
-![img](https://lh3.googleusercontent.com/AxHqYJph7WnRQYFglNKHVYyFvV3VUqYUJxaUrCjWVfqu9C1Kt_WTA63f13kv-237xqRuwhRLBwWtUidsODkuOw69Ag2gv3PB37beQPl3WHn2ee0EY4hiTu1klefrGtvqLWSXHGUiuDWc_aalCg)
+![img](https://imgur.com/PZlw7s9.png)
 
 **Executive** = deel van het NT besturingssysteem dat in **kernelmodus** wordt uitgevoerd. Heeft volledige toegang tot systeemgegevens en hardware. De executive is opgebouwd met een gelaagde structuur.
 
@@ -172,11 +172,13 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 6. > Wat is het verschil tussen een programma en een proces? Wat zijn de vorige definities van een proces? (p28)
 
-      Een **proces** is een uitvoering van een afzonderlijk programma (=**actieve** entiteit). Aan een proces worden ook bronnen toegekend (vb ruimte in hoofdgeheugen, secundaire adresruimte,..). 
+      
 
-      Een **programma** is een verzameling van instructies (= een **passieve** entiteit).
+   Een **proces** is een uitvoering van een afzonderlijk programma (=**actieve** entiteit). Aan een proces worden ook bronnen toegekend (vb ruimte inhoofdgeheugen, secundaire adresruimte,..). 
 
-      Een besturingssyteem met multitasking geeft aan elk proces op ieder ogenblik de illusie van een induviduele programmateller, die bepaalt wat de volgende instructie is die de processor voor dat programma moet uitvoeren.
+   Een **programma** is een verzameling van instructies (= een **passieve** entiteit).
+
+   Een besturingssyteem met multitasking geeft aan elk proces op ieder ogenblik de illusie van een induviduele programmateller, die bepaalt wat de volgende instructie is die de processor voor dat programma moet uitvoeren.
 
    
 
@@ -382,7 +384,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
 17. > Hoe zal men bij een monolithisch kernelontwerp een systeemaanroep afhandelen? (p38)
     
-    In een meer klassiekere benadering (monolithisch kernelontwerp) gebeurt dit **Proceduregestuurd**: Elke system call komt overeen met een **biblitheekprocedure**, die de parameters van de system call op een bepalade plaats, bijvoorbeeld de proces registers, plaatst en vervolgs een trap instructie genereert.
+    In een meer klassiekere benadering (monolithisch kernelontwerp) gebeurt dit **Proceduregestuurd**: Elke system call komt overeen met een **biblitheekprocedure**, die de parameters van de system call op een bepaalde plaats, bijvoorbeeld de proces registers, plaatst en vervolgs een trap instructie genereert.
     
     
     
@@ -404,9 +406,9 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     >moduswissel en een contextwissel? (p40)
 
     1. Context (processortoestandinformatie van PCB) van het proces wordt opgeslaan. Dit opslaan gebeurt hardwarmatig.
-    2. De programmateller wordt ingesteld op het beginadres van een programma voor de interruptafhandeling.
+    2. De **programmateller** wordt ingesteld op het beginadres van een programma voor de interruptafhandeling.
     3. moduswisseling naar kernelmodus
-    4. Er wordt verder gegaan met de instructiecyclus. De eerste instructie van het programma van de interruptafhandeling wordt uitgevoerd.
+    4. Er wordt verder gegaan met de **instructiecyclus**. De eerste instructie van het programma van de interruptafhandeling wordt uitgevoerd.
     5. Scheduler beslist of er een proceswisel nodig is.
     
     Indien proceswissel NIET nodig is en de uitvoering verder gezet wordt in reeds actieve proces:
@@ -436,14 +438,14 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     **stappen:**
     
-    1. Opslaan context van de processor (processortoestandsinformatie).
-    2. Processorbesturingsinformatie van het PCB van het tot op dat moment actieve proces bijwerken.
-    3. PCB van het proces verplaatsen naar juiste wachtrij
-    4. Selectie volgend actief proces
-    5. Bijwerken PCB van het proces.
-    6. Bijwerken gegevensstructuren voor het geheugenbeheer.
-    7. Terugschakelen naar gebruikersmodus 
-    7. Laden van processortoestandsinformatie van het PCB van het geselecteerde proces in de registers. Hiermee wordt de context teruggebracht naar hoe ze was op het moment dat het geselecteerde proces het laatst uit toestand actief werd gewisseld.
+    1. **Opslaan context** van de processor (processortoestandsinformatie).
+    2. **Processorbesturingsinformatie** van het **PCB** van het tot op dat moment actieve proces **bijwerken**.
+    3. **PCB** van het proces **verplaatsen** naar juiste wachtrij
+    4. **Selectie** volgend actief **proces**
+    5. **Bijwerken PCB** van het proces.
+    6. **Bijwerken gegevensstructuren** voor het geheugenbeheer.
+    7. Terugschakelen naar **gebruikersmodus** 
+    7. Laden van **processortoestandsinformatie** van het **PCB** van het geselecteerde proces in de registers. Hiermee wordt de context teruggebracht naar hoe ze was op het moment dat het geselecteerde proces het laatst uit toestand actief werd gewisseld.
 
 
 
@@ -464,9 +466,9 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 23. >Hoe wordt er van binnen een Unix besturingssysteem doorgaans van proces gewisseld? Hoe komt
     >het dat dit vrij efficiënt verloopt? (p41-42)
     
-    1. Context wordt opgeslagen
-    2. Er wordt een ander proces geselecteerd
-    3. besturing wordt overgedragen aan routine voor proceswisseling
+    1. **Context** wordt **opgeslagen**
+    2. Er wordt een ander **proces** **geselecteerd**
+    3. **besturing** wordt **overgedragen** aan routine **voor** **proceswisseling**
     
     
     
@@ -669,15 +671,16 @@ voert een thread een **blokkerende systemcall uit**, dan krijgt het **lichtgewic
 
 35. > Bespreek onderstaande figuur. Hoe worden de verschillende componenten aan elkaar gekoppeld (p48)
 
-    **Combinatie user-level en kernel-level threads**
 
 **![img](https://lh3.googleusercontent.com/tT-8q36GYPHuFL4SK-HrhmUx9sRJhFtIsrjVyZy9WVAClRxXbNIg7dQ8HmA7V-jfOL-4JeJO1aQph5mylQzXDnPgRlM2goVwl-odxjG21_2uiHG3uIcYQ3-lBYrfjvZtlaZ5zCj4N57HKRZtLg)**
+
+**Combinatie user-level en kernel-level threads**
 
 Sommige besturingssystemen, zoals Windows, en enkele Unix varianten , waaronder Solaris, **combineren user-level en kernel-level threads.** Ze baten hierbij de voordelen van beide benaderingen.
 
 Verschillende user-level threads worden gegroepeerd **gekoppeld** aan een (kleiner of gelijk) aantal kernel-level threads. 
 
-In dit gecombineerde systteem moet de user-level threadbibliotheek communiceren met de kernel. Dit gebeurt meestal via lightweight processen (gegevensstructuren). Voor die bibliotheek ziet een lightweight proces er uit als een virtuele processor, waaraan een user-level thread kan **gekoppeld** worden. Het OS gebruikt het lightweight proces om er een kernel-level thread aan te koppelen.
+In dit gecombineerde systteem moet de **user-level threadbibliotheek communiceren met de kernel**. Dit gebeurt meestal via **lightweight processen** (gegevensstructuren). Voor die bibliotheek ziet een lightweight proces er uit als een virtuele processor, waaraan een user-level thread kan **gekoppeld** worden. Het OS gebruikt het lightweight proces om er een kernel-level thread aan te koppelen.
 
 
 
@@ -752,7 +755,7 @@ In dit gecombineerde systteem moet de user-level threadbibliotheek communiceren 
     voldoende gevuld is zal het OS onmiddellijk de leesopdracht kunnen beantwoorden **zonder** te
     moeten wisselen van proces.
     
-    **Waitpid**, **read** en bv. **write** (bij een volle buffer die moet geflusht worden) zijn voorbeelden van
+    **Waitpid**, **read** en bv. **write** (bij een **volle buffer** die moet **geflusht** worden) zijn voorbeelden van
     systeemaanroepen die een **geblokkeerd** proces en dus een **proceswissel** zullen **veroorzaken**.
     
     
@@ -784,7 +787,7 @@ afgebroken. Het proces kan echter uitsluitend worden afgebroken wanneer de paren
 toestand **zombie**. Als de parent zelf beëindigd wordt, wordt het kind naast een zombie ook een
 **orphan** dat **geadopteerd** wordt door het **init-proces**. Het init-proces zal de exit-status van het kind
 lezen waardoor vervolgens ook het kindproces kan worden ontmanteld.
-De **exit-status** van een proces wordt in Linux bijgehouden in het PCB (process control block) dat dus
+De **exit-status** van een proces wordt in Linux bijgehouden in het **PCB** (process control block) dat dus
 zolang het in de status “zombie” vertoefd in het geheugen blijft.
 Bij een daemon-proces zal je dus bij het niet correct lezen van de exit-statussen van de kinderen een
 ganse waslijst met zombie-processen maken die op zich 0% CPU tijd krijgen (dus geen probleem
@@ -821,8 +824,8 @@ aanroepen van de systeemaanroep alle toegewezen tijd door de parent werd opgebru
 43. > In welke situatie maak je gebruik van een named pipe en kan je dus geen unnamed pipe gebruiken? (Oplossing prof)
 
 **Unamed** pipes of anonieme pipes kan je **uitsluitend** **gebruiken** voor **IPC** (interprocescommunicatie)
-tussen processen met verwantschap (ouder, kind, broer, kleinkind, ...). Bij processen zonder
-verwantschap moet je gebruikmaken van een **named** pipe, i.e. een object op het bestandssysteem
+tussen processen met verwantschap (ouder, kind, broer, kleinkind, ...). Bij **processen zonder
+verwantschap** moet je gebruikmaken van een **named** pipe, i.e. een object op het bestandssysteem
 dat je een naam moet geven (vandaar ook de naam)
 
 
@@ -852,7 +855,7 @@ binnen dat proces wel verder doen.
 
 45. > Aan welke vier randvoorwaarden moet ieder geheugenbeheersysteem voldoen? (p109)
 
-	1. Om de efficiëntie van de processor en van de I/O-voorzieningen te verhogen, is het noodzakelijk dat z**oveel mogelijk processen in het hoofdgeheugen geladen** zijn. Er is in praktijk nooit voldoende hoofdgeheugen om alles bij te houden. Daarom is het nodig om gegevens naar en uit het secundair gegeheugen te **swapppen**. Swappen is echter een langzame bewerking. Swappen verhoogt tijd nodig voor proceswisseling en is dus een complexe taak voor het geheugenbeheersysteem. Tegenwoordig wordt er meer gebruikt gemaakt van het concept **virtueel geheugen**.
+	1. Om de efficiëntie van de processor en van de I/O-voorzieningen te verhogen, is het noodzakelijk dat **zoveel mogelijk processen in het hoofdgeheugen geladen** zijn. Er is in praktijk nooit voldoende hoofdgeheugen om alles bij te houden. Daarom is het nodig om gegevens naar en uit het secundair gegeheugen te **swapppen**. Swappen is echter een langzame bewerking. Swappen verhoogt tijd nodig voor proceswisseling en is dus een complexe taak voor het geheugenbeheersysteem. Tegenwoordig wordt er meer gebruikt gemaakt van het concept **virtueel geheugen**.
 	2. Hardware van de processor en software van het OS moeten de verwijzingen in de code van het programma op een of andere wijze **vertalen** in adressen van het fysieke geheugen, die overeenkomen met de huidige locatie van het programma in het hoofdgeheugen.
 	3. Enerzijds mogen processen **niet zonder toestemming** geheugenlocaties van andere processen kunnen **lezen** of **schrijven**. Dergelijke instructies moeten afgebroken worden van zodra ze uitgevoerd worden. **Anderzijds** moet dit **beveiligingsmechanisme** voldoende **flexibel** zijn om verschillende processen **toegang** te kunnen **geven** tot **gedeelde stukken** van het **hoofdgeheugen**. Ook is het dikwijls noodzakelijk dat dat processen die samenwerken dezelfde gegevensstucturen delen.
 	4. Zowel het hoofdgeheugen als het secundaire geheugen zijn doorgaans georganiseerd als een ééndimensionale adresruimte. De meeste Programm'aas daarintegen zijn logisch ingedeeld in modules, met andere karakteristieken. Het is de **taak** van het **geheugenbeheer** en van de **computerhardware** om deze modules te **vertalen** naar een **ééndimensionale adresruimte.**
@@ -918,7 +921,7 @@ Bij het gebruik van **bitmaps** wordt het geheugen verdeeld in **kleine allocati
 **nadelen:** 
 
 - Als de allocatie-eenheid te groot wordt gekozen, **versplit elk proces veel geheugen** in zijn laatst gealloceerde eenheid.
-- Wanneer een nieuw proces, N aaneensluitende allocatie-eenheden vereist, dan moet het geheugen-beheersysteem immers in de bitmap op zoek gaan naar een rij van N opeenvolgende nullen. Dit is een **tijdverslindend proces**.
+- Wanneer een nieuw proces, **N aaneensluitende allocatie-eenheden vereist**, dan moet het geheugen-beheersysteem immers in de bitmap op zoek gaan naar een rij van N opeenvolgende nullen. Dit is een **tijdverslindend proces**.
 
 
 
@@ -948,12 +951,11 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 **paginering** vs **vaste partitionering:** 
 
-| paginering                                                   | vaste partitionering     |
-| ------------------------------------------------------------ | ------------------------ |
-| Partities zijn kleiner.                                      |                          |
-| Processen bezetten verschillende partities die niet aaneengesloten hoeven te zijn. |                          |
-| Geen externe fragmentatie                                    | Wel externe fragmentatie |
-| Interne fragmentatie wordt beperkt tot een fractie voor de laatste pagina van het proces. |                          |
+| paginering                                                   | vaste partitionering                   |
+| ------------------------------------------------------------ | -------------------------------------- |
+| Partities zijn kleiner.                                      |                                        |
+| Processen bezetten verschillende partities die niet aaneengesloten hoeven te zijn. |                                        |
+| Interne fragmentatie wordt beperkt tot een fractie voor de laatste pagina van het proces. | wel veel last van interne fragmentatie |
 
 
 
@@ -979,7 +981,7 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 | Segmentatie                                                  | dynamisch partitionering |
 | ------------------------------------------------------------ | ------------------------ |
 | Processen kunnen meerdere partities in het hoofdgeheugen bezetten, die niet aaneengesloten hoeven te zijn. |                          |
-| Vermijdt interne fragmentatie, maar is onderhevig aan externe fragmentatie (check-boarding) (minder groot dan bij dynamisch partitionering) |                          |
+| Vermijdt interne fragmentatie, maar is onderhevig aan externe fragmentatie (check-boarding) (minder groot dan bij dynamisch partitionering) | externe fragmentatie     |
 
 
 
