@@ -442,7 +442,8 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     4. Selectie volgend actief proces
     5. Bijwerken PCB van het proces.
     6. Bijwerken gegevensstructuren voor het geheugenbeheer.
-    7. Terugschakelen naar gebruikersmodus en het laden van processortoestandsinformatie van het PCB van het geselecteerde proces in de registers. Hiermee wordt de context teruggebracht naar hoe ze was op het moment dat het geselecteerde proces het laatst uit toestand actief werd gewisseld.
+    7. Terugschakelen naar gebruikersmodus 
+    7. Laden van processortoestandsinformatie van het PCB van het geselecteerde proces in de registers. Hiermee wordt de context teruggebracht naar hoe ze was op het moment dat het geselecteerde proces het laatst uit toestand actief werd gewisseld.
 
 
 
