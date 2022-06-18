@@ -88,17 +88,21 @@ Tot voor kort het meest gebruikte ontwerp. wordt nu minder gebruikt.
 |                                                         | beveiliging is lastig te bouwen in dit model                 |
 |                                                         | Volledige kernel blijft draaien in de kernelmodus            |
 
+
+
 **3. Micro kernel:**
 
 ![img](https://lh3.googleusercontent.com/DVZmwD1WnQ0qZxw68VTnkeg7LUNyOIucCmxEkNk18cpXRu930eysvY9YxS45sUCbPx9z0IDZihK6FqI8eC61wakoFDi7Q74MVm9RfQisZ1MQWPzqueBPD6P97xqnobk6y7urOQnpOb4B-DyAGQ)
 
-   - Ook wel **client-server model** genoemd. Wordt **niet veel gebruikt** in moderne systemen om problemen met het definiëren van de lagen en de communicatie ertussen te vermijden.
+Ook wel **client-server model** genoemd. Wordt **niet veel gebruikt** in moderne systemen om problemen met het definiëren van de lagen en de communicatie ertussen te vermijden.
 
 | voordelen                                                    | nadelen                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | Enkel essentiële functies van het besturingssysteem, toegewezen aan de kernel. Kernel wordt zo **klein** mogelijk gehouden | mircrokernel systemen blijken in praktijk te **weinig performant**. Berichtuitwissel belast het systeem te veel waardoor een systemcall langer duurt. |
 | Geschikt voor een **gedistribueerde** omgeving               |                                                              |
 | Alle **hardware** **afhankelijkheid** bevindt zich in de **microkernel** |                                                              |
+
+
 
  **4. Modulaire kernel:** 
 
@@ -223,20 +227,6 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 9. >Voor processen hebben we een model met 7 toestanden, dewelke? Teken het toestandsdiagram en
       >geef aan hoe en wanneer er van toestand zal worden gewisseld. (p32)
 
-      - **New**: Processen die gecreëerd zijn door het besturingssysteem, maar nog niet toegevoegd zijn aan de lijst met uitvoerbare processen.
-
-      - **Ready:** Processen die uitgevoerd kunnen worden van zodra de scheduler hen daartoe de gelegenheid geeft.
-      - **Running**: Enkel het proces dat wordt uitgevoerd, bevindt zich in deze toestand. By systemen met slechts 1 processor kan er maar 1 proces zich in deze toestand bevinden. Bij een systeem met meerdere processoren kunnen er uiteraard meerdere processen zich in deze toestand bevinden.
-      - **Blocked**: Processen die wachten op het optreden van een bepaalde gebeurtenis, dikwijls het voltooien van I/O-bewerkingen.
-      - **Exit**: Processen die door het besturingssysteem vrijgegeven zijn uit de verzameling van uitvoerbare processen.
-
-      Door invoering van swapping moeten in het procestoestandsdiagram 2 aanvullende toestanden worden toegevoegd.
-
-      - **Blocked/Suspended:** Processen die wachten op een bepaalde gebeurtenis, worden onderbroken (suspended).
-      - **Ready/Suspended:** Wanneer die "gebeurtenis" optreedt, dan is het onderbroken proces niet meer geblokkeerd en kan het beschikbaar zijn voor uitvoering.
-
-      **![img](https://lh3.googleusercontent.com/mSqzSFaZlacflLZtqa4jEgV0jr2NjaavJTuVQJu5V--CJkgeEeR18E_aZUu_-8JK37sEQ-gnzoXVMyWc6i0YBql3kljwvE91Rx_HmFdXbYkHF8czont0t64u9_fwS3_cGEwdW5y3WQhOLedpPw)**
-
       **Achtergrondinfo:**
 
       Hoofdgeheugen is **beperkt**. Processen in toestand nieuw worden daarom **opgehouden** (te weinig geheugen). Processor heeft groot van de tijd **niks te doen** (door bijvoorbeeld veel **blocked** processen die wachten op een I/O bewerking). Daarom een nieuw wachtrij (suspended) op de **schijf**. OS zal een deel van de geblokkeerde processen naar die wachtrij verplaatsen. Zo komt er **ruimte vrij in het hoofdgeheugen**. Het OS kan de uitvoering vervolgs voortzetten met een ander proces uit de suspended wachtrij of een **nieuw** proces. Dit vergroot de kans dat de processor bezig gehouden wordt. 
@@ -247,18 +237,38 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
       
       
       
+      - **New**: Processen die gecreëerd zijn door het besturingssysteem, maar nog niet toegevoegd zijn aan de lijst met uitvoerbare processen.
+
+      - **Ready:** Processen die uitgevoerd kunnen worden van zodra de scheduler hen daartoe de gelegenheid geeft.
+      - **Running**: Enkel het proces dat wordt uitgevoerd, bevindt zich in deze toestand. By systemen met slechts 1 processor kan er maar 1 proces zich in deze toestand bevinden. Bij een systeem met meerdere processoren kunnen er uiteraard meerdere processen zich in deze toestand bevinden.
+      - **Blocked**: Processen die wachten op het optreden van een bepaalde gebeurtenis, dikwijls het voltooien van I/O-bewerkingen.
+      - **Exit**: Processen die door het besturingssysteem vrijgegeven zijn uit de verzameling van uitvoerbare processen.
+      
+      Door invoering van swapping moeten in het procestoestandsdiagram 2 aanvullende toestanden worden toegevoegd.
+      
+      - **Blocked/Suspended:** Processen die wachten op een bepaalde gebeurtenis, worden onderbroken (suspended). Deze worden in een wachtrij op de schijf geplaatst.
+      - **Ready/Suspended:** Wanneer die "gebeurtenis" optreedt, dan is het onderbroken proces niet meer geblokkeerd en kan het beschikbaar zijn voor uitvoering.
+      
+      **![img](https://lh3.googleusercontent.com/mSqzSFaZlacflLZtqa4jEgV0jr2NjaavJTuVQJu5V--CJkgeEeR18E_aZUu_-8JK37sEQ-gnzoXVMyWc6i0YBql3kljwvE91Rx_HmFdXbYkHF8czont0t64u9_fwS3_cGEwdW5y3WQhOLedpPw)**
+      
+      
+      
+      
+      
 10. > Wat wordt er bedoeld met het **procesbeeld**? Geef aan hoe dit er uitziet en beschrijf ook wat er zich
       > in elk deel bevindt. Het PCB mag je hier buiten beschouwing laten. (p33)
 
-      **Procesbeeld** (= Proces Image):  Verzameling bestaande uit het **programma**, de **gegevens** en de **stackgebieden** van een proces. Voor uitvoering van het proces gaan we er vooralsnog van uit dat het gehele procesbeeld in het hoofdgeheugen geladen wordt. Bij een onderbroeken toestand wordt het procesbeeld als een aaneengesloten blok in het secundaire geheugen opgeslagen.
+    **Procesbeeld** (= Proces Image):  Verzameling bestaande uit het **programma**, de **gegevens** en de **stackgebieden** van een proces. Voor **uitvoering**
 
-      **Delen:** 
-
-   In gewone **gebruikersmodus** ga je gebruik maken van de **User Stack**, om bijvoorbeeld lokale variabelen in op te slaan, voor het aanroepen van functies en procedures en voor het doorgeven van attributen aan die functies en procedures.
-
-   Als je **kernel** dingen wil uitvoeren ga je die uitvoeren in kernel mode en ga je daarvoor de **Kernel Stack** gebruiken. 
-
-   In de gedeelde adresruimte  (**Shared Adress Space**) worden dingen geplaatst die gedeeld worden zoals bijvoorbeeld de C-API.
+    van het proces gaan we er vooralsnog van uit dat het gehele procesbeeld in het **hoofdgeheugen** geladen wordt. Bij een onderbroeken toestand wordt het procesbeeld als een aaneengesloten blok in het secundaire geheugen opgeslagen.
+    
+    **Delen:** 
+    
+    In gewone **gebruikersmodus** ga je gebruik maken van de **User Stack**, om bijvoorbeeld lokale variabelen in op te slaan, voor het aanroepen vanfuncties en procedures en voor het doorgeven van attributen aan die functies en procedures.
+    
+    Als je **kernel** dingen wil uitvoeren ga je die uitvoeren in kernel mode en ga je daarvoor de **Kernel Stack** gebruiken. 
+    
+    In de gedeelde adresruimte  (**Shared Adress Space**) worden dingen geplaatst die gedeeld worden zoals bijvoorbeeld de C-API.
 
 
 
@@ -279,7 +289,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     **Categoriën:**
     
-    1. **Process Identificatie:** Unieke code voor elk proces (pid). Wordt meestal gebruikt als index in de primaire procestabel.
+    1. **Process Identificatie:** Unieke code voor elk proces (**pid**). Wordt meestal gebruikt als index in de primaire procestabel.
     
     **hoe?** Er wordt een soort boomstructuur gemaakt, Het parentproces verwijst naar het laatst aangemaakte kindproces. Dat kindprocess verwijst dan naar het voorlaatste nieuwe kindproces etc.: 
     
@@ -291,18 +301,18 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     ![img](https://lh3.googleusercontent.com/JxKkczr5oyO9LRdQlEQD4vCMV6UodXzfAwE9rR1FZ_HnnLfvsIzCRE7YtS-s0BFPU3tN--68OhmxCXTWtx2RGbwYhE2Da_CgOi8-YO0lAE_jHFANajopX5qIjbyhlLzWLxrnkfD4SiUrvjvIiA)
     
-    1. **Processor Toestand Informatie**: Bestaat uit de inhoud van alle processor registers. Wanneer een proces actief is bevindt deze informatie zich in de registers van de processor. Wanneer het proces onderbroken wordt zal de informatie in dit deel van de PCB opgeslaan worden.
-    2. **Procesor Besturings Informatie:** Bevat aanvullende informatie die het besturingssysteem nodig heeft voor het beheren van diverse processen.
+    2. **Processor Toestand Informatie**: Bestaat uit de **inhoud van alle processor registers**. Wanneer een proces actief is bevindt deze informatie zich in de registers van de processor. Wanneer het proces onderbroken wordt zal de informatie in dit deel van de PCB opgeslaan worden.
+    3. **Procesor Besturings Informatie:** Bevat **aanvullende** informatie die het **besturingssysteem** nodig heeft voor het **beheren van diverse processen.**
 
 
 
 12. > Welke stappen moet het besturingssysteem ondernemen om een nieuw proces aan te maken? (p36)
 
-    1. Toewijzing unieke PID.
-    2. Toewijing ruimte voor alle elementen van het procesbeeld.
-    3. Installatie PCB. in het bijzonder van de procesbesturingsinformatie.
-    4. Instelling juiste koppelingen. Bv. plaatsing van het proces in de wachtrij gereed of gereed-onderbroken.
-    5. (Eventueel) aanmaken of uitbreiden andere gegevensstructuren.
+    1. Toewijzing unieke **PID**.
+    2. Toewijing **ruimte** voor alle elementen van het **procesbeeld**.
+    3. Installatie **PCB**. in het bijzonder van de procesbesturingsinformatie.
+    4. **Instelling juiste koppelingen**. Bv. plaatsing van het proces in de wachtrij gereed of gereed-onderbroken.
+    5. (**Eventueel**) **aanmaken** of **uitbreiden** andere **gegevensstructuren**.
 
     
 
@@ -314,53 +324,71 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     >
     >mogelijk ook een aantal **voorbeelden** om je antwoord te staven. (p36)
     
-    1. **Interrupts**: Worden veroorzaakt door een gebeurtenis die zich buiten het op dat moment actieve proces afspeelt. Er wordt dan eerst overgeschakeld naar kernelmodus en de **besturing overgedragen aan een routine voor interruptafhandeling**, behorend tot het OS. Deze voert specifieke code uit voor de verwerking van het type interrupt dat is opgetreden.
+    1. **Interrupts**: Worden veroorzaakt door een gebeurtenis die zich buiten het op dat moment actieve proces afspeelt. Er wordt dan eerst overgeschakeld naar **kernelmodus** en de **besturing overgedragen aan een routine voor interruptafhandeling**, behorend tot het OS. Deze voert specifieke code uit voor de verwerking van het type interrupt dat is opgetreden.
     
        **Soorten Interrupts:**
     
-       - *Klokinterrupt*: Actieve proces heeft de maximaal toegestane tijdsduur bereikt en moet preëmptief onderbroken worden. Om deze interrupts te genereren wordt gebruik gemaakt van een teller en een klok. Zodra de teller op 0 komt te staan treedt de interrupt op.
-       - *I/O-interrupts*: Verwittigen het OS dat een I/O gebeurtenis is uitgevoerd. Het OS moet alle processen die op deze gebeurtenis wachten in de toestand gereerd of gereed-onderbroken brengen en kan beslissen het huidig actief proces preëmtief te onderbreken.
-       - *Paginafouten:* Worden veroorzaakt door verwijzingen naar geheugenelementen, die ondertussen door het OS tijdelijk uit het hoofdgeheugen verwijederd zijn.
+       - *Klokinterrupt*: Actieve proces heeft de **maximaal** toegestane **tijdsduur** bereikt en moet preëmptief onderbroken worden. Om deze interrupts te genereren wordt gebruik gemaakt van een teller en een klok. Zodra de teller op 0 komt te staan treedt de interrupt op.
+       - *I/O-interrupts*: Verwittigen het OS dat een **I/O gebeurtenis** is uitgevoerd. Het OS moet alle processen die op deze gebeurtenis wachten in de toestand gereerd of gereed-onderbroken brengen en kan beslissen het huidig actief proces preëmtief te onderbreken.
+       - *Paginafouten:* Worden veroorzaakt door **verwijzingen** naar **geheugenelementen**, die ondertussen door het OS **tijdelijk uit het hoofdgeheugen verwijderd zijn.**
     
-    2. **Trap (Exception):** Fout of uitzonderingsconditie die wordt gegenereerd binnen het op dat moment actieve proces. Bijvoorbeeld een gebruikersprogramma in gebruikersmodus die een actie wilt uitvoeren dat enkele mogelijk is in kernelmodus. Dit geval genereerd een trap (exceptie). Fatale fouten leiden tot beeïndiging van het proces en het activeren van een proceswissel.
+       
+    
+    2. **Trap (Exception):** **Fout** of **uitzonderingsconditie** die wordt gegenereerd binnen het op dat moment actieve proces. Bijvoorbeeld een gebruikersprogramma in gebruikersmodus die een actie wilt uitvoeren dat enkele mogelijk is in kernelmodus. Dit geval genereerd een trap (**exceptie**). Fatale fouten leiden tot beeïndiging van het proces en het activeren van een proceswissel.
+    
+       
     
     3. **De verzameling systeemaanroepen (software-interrupts**): Interface tussen OS en gebruikersprogramma's. Omdat gebruikers-programma's niet rechtstreeks geprivilegieerde instructies kunnen uitvoeren, communiceren ze met het besturingssyteem adhv system calls.
     
        **Soorten System Calls:**
     
-       - **Berichtgestuurd**: Bij OS met microkernel of client/server architectuur is de interface tussen gebruikersprocesse en serverprocessen gebaseerd op het uitwisselen van berichten.
-       - **Proceduregestuurd**: Elke system call komt overeen met een biblitheekprocedure, die de parameters van de system call op een bepalade plaats, bijvoorbeeld de proces registers, plaatst en vervolgs een trap instructie genereert.
+       - **Berichtgestuurd**: Bij OS met **microkernel** of client/server architectuur is de interface tussen gebruikersprocesse en serverprocessen gebaseerd op het **uitwisselen van berichten**.
+       
+       - **Proceduregestuurd**: Elke system call komt overeen met een **biblitheekprocedure**, die de parameters van de system call op een bepalade plaats, bijvoorbeeld de proces registers, plaatst en vervolgs een trap instructie genereert.
+       
+         
     
 14. > Wat is het verschil tussen een synchrone en asynchrone interrupt?
 
-    Interrups kunnen gegroepeerd worden gebaseerd op hun herkomst. **Synchrone** interrupts komen voor bij het uitvoeren van een **instructie** (bijvoorbeeld een segmentation fault na deling door nul). Een **asynchrone** interrupt wordt gegenereerd door iets **extern**, bijvoorbeeld IO die beschikbaar komt. 
+    Interrups kunnen gegroepeerd worden gebaseerd op hun herkomst. **Synchrone** interrupts komen voor bij het **uitvoeren** van een **instructie** (bijvoorbeeld een segmentation fault na deling door nul). 
 
-    De naamgeving komt van: een **synchrone** interrupt moet je steeds onmiddelijk afhandelen, segfaults, pagefaults (opgevraagd geheugen is niet beschikbaar). Je moet dus onmiddelijk zo’n fout fixen. Bij **asynchrone**, bijvoorbeeld IO, kan het wel **even wachten**.
+    Een **asynchrone** interrupt wordt gegenereerd door iets **extern**, bijvoorbeeld I/O die beschikbaar komt. 
+
+    De naamgeving komt van: een **synchrone** interrupt moet je steeds **onmiddelijk afhandelen**, segfaults, pagefaults (opgevraagd geheugen is niet beschikbaar). Je moet dus onmiddelijk zo’n fout fixen. Bij **asynchrone**, bijvoorbeeld I/O, kan het wel **even wachten**.
+
+    
 
 15. > Geef een aantal voorbeelden die aanleiding zullen geven tot het **wisselen van proces**. Geef een aantal voorbeelden die wellicht geen aanleiding zullen geven tot een proceswissel.
 
-    - Bij een IO-interrupt kan het dat een meer prioritair proces gedeblokkeerd wordt (= proces wissel)
-    - Bij een KLOK intterupt zal het ENKEL gewisseld worden ALS Quantum op is.
-    - Bij paginafouten zal het proberen de pagina’s in het geheugen laden en dan ook altijd van process wisselen .
-    - Traps gaan meestal over fouten, als het een oplosbare fout is is het geen probleem als ze niet oplosbaar is zal gewisseld worden en zal het oude proces simpelweg afgesloten wordenBij een systemcall zijn er geen regels
+    - Bij een **I/O-interrupt** (bv. bij inlezen bestand) kan het dat een meer prioritair proces gedeblokkeerd wordt.
+    
+    - Bij een **klok intterupt** zal het enkel gewisseld worden als Quantum op is.
+    
+    - Bij **paginafouten** zal het proberen de pagina’s in het geheugen laden en dan ook altijd van process wisselen .
+    
+    - **Traps** gaan meestal over fouten, als het een oplosbare fout is is het geen probleem **als ze niet oplosbaar** is zal gewisseld worden en zal het oude proces simpelweg afgesloten worden.
+    
+    - **Systemcalls** resulteren altijd in een proces wissel.
+    
+      
     
     
     
 16. > Hoe zal men bij een microkernel-architectuur een systeemaanroep afhandelen? (p38)
     
-    **Berichtgestuurd**. Bij OS met microkernel of client/server architectuur is de interface tussen gebruikersprocessen en serverprocessen gebaseerd op het uitwisselen van berichten. Na het tot stand brengen van een kanaal en het versturen van een aanvraagbericht, laat het gebruikersproces zich door het besturingssysteem blokkeren tot wanneer het antwoord beschikbaar is. 
+    **Berichtgestuurd**. Bij OS met microkernel of client/server architectuur is de **interface** tussen **gebruikersprocessen** en **serverprocessen** gebaseerd op het **uitwisselen** van **berichten**. Na het tot stand brengen van een kanaal en het versturen van een aanvraagbericht, laat het gebruikersproces zich door het besturingssysteem blokkeren tot wanneer het antwoord beschikbaar is. 
     
     
     
 17. > Hoe zal men bij een monolithisch kernelontwerp een systeemaanroep afhandelen? (p38)
     
-    In een meer klassiekere benadering (monolithisch kernelontwerp) gebeurt dit **Proceduregestuurd**: Elke system call komt overeen met een biblitheekprocedure, die de parameters van de system call op een bepalade plaats, bijvoorbeeld de proces registers, plaatst en vervolgs een trap instructie genereert.
+    In een meer klassiekere benadering (monolithisch kernelontwerp) gebeurt dit **Proceduregestuurd**: Elke system call komt overeen met een **biblitheekprocedure**, die de parameters van de system call op een bepalade plaats, bijvoorbeeld de proces registers, plaatst en vervolgs een trap instructie genereert.
     
     
     
 18.  > Waarom hebben software interrupts een veel lagere prioriteit dan hardware interrupts? (p39)
 
-    Het uitvoeren van system calls ten behoeve van één toepassing is minder dringend dan het vroeg genoeg bedienen van een I/O-Controller vooraleer interne buffers overlopen en gegevens verloren gaan.
+    Het uitvoeren van **system calls** ten behoeve van **één toepassing** is **minder dringend** dan het vroeg genoeg **bedienen** van een **I/O-Controller** **vooraleer** interne **buffers overlopen** en gegevens verloren gaan.
     
     
     
@@ -375,6 +403,14 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     >de uitvoering **verder te zetten binnen het reeds actieve proces**. Wat wordt er hier bedoeld met een
     >moduswissel en een contextwissel? (p40)
 
+    1. Context (processortoestandinformatie van PCB) van het proces wordt opgeslaan. Dit opslaan gebeurt hardwarmatig.
+    2. De programmateller wordt ingesteld op het beginadres van een programma voor de interruptafhandeling.
+    3. moduswisseling naar kernelmodus
+    4. Er wordt verder gegaan met de instructiecyclus. De eerste instructie van het programma van de interruptafhandeling wordt uitgevoerd.
+    5. Scheduler beslist of er een proceswisel nodig is.
+    
+    Indien proceswissel NIET nodig is en de uitvoering verder gezet wordt in reeds actieve proces:
+    
     **stappen:**
     
     1. Terugschakelen naar gebruikersmodus. (=**moduswisseling**)
@@ -386,7 +422,17 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     > de uitvoering **niet** verder te zetten binnen het reeds actieve proces. Welke stappen zijn nodig om
     > een proceswissel door te voeren. (p40-41)
 
-    Het OS zal in dit geval softwarematige aanpassingen moeten aanbrengen aan de omgeving. Dit proces zorgt voor overhead omdat het systeem tijdens het overschakelen geen nuttig werk kan uitvoeren.
+    1. Context (processortoestandinformatie van PCB) van het proces wordt opgeslaan. Dit opslaan gebeurt hardwarmatig.
+    2. De programmateller wordt ingesteld op het beginadres van een programma voor de interruptafhandeling.
+    3. moduswisseling naar kernelmodus
+    4. Er wordt verder gegaan met de instructiecyclus. De eerste instructie van het programma van de interruptafhandeling wordt uitgevoerd.
+    5. Scheduler beslist of er een proceswisel nodig is.
+    
+    
+    
+    Indien proceswissel WEL nodig is :
+    
+    Het OS zal in dit geval softwarematige aanpassingen moeten aanbrengen aan de omgeving. Dit proces zorgt voor **overhead** omdat het systeem tijdens het overschakelen geen nuttig werk kan uitvoeren.
     
     **stappen:**
     
