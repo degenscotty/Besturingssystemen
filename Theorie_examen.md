@@ -456,16 +456,23 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     **Procesloze Delen:**
     
-    -  
+    -  Unix:
+    -  Windows:
     
     
     
 23. >Hoe wordt er van binnen een Unix besturingssysteem doorgaans van proces gewisseld? Hoe komt
     >het dat dit vrij efficiënt verloopt? (p41-42)
     
-    Indien een proceswisseling moet uitgevoerd worden, dan wordt binnen het proces zelf de **context opgeslagen**, een **ander proces geselecteerd**, en de **besturing overgedragen aan een routine voor proceswisseling** waarvan de uitvoering plaatsvindt buiten alle processen.
+    1. Context wordt opgeslagen
+    2. Er wordt een ander proces geselecteerd
+    3. besturing wordt overgedragen aan routine voor proceswisseling
+    
+    
     
     Het verloopt vrij efficiënt omdat: Vrijwel alle software van het OS uitgevoerd wordt in de context van een **gebruikersproces** en er dus minder proces wisselingen voorkomen die een bottleneck zouden vormen.
+    
+    
 
 
 24. >Hoe wordt er binnen een microkernelgeoriënteerd besturingssysteem van proces gewisseld? Wat
@@ -475,7 +482,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     **Nadeel**: overhead door veel meer proceswisselingen.
     
-    **Voordeel:** OS kan beschouwd worden als een verzameling van verschillende modules, met onderlingen eenvoudig interfaces. De processen die deze modules uitvoeren, kunnen met aangepaste prioriteit worden verweven met andere processen. Sommige van deze processen moeten bovendien niet in kernelmodus uitgevoerd worden. Ook kan in een systeem met meerdere processoren, of zelf in een gedistribueerd systeem, een deel van de OS processen toegekend worden aan specifieke processoren.    
+    **Voordeel:** OS kan beschouwd worden als een verzameling van verschillende modules, met onderlingen eenvoudig interfaces. De processen die deze **modules** uitvoeren, kunnen met aangepaste prioriteit worden **verweven** met andere processen. Sommige van deze processen moeten bovendien niet in kernelmodus uitgevoerd worden. Ook kan in een systeem met meerdere processoren, of zelf in een gedistribueerd systeem, een deel van de OS processen toegekend worden aan specifieke processoren.    
     
     
 
@@ -494,11 +501,17 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 26. >Geef het procesbeeld van een multithreaded proces met drie threads. Welke delen worden er over
     >de grenzen van een thread gedeeld? (p43-44)
 
-    Er is nog steeds een PCB en gebruikersadresruimte op procesniveau. Voor elke thread zijn er afzonderlijke stacks en een afzonderlijke besturingsblok, waarin ondermeer de contextinfo opgeslagen wordt.
+    **Procesbeeld** (= Proces Image):  Verzameling bestaande uit het **programma**, de **gegevens** en de **stackgebieden** van een proces.
 
+    
+
+    Er is nog steeds een **PCB** en **gebruikersadresruimte** op procesniveau. (deze zaken worden dus **gedeeld**)
+    
+    Voor elke thread zijn er **afzonderlijke stacks** en een **afzonderlijke** **besturingsblok ** (Thread control block), waarin ondermeer de contextinfo opgeslagen wordt.
+    
     Threads kunnen zich zoals processen in verschillende toestanden bevinden. Scheduling wordt uitgevoerd per individuele thread. De OS scheduler maakt bij selectie voor het volgende actieve thread geen onderscheid of threads al dan niet tot hetzelfde proces behoren. De meeste toestandsinformatie wordt daarom bijgehouden op thread niveau.
-
-    Alle threads **delen** de toestand en de bronnen van dat proces: Threads hebben gedeelde toegang tot dezelfde geheugengegevens en dezeflde bestanden. Ook programmacode wordt automatisch gedeeld. Het voordeel van gedeelde code is dat toepassingen meer actieve threads kunnen hebben binnen dezelfde adresruimte, waardoor de processor waarschijnlijk beter bezig kan gehouden worden.
+    
+    Alle threads delen de toestand en de bronnen van dat proces: Threads hebben **gedeelde toegang tot dezelfde geheugengegevens en dezeflde bestanden**. Ook **programmacode** wordt automatisch **gedeeld**. Het **voordeel** van gedeelde code is dat toepassingen meer actieve threads kunnen hebben binnen dezelfde adresruimte, waardoor de processor waarschijnlijk beter bezig kan gehouden worden.
 
 **![img](https://lh6.googleusercontent.com/QrC4gsmJUlzYbbmg6csy2tANu76Xar39YdooEvDKXJlnsU5CK5YIKWQ_qdAjgMoUMQRO9y0lQFxxnzyqdgeVg9E4iznHx3C0qRETk4wOClCaD3kwdA_r8mvz5UJd2rxdHo-v4NetIyLnNcDOTg)**
 
@@ -509,15 +522,15 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
     **Voordelen:**
 
-    - Alle threads delen de toestand en de bronnen van dat proces: Threads hebben gedeelde toegang tot dezelfde geheugengegevens en dezeflde bestanden. Ook programmacode wordt automatisch gedeeld. Het voordeel van gedeelde code is dat toepassingen meer actieve threads kunnen hebben binnen dezelfde adresruimte, waardoor de processor waarschijnlijk beter bezig kan gehouden worden.
-    - Interprocescommunicatie tussen threads van eenzelfde proces kan eenvoudig op gedeeld geheugengebruik worden gebaseerd, zonder tussenkomst van de kernel. 
-    - Het creëren en wisselen van threads binnen een proces vraagt aanzienlijk minder overhead dan de overeenkomstige handelingen op processen.
-    - Blokkeert één thread op een gebeurtenis, dan hoeft het proces daarom niet noodzakelijk geblokkeerd te worden: andere threads binnen hetzelfde proces kunnen immers nog geactiveerd worden.
-    - Programma gaat verder wanneer een deel ervan bezig is met een langdurige bewerking.
+    - **Alle threads delen de toestand en de bronnen van dat proces**: Threads hebben gedeelde toegang tot dezelfde geheugengegevens en dezeflde bestanden. Ook programmacode wordt automatisch gedeeld. Het voordeel van gedeelde code is dat toepassingen meer actieve threads kunnen hebben binnen dezelfde adresruimte, waardoor de processor waarschijnlijk beter bezig kan gehouden worden.
+    - **Interprocescommunicatie** tussen threads van eenzelfde proces kan eenvoudig op gedeeld geheugengebruik worden gebaseerd, zonder tussenkomst van de kernel. 
+    - **Het creëren en wisselen van threads** binnen een proces vraagt aanzienlijk **minder overhead** dan de overeenkomstige handelingen op processen.
+    - **Blokkeert één thread** op een gebeurtenis, dan hoeft het **proces daarom niet noodzakelijk geblokkeerd te worden**: andere threads binnen hetzelfde proces kunnen immers nog geactiveerd worden.
+    - **Programma gaat verder** wanneer een **deel** ervan bezig is met een **langdurige bewerking**.
 
     **Nadelen:**
 
-    - Indien men in threads gebruik maakt van hulpfuncties (bv. van een bibliotheek), dan moeten die reëntrant uitgevoerd zijn. Dit betekent ondermeer dat elke simultane uitvoering van de functie enkel een beroep mag doen op een aparte verzameling lokale variabelen om de toestand van de functie bij te houden.
+    - Indien men in threads gebruik maakt van **hulpfuncties** (bv. van een bibliotheek), dan moeten die **reëntrant** uitgevoerd zijn. Dit betekent ondermeer dat elke simultane uitvoering van de functie enkel een beroep mag doen op een aparte verzameling lokale variabelen om de toestand van de functie bij te houden.
 
     **Mogelijk implementaties:**
 
@@ -531,39 +544,39 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 
 **Voordelen:**
 
-- Kunnen worden ondersteund op elk besturingssysteem
-- Threadwisselingen kunnen efficiënter worden uitgevoerd omdat het proces voor het beheren van de threads niet moet overschakelen naar de kernelmodus van de processor
-- Het schedulingalgoritme kan specifiek aan de toepassing worden aangepast
+- Kunnen worden ondersteund op **elk besturingssysteem**
+- Threadwisselingen kunnen **efficiënter** worden uitgevoerd omdat het proces voor het beheren van de threads niet moet overschakelen naar de kernelmodus van de processor
+- Het **schedulingalgoritme** kan **specifiek** aan de toepassing **worden aangepast**
 
 **Nadelen:**
-- Voert één thread een blokkerende systeemaanroep uit alle threads van het proces worden tegelijkertijd geblokkeerd
-- Op elk moment kan maar één enkele thread actief zijn binnen een proces  geen gebruik van multiprocessing
 
+- Voert **één thread een blokkerende systeemaanroep** uit **alle threads** van het proces worden tegelijkertijd **geblokkeerd**
+- Op elk moment kan maar **één enkele thread actief zijn binnen een proces**  geen gebruik van multiprocessing
 
+![img](https://lh3.googleusercontent.com/6zYBpAZjci7m_NP0G80HioiUGDmt07Ma1RUYn_d7Bgyo0bY6SNBrmv9iRbHrvlHul6V-1DyfQLcRslwPZqajeojtcY-qTUqqKYeOwpkcorFaLwGtJMhHhq3UL1fgrOJdpucQMAMuSsu7JHBPFg)
 
 29. > Wat zijn de voor- en nadelen van kernel level threading? (p47)
 
-    
 
 **Voordelen:**
 
-- Worden door het besturingssysteem zelf beheerd
-- Scheduling door de kernel wordt uitgevoerd op basis van threads
-- Een geblokkeerde thread blokkeert andere thread binnen hetzelfde proces niet
-- Thread pools zorgen er voor dat een aanvraag sneller afgehandeld worden. Anders zou er elke keer een nieuw thread aangemaakt en afgebroken moeten worden
+- Worden **door het OS zelf beheerd**
+- **Scheduling** door de kernel wordt uitgevoerd op basis van threads
+- Een **geblokkeerde thread blokkeert andere thread** binnen hetzelfde proces **niet**
+- **Thread pools** zorgen er voor dat een **aanvraag sneller afgehandeld** worden. Anders zou er elke keer een nieuw thread aangemaakt en afgebroken moeten worden
 
 **Nadelen:**
 
-- De besturing van de ene naar de andere thread vereist een modus- en contextwisseling. Het aantal kernel-level threads wordt hierdoor vaak gelimiteerd.
+- De **besturing** van de **ene naar de andere thread** vereist een **modus- en contextwisseling**. Het aantal kernel-level threads wordt hierdoor vaak gelimiteerd.
 
-
+![img](https://lh6.googleusercontent.com/2tcGSNAiarGA7ywIF0QzojMR7MZ6vIzfkfUYeWv4PASBfJ_5fTd_eqRGBNCefII5pons8pt6GWGhIsipMHKxGO7NQY5-GfPNz3Dy7Qg-9Xmt2RT6Tmic2EjGtf9OoLhE808UhOR9yuns8wJbsQ)
 
 30. >Wat is het verschil tussen coöperatieve- en preempted multitasking? Wanneer kan een proces
     >preemptief worden onderbroken? (p51, theorieles week4: 01:19)
 
-**Coöperatieve multitasking:** Op systemen zonder timeslicing moet een thread vrijwillig de controle over de processor afgeven (met de yield methode) om andere threads een kans te geven.
+**Coöperatieve multitasking:** Op systemen **zonder timeslicing** moet een **thread vrijwillig de controle over de processor afgeven** (met de yield methode) om andere threads een kans te geven.
 
-**preempted multitasking**: Bij preempted multitasking wordt er gebruik gemaakt van **timeslicing** waarbij threads onderbroken kunnen worden. Bijgevolg kunnen threads met een lagere prioriteit actief worden voor een thread met een hogere prioriteit. een thread wordt gewisseld na een bepaalde tijd, het wordt dus preemptief onderbroken wanneer deze tijd verstreken wordt.
+**preempted multitasking**: Bij preempted multitasking wordt er gebruik gemaakt van **timeslicing** waarbij threads **onderbroken** kunnen worden. Bijgevolg kunnen threads met een lagere prioriteit actief worden voor een thread met een hogere prioriteit. een thread wordt gewisseld **na een bepaalde tijd**, het wordt dus preemptief onderbroken wanneer deze tijd verstreken wordt.
 
 Een proces moet **preemptief** onderbroken worden:
 
@@ -573,42 +586,15 @@ Een proces moet **preemptief** onderbroken worden:
 
 
 31. > Geef het procestoestandsdiagram van een klassiek Unix besturingssysteem en bespreek elke
-    > toestandsovergang (cfr. vraag 9). Waarom is dit niet geschikt voor realtime-applicaties?
+    > toestandsovergang (cfr. vraag 9). Waarom is dit niet geschikt voor realtime-applicaties? (p53)
 
-    
-
-    **procestoestandsdiagram:**
-
-![img](https://lh5.googleusercontent.com/oh9RkWW-cGsqiEM4rZU8MabCtjFasif9uEwCdczj-s7Nn7bgd4GeerG4s0N2_7M4HzDFj61J018OMKUr1wtBoyQvFPYq52f_zjDwKVoM_4xahmaADXUBcvKrpkVFfANCt107ht5o7hxYvUn51g)
-
-
-
-**Verschil tussen preempted en ready to run (Oplossing prof):**
-
-Er wordt onderscheid gemaakt tussen de twee toestanden (Ready to Run en Preempted). 
-
-In essentie vormen beide één toestand hetgeen wordt aangegeven door de streepjeslijn die de toestanden
-verbindt. Het onderscheid wordt gemaakt op de wijze waarop een proces in de toestand preemted
-binnenkomt. Wordt een proces uitgevoerd in kernelmode (als gevolg van een interrupt) dan zal er
-een moment aanbreken (na interruptafhandeling) waarop de kernel zijn werk heeft voltooid en de
-besturing kan teruggegeven worden aan het gebruikersprogramma. Net voordat dat gebeurt, wordt
-zoals steeds, de scheduler aangeroepen om te kijken of er preemptief moet worden onderbroken
-ten gunste van een proces met een hogere prioriteit. Wanneer er preemptief moet worden
-gewisseld, wordt het actieve proces naar de toestand preempted gebracht. Het proces in de
-toestand preempted en de processen in de toestand ready to run vormen één wachtrij van gerede
-processen.
-Een proces kan enkel preemptief onderbroken worden wanneer er gewisseld wordt van kernel- naar
-gebruikersmode. Een proces kan echter niet preemptief worden onderbroken terwijl het in
-kernelmode wordt uitgevoerd (een interrupt wordt in Unix afgehandeld binnen de context van dat
-huidige actieve proces). **Dit maakt klassieke Unix ongeschikt voor realtime applicaties.**
-
-
+    **Niet te kennen**
 
 
 
 32. > Een proces in een Windows heeft drie zaken? Benoem ze en bespreek waarvoor ze dienen. (p56)
 
-    - **Access token**: = primary token. Staat in voor de beveiliging. Bevat een kopie van de beveiligingsidentificatiecode.
+    - **Access token**: = primary token. Staat in voor de **beveiliging**. Bevat een kopie van de **beveiligingsidentificatiecode**.
     - **Virtuele adresruimte:** Wordt door de Virtual memory manager module van de Executive beheerd.
     - **Objectlable met handles** naar andere objecten, ondermeer naar elke thread die het proces omvat.
 
@@ -623,11 +609,11 @@ huidige actieve proces). **Dit maakt klassieke Unix ongeschikt voor realtime app
     Een NT-thread kan zich in zes verschillende **toestanden** bevinden:
 
     - **ready**
-    - **running**
+    - **running**: thread bevindt zich in deze toestand tot het zichzelf blokkeert of kwantum (tijd) op is.
     - **terminated**
-    - **stand-by**: Hier bevindt zich de ready thread met hoogste prioriteit
-    - **waiting**: Wordt bereikt indien een thread geblokkeerd wordt op een gebeurtenis (bijvoorbeeld een I/O-handeling), of wanneer een thread, vrijwillig of op verzoek van een andere thread, zichzelf onderbreek.
-    - **transition**: Zijn na het wachten de (geheugen)bronnen nog steeds beschikbaar, dan gaat de thread rechtstreeks naar de toestand gereed, zoniet naar de overgang transition.
+    - **stand-by**: Hier bevindt zich de **ready** thread met **hoogste prioriteit**. Is de prioriteit van de standby groot genoeg, dan kan het actieve thread preemtief onderbroken worden.
+    - **waiting**: Wordt bereikt indien een **thread geblokkeerd** wordt op een gebeurtenis (bijvoorbeeld een I/O-handeling), of wanneer een thread, vrijwillig of op verzoek van een andere thread, **zichzelf onderbreek**.
+    - **transition**: Zijn na het wachten de **(geheugen)bronnen** nog steeds beschikbaar, dan gaat de thread rechtstreeks naar de toestand **gereed**, zoniet naar de overgang **transition**.
 
     
 
@@ -663,12 +649,21 @@ huidige actieve proces). **Dit maakt klassieke Unix ongeschikt voor realtime app
 
 **Overgangen:**
 
-- Active -> Sleeping: Door een primitieve voor synchronistatie , waardoor de toestand sleeping wordt aangenomen tot wanneer de synchronisatievoorwaarde voldaan is.
-- Active -> Stopped: Door een ander actieve user-level thread
-- Active -> Runable: Het user-level thread wordt preëmptief onderbroken wanneer een andere thread met hoger prioriteit runnable wordt.
-- Een actief User-level thread kan zichzelf ook preëmptief onderbreken en de controle overdragen aan een andere uitvoerbare user-level thread met gelijke prioriteit.
+- **Active -> Sleeping:** Door een primitieve voor synchronistatie , waardoor de toestand sleeping wordt aangenomen tot wanneer de synchronisatievoorwaarde voldaan is.
+- **Active -> Stopped:** Door een ander actieve user-level thread
+- **Active -> Runable:** Het user-level thread wordt preëmptief onderbroken wanneer een andere thread met hoger prioriteit runnable wordt.
+- Een actief User-level thread kan zichzelf ook **preëmptief** onderbreken en de controle overdragen aan een **andere uitvoerbare user-level thread** met gelijke prioriteit.
 
 Indien de user-level thread niet gebonden is aan een enkel lichtgewicht proces, dan wordt die enkel in de **actieve toestand** effectief aan het lichtgewicht proces gekoppeld.
+
+In de actieve toestand van de user-level thread kan het corresponderen lichtgewicht proces verschillende toestanden aanemen:
+
+- Running
+- Stopped
+- Blocked
+- Runnable
+
+voert een thread een **blokkerende systemcall uit**, dan krijgt het **lichtgewichtproces** de toestand **geblokkeerd** maar **blijft de user-level thread actief**.
 
 
 
@@ -680,7 +675,9 @@ Indien de user-level thread niet gebonden is aan een enkel lichtgewicht proces, 
 
 Sommige besturingssystemen, zoals Windows, en enkele Unix varianten , waaronder Solaris, **combineren user-level en kernel-level threads.** Ze baten hierbij de voordelen van beide benaderingen.
 
-Verschillende user-level threads worden gegroepeerd **gekoppeld** aan een (kleiner of gelijk) aantal kernel-level threads. In dit gecombineerde systteem moet de user-level threadbibliotheek communiceren met de kernel. Dit gebeurt meestal via lightweight processen (gegevensstructuren). Voor die bibliotheek ziet een lightweight proces er uit als een virtuele processor, waaraan een user-level thread kan **gekoppeld** worden. Het OS gebruikt het lightweight proces om er een kernel-level thread aan te koppelen.
+Verschillende user-level threads worden gegroepeerd **gekoppeld** aan een (kleiner of gelijk) aantal kernel-level threads. 
+
+In dit gecombineerde systteem moet de user-level threadbibliotheek communiceren met de kernel. Dit gebeurt meestal via lightweight processen (gegevensstructuren). Voor die bibliotheek ziet een lightweight proces er uit als een virtuele processor, waaraan een user-level thread kan **gekoppeld** worden. Het OS gebruikt het lightweight proces om er een kernel-level thread aan te koppelen.
 
 
 
@@ -691,11 +688,11 @@ Verschillende user-level threads worden gegroepeerd **gekoppeld** aan een (klein
 
     
 
-- **Proces 1:** Heeft één user-level thread, die gebonden is aan één lichtgewicht proces. Deze optie gaan nomen worden indien gelijktijdigheid binnen een proces niet vereist is.
-- **Proces 2:** Meerdere user-level threads, die allemaal gebonden zijn aan hetzelfde lightweight proces. Dit is een efficiënte oplossing voor programma's met een logische parallelliteit.
-- **Proces 3**: Meerdere user-level threads, gekoppeld aan een (kleiner of gelijk) aantal  lightweight processen. Goede oplossing indien threads geblokkeerd kunnen worden.
-- **Proces 4**: Meerdere user-level threads, die elk in een 1-op-1 relatie gebonden zijn met lightweight processen. Dit kan nuttig zijn bij CPU-gebonden toepassingen.
-- **Proces 5:** Gelijkaardig aan proces 3 maar bindt aanvullend nog één user-level een lightweight proces, dat bovendien gebonden is aan een spcifieke processor. Dit is bijvoorbeeld aangewezen voor toepassingen met een realtime component.
+- **Proces 1:** Heeft **één user-level thread**, die gebonden is aan **één lichtgewicht proces**. Deze optie gaan nomen worden indien **gelijktijdigheid binnen een proces niet vereist is.**
+- **Proces 2:** **Meerdere user-level threads**, die allemaal **gebonden zijn aan hetzelfde lightweight proces**. Dit is een efficiënte oplossing voor programma's met een **logische parallelliteit.**
+- **Proces 3**: **Meerdere user-level threads**, gekoppeld aan een **(kleiner of gelijk) aantal  lightweight processen**. Goede oplossing **indien threads geblokkeerd kunnen worden.**
+- **Proces 4**: Meerdere user-level threads, die elk in een **1-op-1 relatie** gebonden zijn met lightweight processen. Dit kan nuttig zijn bij **CPU-gebonden toepassingen.**
+- **Proces 5:** Gelijkaardig aan proces 3 maar **bindt** aanvullend nog **één user-level een lightweight proces,** dat bovendien **gebonden is aan een spcifieke processor**. Dit is bijvoorbeeld aangewezen voor toepassingen met een realtime component.
 
 
 
@@ -715,7 +712,8 @@ Verschillende user-level threads worden gegroepeerd **gekoppeld** aan een (klein
     systeemaanroep is een proceswissel dus niet steeds aan de orde. Wanneer de kernelbuffer echter
     vol komt, moet er een **I/O-operatie** gestart worden en zal het gebruikersproces moeten worden
     geblokkeerd tot wanneer alle bytes uit de userbuffer werden gekopieerd.
-    Bij het zetten van de O_SYNC-vlag heb je dus naast meer **I/O-operaties** ook steeds een extra
+    
+    Bij het zetten van de O_SYNC-vlag heb je dus naast  **meer I/O-operaties** ook steeds een extra
     **proceswissel** wat het vertragend effect nog versterkt. Iedere write-systeemaanroep wordt verplicht
     om een I/O-operatie te starten en het bijhorende proces te blokkeren tot wanneer de bijhorende
     I/O-interrupt het geblokkeerde proces deblokkeert
@@ -732,8 +730,8 @@ Verschillende user-level threads worden gegroepeerd **gekoppeld** aan een (klein
 - Buffering **beperkt** het aantal **I/O-opdrachten** naar de schijf. De blokgroottes die naar schijf worden
   geschreven zijn niet bepalend voor de schijfprestaties, het aantal lees/schrijfoperaties per seconde
   daarentegen wel. 
-- Buffering zorgt dat lees/schrijfopdrachten plaatsvinden op een geheugenbuffer en wanneer die
-  dreigt vol te lopen zal het OS die moeten flushen. Er wordt dus van heel veel kleine I/O-opdrachten
+- Buffering zorgt dat **lees/schrijfopdrachten plaatsvinden** op een **geheugenbuffer** en wanneer die
+  dreigt vol te lopen zal het OS die moeten **flushen**. Er wordt dus van heel veel kleine I/O-opdrachten
   één grote I/O-opdracht gemaakt die dan daadwerkelijk naar schijf zal worden geschreven.
 
 **Nadelen:**
@@ -791,7 +789,7 @@ zolang het in de status “zombie” vertoefd in het geheugen blijft.
 Bij een daemon-proces zal je dus bij het niet correct lezen van de exit-statussen van de kinderen een
 ganse waslijst met zombie-processen maken die op zich 0% CPU tijd krijgen (dus geen probleem
 voor de scheduler) en ook 0% geheugen toegewezen krijgen. Iedere zombie neemt wel een plaats in
-de globale procestabel in beslag en bovendien blijft de volledige procesbesturingsinformatie achter
+de globale procestabel in beslag en bovendien blijft de volledige **procesbesturingsinformatie** achter
 in het geheugen! Dit is dus niet onschuldig!
 
 
@@ -854,14 +852,14 @@ binnen dat proces wel verder doen.
 
 45. > Aan welke vier randvoorwaarden moet ieder geheugenbeheersysteem voldoen? (p109)
 
-	1. Om de efficiëntie van de processor en van de I/O-voorzieningen te verhogen, is het noodzakelijk dat zoveel mogelijk processen in het hoofdgeheugen geladen zijn. Er is in praktijk nooit voldoende hoofdgeheugen om alles bij te houden. Daarom is het nodig om gegevens naar en uit het secundair gegeheugen te **swapppen**. Swappen is echter een langzame bewerking. Swappen verhoogt tijd nodig voor proceswisseling en is dus een complexe taak voor het geheugenbeheersysteem. Tegenwoordig wordt er meer gebruikt gemaakt van het concept **virtueel geheugen**.
+	1. Om de efficiëntie van de processor en van de I/O-voorzieningen te verhogen, is het noodzakelijk dat z**oveel mogelijk processen in het hoofdgeheugen geladen** zijn. Er is in praktijk nooit voldoende hoofdgeheugen om alles bij te houden. Daarom is het nodig om gegevens naar en uit het secundair gegeheugen te **swapppen**. Swappen is echter een langzame bewerking. Swappen verhoogt tijd nodig voor proceswisseling en is dus een complexe taak voor het geheugenbeheersysteem. Tegenwoordig wordt er meer gebruikt gemaakt van het concept **virtueel geheugen**.
 	2. Hardware van de processor en software van het OS moeten de verwijzingen in de code van het programma op een of andere wijze **vertalen** in adressen van het fysieke geheugen, die overeenkomen met de huidige locatie van het programma in het hoofdgeheugen.
-	3. Enerzijds mogen processen **niet zonder toestemming** geheugenlocaties van andere processen kunnen **lezen** of **schrijven**. Dergelijke instructies moeten afgebroken worden van zodra ze uitgevoerd worden. Anderzijds moet dit beveiligingsmechanisme voldoende flexibel zijn om verschillende processen toegang te kunnen geven tot gedeelde stukken van het hoofdgeheugen. Ook is het dikwijls noodzakelijk dat dat processen die samenwerken dezelfde gegevensstucturen delen.
-	4. Zowel het hoofdgeheugen als het secundaire geheugen zijn doorgaans georganiseerd als een ééndimensionale adresruimte. De meeste Programm'aas daarintegen zijn logisch ingedeeld in modules, met andere karakteristieken. Het is de taak van het geheugenbeheer en van de computerhardware om deze modules te **vertalen** naar een ééndimensionale adresruimte.
+	3. Enerzijds mogen processen **niet zonder toestemming** geheugenlocaties van andere processen kunnen **lezen** of **schrijven**. Dergelijke instructies moeten afgebroken worden van zodra ze uitgevoerd worden. **Anderzijds** moet dit **beveiligingsmechanisme** voldoende **flexibel** zijn om verschillende processen **toegang** te kunnen **geven** tot **gedeelde stukken** van het **hoofdgeheugen**. Ook is het dikwijls noodzakelijk dat dat processen die samenwerken dezelfde gegevensstucturen delen.
+	4. Zowel het hoofdgeheugen als het secundaire geheugen zijn doorgaans georganiseerd als een ééndimensionale adresruimte. De meeste Programm'aas daarintegen zijn logisch ingedeeld in modules, met andere karakteristieken. Het is de **taak** van het **geheugenbeheer** en van de **computerhardware** om deze modules te **vertalen** naar een **ééndimensionale adresruimte.**
 
 
 
-46. > Bespreek de werking van vaste partitionering (vaste grootte en verschillende grootte). Wat zijn de voor- en nadelen van dit systeem? Hoe zal het besturingssysteem procesbeelden gaan plaatsen in een systeem met vaste partitionering? (p110)
+46. > Bespreek de werking van vaste partitionering (vaste grootte en verschillende grootte). Wat zijn de voor- en nadelen van dit systeem? Hoe zal het besturingssysteem procesbeelden gaan plaatsen in een systeem met vaste partitionering? (p110,111)
 
 
 
@@ -869,19 +867,14 @@ binnen dat proces wel verder doen.
 
 
 
-**Voordelen:**
+| voordelen                                                    | nadelen                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Systemen met vaste partitionering **vereisen nauwelijks OS software**. Het OS moet enkel in een tabel bijhouden welke partities nog beschikbaar zijn en welke reeds bezet zijn. | Het **aantal partities** die werd ingesteld bij het genereren van het systeem **beperkt** echter het aantal actieve processen. |
+| **Verschillende grootte**: Bieden een grotere flexibiliteit. **Men kan elk proces toewijzen aan de kleinste partitie waarin het past.** Het geheugenbeeld van het OS ligt nu dichter bij de werkelijke behoeften van de processen. Voor elke partitie is wel eens scheduling wachtrij nodig. In deze benadering wordt verspilling uiteraard geminimaliseerd. | Het vergt dat het **maximale geheugen** dat een proces zal vereisen, op voorhand gekend is. |
+|                                                              | **Vaste grootte**: Hoofdgeheugen weinig efficiënt gebruikt. = **Interne Fragmentatie** |
+|                                                              | **Vaste grootte:** **Procesbeeld** kan nog steeds te groot zijn om in één partitie te passen. In dat geval moet het gebruikersprogramma zelf **overlaytechnieken** inbouwen, zodat zich altijd maar een deel van het programma in de toegewezen partitie bevindt. |
 
-- Systemen met vaste partitionering vereisen nauwelijks OS software. Het OS moet enkel in een tabel bijhouden welke partities nog beschikbaar zijn en welke reeds bezet zijn.
-- Gelijke grootte: Bieden een grotere flexibiliteit. Men kan elk proces toewijzen aan de kleinste partitie waarin het past. Het geheugenbeeld van het OS ligt nu dichter bij de werkelijke behoeften van de processen. Voor elke partitie is wel eens scheduling wachtrij nodig. In deze benadering wordt verspilling uiteraard geminimaliseerd.
 
-
-
-**Nadelen**:
-
-- Het aantal partities die werd ingesteld bij het genereren van het systeem beperkt echter het aantal actieve processen.
-- Het vergt dat het maximale geheugen dat een proces zal vereisen, op voorhand gekend is.
-- Vaste grootte: Hoofdgeheugen weinig efficiënt gebruikt. = **Interne Fragmentatie**
-- Vaste grootte: **Procesbeeld** kan nog steeds te groot zijn om in één partitie te passen. In dat geval moet het gebruikersprogramma zelf overlaytechnieken inbouwen, zodat zich altijd maar een deel van het programma in de toegewezen partitie bevindt.
 
 
 
@@ -894,28 +887,31 @@ binnen dat proces wel verder doen.
 
 
 
-**Voordelen**:
+| voordelen                                                    | nadelen                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Het creeërt een geheugenbeeld dat meer aan de eisen van processen voldoet. Wanneer een proces wordt overgebracht naar het hoofdgeheugen krijgt het **precies de benodigde hoeveelheid geheugen**. | Processen die zich niet meer in de toestand gereed bevinden, worden uit het hoofdgeheugen geswapt om plaats te maken voor beschikbare processen, in de toestand gereed-onderbroken. Aangrenzende vrije partities kunnen hierbij worden samengevoegd. Dit leidt tot **extern fragmentatie**. Het **geheugen buiten de partities** worden steeds **meer gefragmenteerd** en steeds **minder benut**. In het ergste geval wordt er een blok verspild tussen elke twee opeenvolgende processen. |
 
-Het creeërt een geheugenbeeld dat meer aan de eisen van processen voldoet. Wanneer een proces wordt overgebracht naar het hoofdgeheugen krijgt het precies de benodigde hoeveelheid geheugen. 
 
 
 
-**Nadelen**:
 
-Processen die zich niet meer in de toestand gereed bevinden, worden uit het hoofdgeheugen geswapt om plaats te maken voor beschikbare processen, in de toestand gereed-onderbroken. Aangrenzende vrije partities kunnen hierbij worden samengevoegd. Dit leidt tot **extern fragmentatie**. Het geheugen buiten de partities worden steeds meer gefragmenteerd en steeds minder benut. In het ergste geval wordt er een blok verspild tussen elke twee opeenvolgende procassen.
+
 
 
 
 48. > Hoe gebeurt adresvertaling bij dynamische partitionering? (p114)
 
-Wanneer het proces in het hoofdgeheugen wordt geladen, geswapt of verschoven, worden de aan het proces toegekende absolute begin- en eindadressen geladen in het **basisregister** en het **begrenzingsregister** van de processorregister, als onderdeel van de contextwisseling. Tijdens de uitvoering worden enkel relatieve adressen aangewend. Elk adres ondergaat hierbij 2 bewerkingen: een **optelling** om het overeenkomstige fysiek adres te bekomen, en een **vergelijking** met de begrenzingregister. Wanneer het adres niet binnen de begrenzing ligt, dan wordt een **interrupt** gegenereerd naar het OS.
+Wanneer het proces in het hoofdgeheugen wordt geladen, geswapt of verschoven, worden de aan het proces toegekende absolute begin- en eindadressen geladen in het **basisregister** en het **begrenzingsregister** van de processorregister, als onderdeel van de contextwisseling. Tijdens de uitvoering worden enkel relatieve adressen aangewend. Elk adres ondergaat hierbij 2 bewerkingen:
+
+-  een **optelling** om het overeenkomstige fysiek adres te bekomen
+- een **vergelijking** met de begrenzingregister. Wanneer het adres niet binnen de begrenzing ligt, dan wordt een **interrupt** gegenereerd naar het OS.
 
 
 
 49. >Bij dynamische partitionering kan je voor het geheugengebruik een bitmap of een gelinkte lijst
     >bijhouden (maak een schets)? Hoe gebeurt dit en wat zijn de voor- en nadelen van beide systemen? (p115)
 
-Bij het gebruik van **bitmaps** wordt het geheugen verdeeld in kleine allocatie-eenheden van gelijke grootte. Bij elke allocatie-eenheid hoort een bit die aangeeft of de eenheid vrij is of bezet. Hoe kleiner de allocatie-eenheid is, des te groter wordt de bitmap.
+Bij het gebruik van **bitmaps** wordt het geheugen verdeeld in **kleine allocatie-eenheden** van gelijke grootte. Bij elke allocatie-eenheid hoort een **bit** die aangeeft of de eenheid **vrij is of bezet**. Hoe kleiner de allocatie-eenheid is, des te groter wordt de bitmap.
 
 ![img](https://lh4.googleusercontent.com/4ciH29yqT78whRu8Odm92SFqQq90PpUPcTcQIq8C85BEKBo5s9mxPaHlP91rfXToE2g_zyWBV1EgZboUjCwLRjbRfslhO-cL4jnsTdzBEyfN4_yd_I2SO7nLQ9_dschNqOwROOQI0FyUVRV3IQ)
 
@@ -924,13 +920,15 @@ Bij het gebruik van **bitmaps** wordt het geheugen verdeeld in kleine allocatie-
 - Als de allocatie-eenheid te groot wordt gekozen, **versplit elk proces veel geheugen** in zijn laatst gealloceerde eenheid.
 - Wanneer een nieuw proces, N aaneensluitende allocatie-eenheden vereist, dan moet het geheugen-beheersysteem immers in de bitmap op zoek gaan naar een rij van N opeenvolgende nullen. Dit is een **tijdverslindend proces**.
 
+
+
 **Gelinkte lijsten** vormen een alternatieve manier om de vrije allocatie-eenheden bij te houden. Het geheugen wordt voorgesteld als een gekoppelde lijst segmenten die ofwel in gebruikt zijn door een proces, ofwel beschikbaar zijn.
 
 ![img](https://lh5.googleusercontent.com/9Gj6SuGZ_Lm4zpUt_C7tJMYHfToBGk9FUjk8ALqaI3msjucJUZcxf9ydqYIhs2h-wkXdssUjLbnBoJo7Dv305zfCeeql-ShYDknMgEAAHjFQkebHhnJ1OFr6-3renx81m7vXLsZSPEYOcSOWzg)
 
 **voordelen**: 
 
-- indien voor het vrije en gebruikte geheugen aparte lijsten worden bijgehouden, kunnen deze lijsten worden gesorteerd op grootte. 
+- indien voor het **vrije** en **gebruikte** geheugen **aparte** lijsten worden bijgehouden, kunnen deze lijsten worden **gesorteerd** op grootte. 
 
 **nadelen**:
 - bijwerken lijsten complex en duur. 
@@ -942,27 +940,62 @@ De blijkbaar meest efficiënte oplossing, voorgesteld door donald Knuth, plaatst
 50. >Bespreek de werking van paginering (zonder virtueel geheugen). Wat is het verschil tussen
     >paginering en vaste partitionering? Hoe gebeurt de adresvertaling bij paginering (maak een schets)?  (p118)
 
-Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een gelijke, relatief kleine grootte) en alle **procesbeelden in pagina’s ter grootte van de frames**. De procespagina’s worden toegewezen aan frames van het hoofdgeheugen. Kleinere processen vereisen minder frames, grotere processen vereisen er meer. Het besturingssysteem houdt een lijst van vrije frames bij, en een pagina table voor elk proces (in het procesbeeld van het proces zelf). Deze bevat de framelocatie van elke pagina van het proces: elke ingang in de paginatabel bevat het nummer van het frame in het hoofdgeheugen dat de corresponderende pagina bevat.
+Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een gelijke, relatief kleine grootte) en alle **procesbeelden in pagina’s ter grootte van de frames**. De procespagina’s worden toegewezen aan frames van het hoofdgeheugen. Kleinere processen vereisen minder frames, grotere processen vereisen er meer. Het besturingssysteem houdt een **lijst van vrije frames** bij, en een pagina table voor elk proces (in het procesbeeld van het proces zelf). Deze bevat de **framelocatie** van elke pagina van het proces: elke ingang in de paginatabel bevat het nummer van het frame in het hoofdgeheugen dat de corresponderende pagina bevat.
 
 ![img](https://lh6.googleusercontent.com/7jQN3iEGtnryZalWRjl-OSC8ZBqVZScxssG3wgU-5u4iyAcBzpaV8Sprhb4aq4m_SVDcpPm2ldUMYv5UoEIXzZXcEhUxtKDL7xE7bcHXCaKeG_DHEy_27z-6u1_rKtiY52rTtFasXVc44Iy-OQ)
 
+
+
 **paginering** vs **vaste partitionering:** 
 
-- Partities bij paginering zijn kleiner.Processen bij paginering bezetten verschillende partities die niet aaneengesloten hoeven te zijn.
-- Bij paginering is geen externe fragmentatie.
-- Bij paginering wordt de interne fragmentatie beperkt tot een fractie voor de laatste pagina van het proces.
+| paginering                                                   | vaste partitionering     |
+| ------------------------------------------------------------ | ------------------------ |
+| Partities zijn kleiner.                                      |                          |
+| Processen bezetten verschillende partities die niet aaneengesloten hoeven te zijn. |                          |
+| Geen externe fragmentatie                                    | Wel externe fragmentatie |
+| Interne fragmentatie wordt beperkt tot een fractie voor de laatste pagina van het proces. |                          |
+
+
 
 **adresvertaling bij paginering:** 
+
 - Door de MMU (memory management unit) 
-- Voor de grootte van de pagina’s en frames wordt een macht van 2 gekozen. Hierdoor kunnen logische adressen beschouwd blijven worden als relatieve adressen, verwijzend naar de oorsprong van het programma. 
+- Voor de **grootte** van de pagina’s en frames wordt een **macht van 2** gekozen. Hierdoor kunnen **logische adressen beschouwd blijven worden als relatieve adressen**, verwijzend naar de oorsprong van het programma. 
+
+
 
 51. >Bespreek de werking van segmentatie (zonder virtueel geheugen)? Wat is het verschil tussen
     >dynamische partitionering en segmentatie? Waarom wordt dit model voor de gebruiker bewust
-    >zichtbaar wordt gehouden. Geef een voorbeeld waar je handig gebruik kan maken van segmenten. 
+    >zichtbaar gehouden. Geef een voorbeeld waar je handig gebruik kan maken van segmenten. 
     >
     >Hoe gebeurt de adresvertaling bij segmentatie (maak een schets)? (p119)
 
-**Segmentatie** lijkt op **dynamisch partitionering**, zoals **paginering** lijkt op **vaste partitionering**. Bij segmentatie worden de blokken **niet uniform** verdeeld in blokken. Elk logisch adres bestaat uit twee onafhankelijke dimensies: een segmentnummer en een relatieve positie binnen het segment. Het hoofdgeheugen blijft 1-dimensionale, lineaire, rij adressen, vertrekkend van 0. De koppeling tussen het tweedimensionale en eendimensionale geheugen beeld gebeurt aan de hand van een segmenttabel. Het besturingssysteem houdt een segmenttabel bij voor elk proces, die de fysieke locatie van elk segment van het proces bevat. **In tegenstelling tot dynamische partitionering** kunnen processen bij segmentatie meerdere partities in het hoofdgeheugen bezetten, die niet aaneengesloten hoeven te zijn.Segmentatie **vermijdt interne fragmentatie, maar is onderhevig aan externe fragmentatie,** een verschijnsel dat hier checker-boarding wordt genoemd.
+**Segmentatie** lijkt op **dynamisch partitionering**, zoals **paginering** lijkt op **vaste partitionering**. Bij segmentatie wordt het programma en de gegevens **niet uniform** verdeeld in blokken. Elk logisch adres bestaat uit twee onafhankelijke dimensies: een **segmentnummer** en een **relatieve positie binnen het segment**. Het hoofdgeheugen blijft **1-dimensionale, lineaire, rij adressen, vertrekkend van 0**. De **koppeling** tussen het **tweedimensionale** en **eendimensionale** geheugen beeld gebeurt aan de hand van een **segmenttabel**. Het besturingssysteem houdt een segmenttabel bij voor elk proces, die de fysieke locatie van elk segment van het proces bevat.
+
+
+
+**Segmentatie** vs **dynamisch partitionering:** 
+
+| Segmentatie                                                  | dynamisch partitionering |
+| ------------------------------------------------------------ | ------------------------ |
+| Processen kunnen meerdere partities in het hoofdgeheugen bezetten, die niet aaneengesloten hoeven te zijn. |                          |
+| Vermijdt interne fragmentatie, maar is onderhevig aan externe fragmentatie (check-boarding) (minder groot dan bij dynamisch partitionering) |                          |
+
+
+
+**voorbeeld usecase segmentatie**
+
+segmentatie kan gebruikt worden bij het compileren van programma’s waar er nood is aan tabellen in het geheugen die snel kunnen groeien.
+
+
+
+**Adresvertaling**
+
+door ongelijke grootte is er geen eenvoudige relatie tussen logische en relatieve adressen. 
+
+1. Het **segmentnummer** wordt gehaald uit de linkerbits van het logisch adres.
+2. Dit nummer wordt gebruikt om het **fysieke beginadres** en **lengte** van het segment te vinden.
+3. Het **fysiek adres** wordt gevonden door **beginadres** + **positie** binnen segment.
 
 ![img](https://lh5.googleusercontent.com/opf8K6dgOF2SP4k-wdjAekv94QE0LpuyZhGTKP1WjQr_m27ezHoh80S7olNQpKoKm4Me2blvaf8-QVe_z-O430aw1EElGsnBmW5tiPdPXqCtJk7kGHp8IOoPbzYPRRHfjHR1xg5f1YH04TI-cg)
 
@@ -977,12 +1010,12 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 **(nummers verwijzen naar nummers uit de figuur)**
 
-1. Op basis van de paginatabel kan de processor vaststellen of alle geheugen verwijzingen betrekking hebben op de locaties die zich in de residente set bevinden. 
-2. Wordt er een logisch adres tegengekomen dat zich niet in het hoofdgeheugen bevindt, dan genereert de processor een interrupt die een geheugentoegang fout aangeeft.
-3. Het besturingssysteem neemt op dat ogenblik de besturing over, en plaatst een I/O verzoek om het stuk van het procesbeeld met het virtuele adres dat de toegangsfout veroorzaakte, binnen te halen in het hoofdgeheugen. 
-4. Is het gewenste stuk eenmaal binnengehaald in het hoofdgeheugen, dan wordt opnieuw een interrupt gegeneerd
-5. .Het besturingssysteem kan hierdoor de paginatabellen bijwerken.
-6. En het betrokken proces terug in de gereed wachtrij plaatsen.
+1. Op basis van de **paginatabel** kan de processor vaststellen of alle geheugen verwijzingen betrekking hebben op de locaties die zich in de **residente set** bevinden. 
+2. Wordt er een logisch adres tegengekomen dat zich niet in het hoofdgeheugen (residente set) bevindt, dan genereert de processor een **interrupt** die een geheugentoegang fout aangeeft.
+3. Het **besturingssysteem** neemt op dat ogenblik de **besturing over**, en plaatst een I/O verzoek om het stuk van het procesbeeld met het virtuele adres dat de toegangsfout veroorzaakte, binnen te halen in het hoofdgeheugen. 
+4. Is het gewenste stuk eenmaal binnengehaald in het hoofdgeheugen, dan wordt opnieuw een **interrupt** gegeneerd
+5. .Het besturingssysteem kan hierdoor de **paginatabellen** bijwerken.
+6. En het betrokken proces terug in de gereed **wachtrij** plaatsen.
 
 
 
@@ -993,13 +1026,13 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 **Voordelen:**
 
-- Omdat de processen slechts partieel in het hoofdgeheugen geladen worden, is er ruimte voor meer processen. Hierdoor is de kans groter dat minstens één proces zich in de toestand gereed bevindt.
-- Het wordt mogelijk dat de geheugen hoeveelheid die elk individueel proces aanspreekt groter is dan het totale hoofdgeheugen. Voor wat de programmeur betreft, wordt het hoofdgeheugen enkel beperkt door de beschikbare schijfruimte. Hij moet zich niet langer zorgen maken over het beschikbaar fysiek geheugen. Hij hoeft ook niet langer na te denken over overlay- of andere benaderingen.
-- Het laden van het volledige proces is duidelijk een verspilling als er slechts enkele stukken effectief gebruikt worden vooraleer het programma wordt onderbroken en terug uit het hoofdgeheugen geswapt wordt. Het geheugen wordt efficiënter benut door slechts enkele stukken in te laden. Zorgt voor heel wat overhead. Telkens er naar een logisch adres gerefereerd wordt dat zich niet in het hoofdgeheugen bevindt, moet niet alleen het besturingssysteem tweemaal de controle overnemen, maar moet eveneens een ander stuk uitgeswapt worden.
+- Omdat de processen slechts partieel in het hoofdgeheugen geladen worden, is er **ruimte voor meer processen**. Hierdoor is de kans groter dat minstens één proces zich in de toestand gereed bevindt.
+- Het wordt mogelijk dat de geheugen hoeveelheid die elk individueel proces aanspreekt groter is dan het totale hoofdgeheugen. Voor wat de programmeur betreft, wordt het **hoofdgeheugen enkel beperkt door de beschikbare schijfruimte**. Hij moet zich niet langer zorgen maken over het beschikbaar fysiek geheugen. Hij hoeft ook niet langer na te denken over overlay- of andere benaderingen.
+- Het **laden** van het **volledige proces** is duidelijk een **verspilling** als er slechts enkele stukken effectief gebruikt worden vooraleer het programma wordt onderbroken en terug uit het hoofdgeheugen geswapt wordt. **Het geheugen wordt efficiënter benut door slechts enkele stukken in te laden**. Zorgt voor heel wat overhead. Telkens er naar een logisch adres gerefereerd wordt dat zich niet in het hoofdgeheugen bevindt, moet niet alleen het besturingssysteem tweemaal de controle overnemen, maar moet eveneens een ander stuk uitgeswapt worden.
 
 **Nadelen**:
 
-- Zorgt voor heel wat overhead. Telkens er naar een logisch adres gerefereerd wordt dat zich niet in het hoofdgeheugen bevindt, moet niet alleen het besturingssysteem tweemaal de controle overnemen, maar moet eveneens een ander stuk uitgeswapt worden.
+- Zorgt voor heel wat **overhead**. Telkens er naar een logisch adres gerefereerd wordt dat zich niet in het hoofdgeheugen bevindt, moet niet alleen het besturingssysteem tweemaal de controle overnemen, maar moet eveneens een ander stuk uitgeswapt worden.
 
 54. >Welke twee parameters moet het besturingssysteem in de gaten houden om te zien of er bij het
     >gebruik van virtueel geheugen te veel dan wel te weinig paginafouten optreden? Wat wordt er
@@ -1009,7 +1042,7 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 - gemiddelde tijd tussen 2 paginafouten **(L)**
 - gemiddelde tijd die nodig is om pagina te vervangen **(S)**
 
-**Trashing**: De processor besteedt meer tijd aan het swappen van stukken dan aan het uitvoeren van instructie. Het is essentieel dat besturingssystemen **op basis van de historiek in het recente verleden**, oordeelkundig kunnen inschatten welke stukken niet meer en welke stukken waarschijnlijk wel nog gebruikt zullen worden in de nabije toekomst.
+**Trashing**: De processor **besteedt meer tijd aan het swappen van stukken dan aan het uitvoeren van instructie**. Het is essentieel dat besturingssystemen op basis van de historiek in het recente verleden, oordeelkundig kunnen inschatten welke stukken niet meer en welke stukken waarschijnlijk wel nog gebruikt zullen worden in de nabije toekomst.
 
 
 
@@ -1041,8 +1074,6 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 
 
 
-
-
 ### Begrippen
 
 **Besturingssysteem**: Meer eenvoudige, gelaagde interface naar gebruikers en programmeurs toe. Beheert bronnen (processor, geheugen & I/O apparaten)
@@ -1056,4 +1087,6 @@ Bij de **paginering** verdeelt men het hoofdgeheugen in frames (stukken met een 
 **Executive**: Deel van het NT besturingssysteem dat in kernelmodus wordt uitgevoerd. Heeft volledige toegang tot systeemgegevens en hardware. 
 
 **System Call**: Een **systeemaanroep**, of **system call**, is een verzoek van een computerprogramma aan het besturingssysteem om een bepaalde taak uit te voeren voor het programma. Alle systeemaanroepen samen vormen de interface (de API) van het besturingssysteem of de kernel.
+
+**Procesbeeld** (= Proces Image):  Verzameling bestaande uit het **programma**, de **gegevens** en de **stackgebieden** van een proces.
 
