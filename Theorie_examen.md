@@ -8,7 +8,7 @@
 
 In een **asymmetrische** multiprocessor wordt de kernel van het besturingssysteem altijd uitgevoerd op een bepaalde **master processor**. Deze is verantwoordelijk voor **scheduling** en heeft **volledige controle over het volledige geheugen** en andere bronnen. 
 
-De **andere processoren** kunnen alleen gebruikersprogramma’s en hulpprogramma’s van het besturingssysteem uitvoeren. Heeft een andere processor een **dienst** nodig (bijvoorbeeld I/O oproep) dan moet die een verzoek sturen naar de master en wachten tot die dienst is uitgevoerd. 
+De **andere processoren** kunnen alleen **gebruikersprogramma’s** en **hulpprogramma’s** van het besturingssysteem uitvoeren. Heeft een andere processor een **dienst** nodig (bijvoorbeeld I/O oproep) dan moet die een verzoek sturen naar de master en wachten tot die dienst is uitgevoerd. 
 
 | voordelen                                                    | nadelen                                             |
 | ------------------------------------------------------------ | --------------------------------------------------- |
@@ -165,7 +165,7 @@ Beheert proces- en threadobjecten.
 
 **8. Virtual Memory Manager:**
 
-Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat hierdoor hardwareafhankelijke code.
+Voert **vertaling** uit tussen **virtuele** en **fysieke geheugenadressen** (MMU) en bevat hierdoor hardwareafhankelijke code.
 
 
 ### Hoofdstuk 2
@@ -283,7 +283,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 11. > De info in het PCB kan je in drie categorieën onderverdelen. Dewelke? Bespreek ook wat er zich zoal
     > in elk deel van het PCB bevindt. (p34)
 
-    **PCB** (= Process Control Block): Informatie in verband met het beheer van processen. Wordt aan het proces beeld toegevoegd.
+    **PCB** (= Process Control Block): Bevat Informatie dat het OS over een proces nodig heeft. Wordt aan het proces beeld toegevoegd.
     
     
     
@@ -303,7 +303,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     ![img](https://lh3.googleusercontent.com/JxKkczr5oyO9LRdQlEQD4vCMV6UodXzfAwE9rR1FZ_HnnLfvsIzCRE7YtS-s0BFPU3tN--68OhmxCXTWtx2RGbwYhE2Da_CgOi8-YO0lAE_jHFANajopX5qIjbyhlLzWLxrnkfD4SiUrvjvIiA)
     
-    2. **Processor Toestand Informatie**: Bestaat uit de **inhoud van alle processor registers**. Wanneer een proces actief is bevindt deze informatie zich in de registers van de processor. Wanneer het proces onderbroken wordt zal de informatie in dit deel van de PCB opgeslaan worden.
+    2. **Processor Toestand Informatie**: Bestaat uit de **inhoud van alle processor registers**. Wanneer een proces actief is bevindt deze informatie zich in de registers van de processor. Wanneer het proces onderbroken wordt zal de informatie (processor toestand) in dit deel van de PCB opgeslaan worden.
     3. **Procesor Besturings Informatie:** Bevat **aanvullende** informatie die het **besturingssysteem** nodig heeft voor het **beheren van diverse processen.**
 
 
@@ -311,7 +311,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 12. > Welke stappen moet het besturingssysteem ondernemen om een nieuw proces aan te maken? (p36)
 
     1. Toewijzing unieke **PID**.
-    2. Toewijing **ruimte** voor alle elementen van het **procesbeeld**.
+    2. Toewijzing **ruimte** voor alle elementen van het **procesbeeld**.
     3. Installatie **PCB**. in het bijzonder van de procesbesturingsinformatie.
     4. **Instelling juiste koppelingen**. Bv. plaatsing van het proces in de wachtrij gereed of gereed-onderbroken.
     5. (**Eventueel**) **aanmaken** of **uitbreiden** andere **gegevensstructuren**.
@@ -366,11 +366,9 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     - Bij een **klok intterupt** zal het enkel gewisseld worden als Quantum op is.
     
-    - Bij **paginafouten** zal het proberen de pagina’s in het geheugen laden en dan ook altijd van process wisselen .
+    - Bij **paginafouten** zal het proberen de pagina’s in het geheugen laden en dan ook altijd van **process wisselen** .
     
     - **Traps** gaan meestal over fouten, als het een oplosbare fout is is het geen probleem **als ze niet oplosbaar** is zal gewisseld worden en zal het oude proces simpelweg afgesloten worden.
-    
-    - **Systemcalls** resulteren altijd in een proces wissel.
     
       
     
@@ -434,7 +432,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     Indien proceswissel WEL nodig is :
     
-    Het OS zal in dit geval softwarematige aanpassingen moeten aanbrengen aan de omgeving. Dit proces zorgt voor **overhead** omdat het systeem tijdens het overschakelen geen nuttig werk kan uitvoeren.
+    Het OS zal in dit geval **softwarematige** aanpassingen moeten aanbrengen aan de omgeving. Dit proces zorgt voor **overhead** omdat het systeem tijdens het overschakelen geen nuttig werk kan uitvoeren.
     
     **stappen:**
     
@@ -456,10 +454,9 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     - Het veelvoudig optreden van context- en proceswisselingen vormt een bottleneck.
     
-    **Procesloze Delen:**
+    **procesloze Delen:**
     
-    -  Unix:
-    -  Windows:
+    - De code voor interruptafhandeling en de code voor proceswissel.
     
     
     
@@ -472,7 +469,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     
     
-    Het verloopt vrij efficiënt omdat: Vrijwel alle software van het OS uitgevoerd wordt in de context van een **gebruikersproces** en er dus minder proces wisselingen voorkomen die een bottleneck zouden vormen.
+    Het verloopt vrij efficiënt omdat: Vrijwel alle software van het OS uitgevoerd wordt in de context van een **gebruikersproces** en er dus minder context & proces wisselingen voorkomen die een bottleneck zouden vormen.
     
     
 
@@ -482,12 +479,17 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
     
     De belangrijkste OS functiess worden gestructureerd als aparte processen, uitgevoerd in de kernelmodus. Ook hier zorgt een kleine hoeveelheid code voor de proceswisseling, uitgevoerd buiten alle processen om. 
     
+    **proceswissel:** 
+    
+    - Clientproces blokkeert zichzelf, wachtend op een antwoord van het serverproces
+    - Serverproces schakelt over naar kernelmodus en blokkeert zichzelf tot de kernel een antwoord geeft.
+    
     **Nadeel**: overhead door veel meer proceswisselingen.
     
     **Voordeel:** OS kan beschouwd worden als een verzameling van verschillende modules, met onderlingen eenvoudig interfaces. De processen die deze **modules** uitvoeren, kunnen met aangepaste prioriteit worden **verweven** met andere processen. Sommige van deze processen moeten bovendien niet in kernelmodus uitgevoerd worden. Ook kan in een systeem met meerdere processoren, of zelf in een gedistribueerd systeem, een deel van de OS processen toegekend worden aan specifieke processoren.    
     
     
-
+    
 25. > Wat is de herdefinitie van een proces en de definitie van een thread? (p43)
 
 **Proces**: eenheid voor de eigendom van bronnen
@@ -547,7 +549,7 @@ Voert vertaling uit tussen virtuele en fysieke geheugenadressen (MMU) en bevat h
 **Voordelen:**
 
 - Kunnen worden ondersteund op **elk besturingssysteem**
-- Threadwisselingen kunnen **efficiënter** worden uitgevoerd omdat het proces voor het beheren van de threads niet moet overschakelen naar de kernelmodus van de processor
+- Threadwisselingen kunnen **efficiënter** worden uitgevoerd omdat het proces voor het beheren van de threads **niet** moet **overschakelen** naar de **kernelmodus** van de processor
 - Het **schedulingalgoritme** kan **specifiek** aan de toepassing **worden aangepast**
 
 **Nadelen:**
@@ -598,7 +600,9 @@ Een proces moet **preemptief** onderbroken worden:
 
     - **Access token**: = primary token. Staat in voor de **beveiliging**. Bevat een kopie van de **beveiligingsidentificatiecode**.
     - **Virtuele adresruimte:** Wordt door de Virtual memory manager module van de Executive beheerd.
-    - **Objectlable met handles** naar andere objecten, ondermeer naar elke thread die het proces omvat.
+    - **Objectlable** met handles naar andere objecten, ondermeer naar elke thread die het proces omvat.
+
+    ![Imgur](https://imgur.com/n589ros.png)
 
     
 
@@ -660,10 +664,10 @@ Indien de user-level thread niet gebonden is aan een enkel lichtgewicht proces, 
 
 In de actieve toestand van de user-level thread kan het corresponderen lichtgewicht proces verschillende toestanden aanemen:
 
-- Running
-- Stopped
-- Blocked
-- Runnable
+- **Running**
+- **Stopped**
+- **Blocked**
+- **Runnable**
 
 voert een thread een **blokkerende systemcall uit**, dan krijgt het **lichtgewichtproces** de toestand **geblokkeerd** maar **blijft de user-level thread actief**.
 
@@ -712,14 +716,14 @@ In dit gecombineerde systteem moet de **user-level threadbibliotheek communicere
     code van de systeemaanroep wordt in kernelmode uitgevoerd. Zonder de O_SYNC-vlag leidt dit
     veelal tot een zuivere geheugenoperatie door het wegschrijven van 1 of meerdere bytes van de
     user-buffer naar de kernel-buffer. De tijd die hiervoor nodig is is zeer beperkt en na de
-    systeemaanroep is een proceswissel dus niet steeds aan de orde. Wanneer de kernelbuffer echter
-    vol komt, moet er een **I/O-operatie** gestart worden en zal het gebruikersproces moeten worden
+    systeemaanroep is een proceswissel dus niet steeds aan de orde. Wanneer de **kernelbuffer** echter
+    **vol** komt, moet er een **I/O-operatie** gestart worden en zal het gebruikersproces moeten worden
     geblokkeerd tot wanneer alle bytes uit de userbuffer werden gekopieerd.
     
     Bij het zetten van de O_SYNC-vlag heb je dus naast  **meer I/O-operaties** ook steeds een extra
     **proceswissel** wat het vertragend effect nog versterkt. Iedere write-systeemaanroep wordt verplicht
     om een I/O-operatie te starten en het bijhorende proces te blokkeren tot wanneer de bijhorende
-    I/O-interrupt het geblokkeerde proces deblokkeert
+    I/O-interrupt het geblokkeerde proces deblokkeert. (Want O_SYNC vlag zet buffer uit )
 
 ​	
 
@@ -746,8 +750,8 @@ In dit gecombineerde systteem moet de **user-level threadbibliotheek communicere
 
 
 
-39. >Wanneer zal de systeemaanroep read resulteren in een geblokkeerd proces en wanneer niet. Idem
-    >voor een write-systeemaanroep. Geef nog een aantal andere systeemaanroepen die doorgaans een
+39. >Wanneer zal de systeemaanroep **read** resulteren in een geblokkeerd proces en wanneer niet. Idem
+    >voor een **write**-systeemaanroep. Geef nog een aantal andere systeemaanroepen die doorgaans een
     >proces zullen blokkeren en dus bijgevolg een proceswissel zullen veroorzaken. (Oplossing prof)
 
     Wanneer de buffer net moeten worden opgevuld, zal het OS het proces moeten **blokkeren** tot
@@ -792,7 +796,7 @@ zolang het in de status “zombie” vertoefd in het geheugen blijft.
 Bij een daemon-proces zal je dus bij het niet correct lezen van de exit-statussen van de kinderen een
 ganse waslijst met zombie-processen maken die op zich 0% CPU tijd krijgen (dus geen probleem
 voor de scheduler) en ook 0% geheugen toegewezen krijgen. Iedere zombie neemt wel een plaats in
-de globale procestabel in beslag en bovendien blijft de volledige **procesbesturingsinformatie** achter
+de globale procestabel in beslag en bovendien blijft de volledige **procesbesturingsinformatie** (**proces control information**) achter
 in het geheugen! Dit is dus niet onschuldig!
 
 
@@ -834,8 +838,8 @@ dat je een naam moet geven (vandaar ook de naam)
     >dit besluit? (Oplossing prof)
 
 Linux kent uitsluitend tasks en maakt eigenlijk geen onderscheid tussen threads en processen. Bij
-het gebruik van POSIX-threads merk je op dat er achter de schermen een clone-systeemaanroep
-wordt gebruikt en waar dus een nieuw proces mee wordt aangemaakt waarbij alles gedeeld wordt
+het gebruik van POSIX-threads merk je op dat er achter de schermen een **clone-systeemaanroep**
+wordt gebruikt en waar dus een **nieuw proces** mee wordt aangemaakt waarbij alles gedeeld wordt
 behalve dan de userstack. Ook wanneer je kijkt met de opdracht top -H zie je hier twee processen
 staan waarbij het dus **eerder** aanleunt bij de definitie van **kernelthreads** **dan** bij de definitie van **user**
 **level threads**. 
@@ -868,7 +872,7 @@ binnen dat proces wel verder doen.
 
 **Vaste partitionering** is de eenvoudigste techniek om de rest van het hoofdgeheugen te beheren. Het hoofdgeheugen wordt verdeeld in **gebieden met vaste begrenzing.**
 
-
+![Imgur](https://imgur.com/7wBaLjO.png)
 
 | voordelen                                                    | nadelen                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -888,7 +892,7 @@ binnen dat proces wel verder doen.
 
 **Dynamische partitionering** probeert de beperkingen van vaste partitionering op te lossen door een variabel aantal partities met een variabele grootte te gebruiken. 
 
-
+![Imgur](https://imgur.com/WuNcUoN.png)
 
 | voordelen                                                    | nadelen                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -909,23 +913,32 @@ binnen dat proces wel verder doen.
 
 48. > Hoe gebeurt adresvertaling bij dynamische partitionering? (p114)
 
-Wanneer het proces in het hoofdgeheugen wordt geladen, geswapt of verschoven, worden de aan het proces toegekende absolute begin- en eindadressen geladen in het **basisregister** en het **begrenzingsregister** van de processorregister, als onderdeel van de contextwisseling. Tijdens de uitvoering worden enkel relatieve adressen aangewend. Elk adres ondergaat hierbij 2 bewerkingen:
+Wanneer het proces in het hoofdgeheugen wordt geladen, geswapt of verschoven, worden de aan het proces toegekende **absolute begin- en eindadressen** geladen in het **basisregister** en het **begrenzingsregister** van de processorregister, als onderdeel van de contextwisseling. Tijdens de uitvoering worden enkel relatieve adressen aangewend. Elk adres ondergaat hierbij 2 bewerkingen:
 
--  een **optelling** om het overeenkomstige fysiek adres te bekomen
+- een **optelling** om het overeenkomstige fysiek adres te bekomen
+
 - een **vergelijking** met de begrenzingregister. Wanneer het adres niet binnen de begrenzing ligt, dan wordt een **interrupt** gegenereerd naar het OS.
+
+  ![Imgur](https://imgur.com/ivMA7jI.png)
 
 
 
 49. >Bij dynamische partitionering kan je voor het geheugengebruik een bitmap of een gelinkte lijst
     >bijhouden (maak een schets)? Hoe gebeurt dit en wat zijn de voor- en nadelen van beide systemen? (p115)
 
-Bij het gebruik van **bitmaps** wordt het geheugen verdeeld in **kleine allocatie-eenheden** van gelijke grootte. Bij elke allocatie-eenheid hoort een **bit** die aangeeft of de eenheid **vrij is of bezet**. Hoe kleiner de allocatie-eenheid is, des te groter wordt de bitmap.
+**Bitmaps:**
+
+- Geheugen wordt verdeeld in **kleine allocatie-eenheden** van **gelijke grootte**.
+- Per **allocatie-eenheid** hoort een **bit** die aangeeft of de eenheid **vrij is of bezet**.
+- Hoe **kleiner** de **allocatie-eenheid** is, des te **groter** wordt de **bitmap**.
+
+
 
 ![img](https://lh4.googleusercontent.com/4ciH29yqT78whRu8Odm92SFqQq90PpUPcTcQIq8C85BEKBo5s9mxPaHlP91rfXToE2g_zyWBV1EgZboUjCwLRjbRfslhO-cL4jnsTdzBEyfN4_yd_I2SO7nLQ9_dschNqOwROOQI0FyUVRV3IQ)
 
 **nadelen:** 
 
-- Als de allocatie-eenheid te groot wordt gekozen, **versplit elk proces veel geheugen** in zijn laatst gealloceerde eenheid.
+- Als de allocatie-eenheid te groot wordt gekozen, **versplit elk proces veel geheugen** in zijn **laatst gealloceerde eenheid**.
 - Wanneer een nieuw proces, **N aaneensluitende allocatie-eenheden vereist**, dan moet het geheugen-beheersysteem immers in de bitmap op zoek gaan naar een rij van N opeenvolgende nullen. Dit is een **tijdverslindend proces**.
 
 
@@ -948,7 +961,9 @@ De blijkbaar meest efficiënte oplossing, voorgesteld door donald Knuth, plaatst
 50. >Bespreek de werking van paginering (zonder virtueel geheugen). Wat is het verschil tussen
     >paginering en vaste partitionering? Hoe gebeurt de adresvertaling bij paginering (maak een schets)?  (p118)
 
-Bij de **paginering** verdeelt men het **hoofdgeheugen** in **frames** (stukken met een **gelijke**, relatief **kleine** grootte) en alle **procesbeelden in pagina’s ter grootte van de frames**. De procespagina’s worden toegewezen aan frames van het hoofdgeheugen. Kleinere processen vereisen minder frames, grotere processen vereisen er meer. Het besturingssysteem houdt een **lijst van vrije frames** bij, en een **pagina table** voor elk proces (in het procesbeeld van het proces zelf). Deze bevat de **framelocatie** van elke pagina van het proces: elke ingang in de paginatabel bevat het nummer van het frame in het hoofdgeheugen dat de corresponderende pagina bevat.
+- Hoofdgeheugen verdeeld in **frames**  (stukken met een **gelijke**, relatief **kleine** grootte).
+- Alle **procesbeelden** worden verdeeld in **pagina’s ter grootte van de frames**.
+- Besturingssysteem houdt **lijst van vrije frames** bij EN een **pagina table** voor **elk proces**. Deze bevat de **framelocatie** van elke pagina van het proces
 
 ![img](https://lh6.googleusercontent.com/7jQN3iEGtnryZalWRjl-OSC8ZBqVZScxssG3wgU-5u4iyAcBzpaV8Sprhb4aq4m_SVDcpPm2ldUMYv5UoEIXzZXcEhUxtKDL7xE7bcHXCaKeG_DHEy_27z-6u1_rKtiY52rTtFasXVc44Iy-OQ)
 
@@ -960,14 +975,23 @@ Bij de **paginering** verdeelt men het **hoofdgeheugen** in **frames** (stukken 
 | ------------------------------------------------------------ | -------------------------------------- |
 | Partities zijn kleiner.                                      |                                        |
 | Processen bezetten verschillende partities die niet aaneengesloten hoeven te zijn. |                                        |
-| Interne fragmentatie wordt beperkt tot een fractie voor de laatste pagina van het proces. | wel veel last van interne fragmentatie |
+| **Interne fragmentatie** wordt **beperkt** tot een fractie voor de laatste pagina van het proces. | wel veel last van interne fragmentatie |
 
 
 
 **adresvertaling bij paginering:** 
 
 - Door de MMU (memory management unit) 
+
 - Voor de **grootte** van de pagina’s en frames wordt een **macht van 2** gekozen. Hierdoor kunnen **logische adressen beschouwd blijven worden als relatieve adressen**, verwijzend naar de oorsprong van het programma. 
+
+**stappen:**
+
+1. **Page nummer** wordt gehaald uit logisch adres.
+2. Wordt gebruikt als index in de **page table** om het **framenummer** te vinden.
+3. **Fysiek adres** wordt gevonden door **framenummer** en en **positie (offset)** aan elkaar te plakken.
+
+![Imgur](https://imgur.com/57vXV79.png)
 
 
 
@@ -1000,7 +1024,7 @@ Het hoofdgeheugen blijft **1-dimensionale, lineaire, rij adressen, vertrekkend v
 
 **voorbeeld usecase segmentatie**
 
-segmentatie kan gebruikt worden bij het compileren van programma’s waar er nood is aan tabellen in het geheugen die snel kunnen groeien.
+segmentatie kan gebruikt worden bij het **compileren van programma’s** waar er nood is aan tabellen in het geheugen die snel kunnen groeien.
 
 
 
@@ -1051,13 +1075,19 @@ door ongelijke grootte is er geen eenvoudige relatie tussen logische en relatiev
 
 54. >Welke twee parameters moet het besturingssysteem in de gaten houden om te zien of er bij het
     >gebruik van virtueel geheugen te veel dan wel te weinig paginafouten optreden? Wat wordt er
-    >bedoeld met “**thrashing**”?  **Hoe** kan het besturingssysteem oordeelkundig **inschatten** welke pagina’s
+    >bedoeld met “**thrashing**”?  **Hoe** kan het besturingssysteem **oordeelkundig inschatten** welke pagina’s
     >in de toekomst nodig zullen zijn en welke niet? (p122)
 
 - gemiddelde tijd tussen 2 **paginafouten** **(L)**
 - gemiddelde tijd die nodig is om pagina te **vervangen** **(S)**
 
-**Trashing**: De processor **besteedt meer tijd aan het swappen van stukken dan aan het uitvoeren van instructie**. Het is essentieel dat besturingssystemen op basis van de historiek in het recente verleden, oordeelkundig kunnen inschatten welke stukken niet meer en welke stukken waarschijnlijk wel nog gebruikt zullen worden in de nabije toekomst.
+**L >> S**: disk waar op wordt geswapt is onderbenut
+
+**L << S**: Meer paginafouten dan haalbaar
+
+**Trashing**: De processor **besteedt meer tijd aan het swappen van stukken dan aan het uitvoeren van instructie**. 
+
+Het is essentieel dat besturingssystemen op basis van de historiek in het recente verleden, **oordeelkundig** kunnen **inschatten** welke stukken niet meer en welke stukken waarschijnlijk wel nog gebruikt zullen worden in de nabije toekomst.
 
 
 
