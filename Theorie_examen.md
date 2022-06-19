@@ -856,9 +856,9 @@ binnen dat proces wel verder doen.
 45. > Aan welke vier randvoorwaarden moet ieder geheugenbeheersysteem voldoen? (p109)
 
 	1. Om de efficiëntie van de processor en van de I/O-voorzieningen te verhogen, is het noodzakelijk dat **zoveel mogelijk processen in het hoofdgeheugen geladen** zijn. Er is in praktijk nooit voldoende hoofdgeheugen om alles bij te houden. Daarom is het nodig om gegevens naar en uit het secundair gegeheugen te **swapppen**. Swappen is echter een langzame bewerking. Swappen verhoogt tijd nodig voor proceswisseling en is dus een complexe taak voor het geheugenbeheersysteem. Tegenwoordig wordt er meer gebruikt gemaakt van het concept **virtueel geheugen**.
-	2. Hardware van de processor en software van het OS moeten de verwijzingen in de code van het programma op een of andere wijze **vertalen** in adressen van het fysieke geheugen, die overeenkomen met de huidige locatie van het programma in het hoofdgeheugen.
+	2. Hardware van de processor en software van het OS moeten de verwijzingen in de code van het programma op een of andere wijze **vertalen** in **adressen** van het fysieke geheugen, die overeenkomen met de huidige locatie van het programma in het hoofdgeheugen.
 	3. Enerzijds mogen processen **niet zonder toestemming** geheugenlocaties van andere processen kunnen **lezen** of **schrijven**. Dergelijke instructies moeten afgebroken worden van zodra ze uitgevoerd worden. **Anderzijds** moet dit **beveiligingsmechanisme** voldoende **flexibel** zijn om verschillende processen **toegang** te kunnen **geven** tot **gedeelde stukken** van het **hoofdgeheugen**. Ook is het dikwijls noodzakelijk dat dat processen die samenwerken dezelfde gegevensstucturen delen.
-	4. Zowel het hoofdgeheugen als het secundaire geheugen zijn doorgaans georganiseerd als een ééndimensionale adresruimte. De meeste Programm'aas daarintegen zijn logisch ingedeeld in modules, met andere karakteristieken. Het is de **taak** van het **geheugenbeheer** en van de **computerhardware** om deze modules te **vertalen** naar een **ééndimensionale adresruimte.**
+	4. Zowel het hoofdgeheugen als het secundaire geheugen zijn doorgaans georganiseerd als een ééndimensionale adresruimte. De meeste Programm'as daarintegen zijn logisch ingedeeld in modules, met andere karakteristieken. Het is de **taak** van het **geheugenbeheer** en van de **computerhardware** om deze modules te **vertalen** naar een **ééndimensionale adresruimte.**
 
 
 
@@ -896,7 +896,12 @@ binnen dat proces wel verder doen.
 
 
 
+**plaatsingsalgoritmen:**
 
+- **Best-Fit**: kiest blok waarvan de grootte het meest overeenkomt met die van het nieuwe proces
+- **First-Fit**: zoekt het hoofdgeheugen af vanaf het begin, en kiest het eerste beschikbare blok dat voldoende groot is
+- **Next-Fit**: (=Rotating first) zoekt het hoofdgeheugen sequentieel af vanaf het punt van de laatste plaatsing. Kiest opnieuw het eerste beschikbare blok dat voldoende groot is
+- **Worst-Fit**: wijst het grootst beschikbare blok toe, in de hoop relatief grote gaten te houden
 
 
 
