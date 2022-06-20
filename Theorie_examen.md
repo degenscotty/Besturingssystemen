@@ -443,7 +443,7 @@ Voert **vertaling** uit tussen **virtuele** en **fysieke geheugenadressen** (MMU
     5. **Bijwerken PCB** van het proces.
     6. **Bijwerken gegevensstructuren** voor het geheugenbeheer.
     7. Terugschakelen naar **gebruikersmodus** 
-    7. Laden van **processortoestandsinformatie** van het **PCB** van het geselecteerde proces in de registers. Hiermee wordt de context teruggebracht naar hoe ze was op het moment dat het geselecteerde proces het laatst uit toestand actief werd gewisseld.
+    7. Laden van **processortoestandsinformatie** van het **PCB** van het geselecteerde proces in de registers. Hiermee wordt de context teruggebracht naar hoe ze was op het moment dat het geselecteerde proces het laatst uit toestand actief werd gewisseld. (= **Contextwissel**)
 
 
 
@@ -820,7 +820,7 @@ aanroepen van de systeemaanroep alle toegewezen tijd door de parent werd opgebru
 
 42. > Linux kent geen fork-systeemaanroep. Hoe komt het dat je hem wel kan gebruiken? (Oplossing prof)
 
-    Linux gebruikt de glibc-POSIX API. Die staat in voor de **vertaling** van courante Unix-
+    Linux gebruikt de **glibc-POSIX API**. Die staat in voor de **vertaling** van courante Unix-
     systeemaanroepen naar Linux-specifieke systeemaanroepen.
 
     
@@ -945,7 +945,7 @@ Wanneer het proces in het hoofdgeheugen wordt geladen, geswapt of verschoven, wo
 
 **Gelinkte lijsten** vormen een alternatieve manier om de vrije allocatie-eenheden bij te houden. Het geheugen wordt voorgesteld als een gekoppelde lijst segmenten die ofwel in gebruikt zijn door een proces, ofwel beschikbaar zijn.
 
-![img](https://lh5.googleusercontent.com/9Gj6SuGZ_Lm4zpUt_C7tJMYHfToBGk9FUjk8ALqaI3msjucJUZcxf9ydqYIhs2h-wkXdssUjLbnBoJo7Dv305zfCeeql-ShYDknMgEAAHjFQkebHhnJ1OFr6-3renx81m7vXLsZSPEYOcSOWzg)
+![Imgur](https://imgur.com/Hrx0VLx.png)
 
 **voordelen**: 
 

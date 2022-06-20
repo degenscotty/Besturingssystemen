@@ -770,23 +770,22 @@ int main(int argc, char **argv){
 
 void maak_buffer(char *buffer, int n)
 {
-    int i = 0;
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
-        buffer[i] = rand() % 26 + 'a';
+
+        char c = rand() % 26 + 'a';
+        buffer[i] = c;
     }
     return;
 }
 
 int main(int argc, char **argv)
 {
-    srand(time(0));
-    char buffer[8192]; //buffergrootes van 1 -> 8192. Zonder malloc
-    int i;
-    for (i = 1; i < 8192; i << 1)
-    { //left shift == maal 2
+    char buffer[8192]; 					//buffergrootes van 1 -> 8192. Zonder malloc
+
+    for (int i = 16; i < 8192; i *= 2) //left shift == maal 2. Beginnen bij 16 ipv 1 anders duurt het veel te lang
+    {
         double start = clock();
-        printf("%d",i);
         int fd = open("largefile", O_WRONLY | O_CREAT);
         if (fd < 0)
         {
@@ -795,13 +794,14 @@ int main(int argc, char **argv)
         }
         maak_buffer(buffer, i);
         int tot = 0;
-        int n = write(fd, buffer, i); 			//lees altijd i bytes in totdat er geen meer zijn
-        while (n < (10 * 1024 * 1024 - i))
-        {	 
-            printf("%d",tot);
-            tot += n;
+        int n = write(fd, buffer, i); //lees altijd i bytes in totdat er geen meer zijn
+        tot += n;
+        while (tot < (10 * 1024 * 1024 - i))
+        {
+            //printf("%d %d\n ", i, tot);
             maak_buffer(buffer, i);
             n = write(fd, buffer, i);
+            tot += n;
         }
 
         if (n < 0)
@@ -810,22 +810,13 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        maak_buffer(buffer, i);
-        n = write(fd, buffer, i);
-        tot += n;
-        if (n < 0)
+        if (close(fd) < 0) //bestand sluiten alvorens verwijderen
         {
             perror(argv[0]);
             return 1;
         }
 
-        if (close(fd) < 0) 						//bestand sluiten alvorens verwijderen
-        {
-            perror(argv[0]);
-            return 1;
-        }
-
-        if (unlink("largefile") < 0) 			//bestand verwijderen
+        if (unlink("largefile") < 0) //bestand verwijderen
         {
             perror(argv[0]);
             return 1;
@@ -1426,7 +1417,7 @@ fork()
    }
    ```
    
-   **oef interprocescommunicatie (pip') (theorie les7)**
+   **oef interprocescommunicatie (pipe) (theorie les7)**
    
    ```C
    int main(int argc, char **argv){
@@ -4818,7 +4809,7 @@ IFS=: read a b > /etc/passwd
 91. >Ontwikkel een script om de **gebruikersnaam** (veld 1 van /etc/passwd) te bepalen aan de
     >hand van een **gebruikers-ID** (veld 3 van /etc/passwd) dat je als (enige) parameter aan het
     >script meegegeven hebt.
-    >Je kunt de output van het commando grep zowel met **cut**, **read** als met een **array**
+    >Je kunt de output van het commando **grep** zowel met **cut**, **read** als met een **array**
     >analyseren.
 
 ```bash
