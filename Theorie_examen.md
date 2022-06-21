@@ -39,7 +39,7 @@ Bij een **symmetrische** multiprocessor kan de kernel worden uitgevoerd op **elk
    
    **AchtergrondInfo:**
    
-   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid. Bij **UNIX** kan een **systeemaanroep** **rechtstreeks vanuit een programma in C of C++** worden gegenereerd. Programma’s die voor **systeemaanroepen** louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de API. Zo zorgt de **POSIX-standaard** voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
+   Om **systeemaanroepen** te kunnen uitvoeren moet de processor overschakelen naar **kernelmodus**. Dit gebeurt via een verzameling van bibliotheek routines met een gestandaardiseerde interface (bijvoorbeeld POSIX-standaard). Bij Windows is dit de enige mogelijkheid. Bij **UNIX** kan een **systeemaanroep** **rechtstreeks vanuit een programma in C of C++** worden gegenereerd. Programma’s die voor **systeemaanroepen** louter beroep doen op de op een gestandaardiseerde API set kunnen dan ook uitgevoerd worden op andere besturingssystemen die de systeemaanroepen ter beschikking stelt met dezelfde API. Op deze manier heeft ieder besturingssysteem zijn eigen implementatie van de **API**. Zo zorgt de **POSIX-standaard** voor het uitvoeren van programma’s zonder het aan te passen aan een specifiek platform. Het **besturingssysteem** **verbergt** alle **complexiteit** en biedt een **eenvoudige gebruiksvriendelijke interface** aan, wat ook wel een **virtuele machine** wordt genoemd.
    
    
    
@@ -1071,7 +1071,7 @@ door ongelijke grootte is er geen eenvoudige relatie tussen logische en relatiev
 
 **Nadelen**:
 
-- Zorgt voor heel wat **overhead**. Telkens er naar een logisch adres gerefereerd wordt dat zich niet in het hoofdgeheugen bevindt, moet niet alleen het besturingssysteem tweemaal de controle overnemen, maar moet eveneens een ander stuk uitgeswapt worden.
+- Zorgt voor heel wat **overhead**. Telkens er naar een logisch adres gerefereerd wordt dat zich niet in het hoofdgeheugen bevindt, moet niet alleen het besturingssysteem tweemaal de controle overnemen, maar moet eveneens een ander stuk uitgeswapt worden. 
 
 54. >Welke twee parameters moet het besturingssysteem in de gaten houden om te zien of er bij het
     >gebruik van virtueel geheugen te veel dan wel te weinig paginafouten optreden? Wat wordt er

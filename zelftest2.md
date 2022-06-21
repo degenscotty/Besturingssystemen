@@ -378,10 +378,10 @@ done < "$1"
     >een punt. (probeer dit ook eens uit via de externe opdracht tr
 
     ```bash
-    tr [aeiouyAEIOY] . <<< "hallo wim" # input redirection -> h.all. w.m
+    tr [aeiouyAEIOY] . <<< "hallo wim" # input redirection -> h.ll. w.m
     
     tekst="halle wim"
-    echo ${tekst//[aeoiuy]/.} # -> h.all. w.m
+    echo ${tekst//[aeoiuy]/.} # ->h.ll. w.m
     ```
 
     
@@ -592,8 +592,123 @@ done < "$1"
     > C1 de som van g1 en g2*2 naar het scherm schrijft.
 
      ```bash
+     #include <sys/mman.h>
+     #include <unistd.h>
+     #include <stdio.h>
+     #include <pthread.h>
+     #include <semaphore.h>
+     #include <sys/types.h>
+     #include <fcntl.h>
+     #include <string.h>
+     #include <sys/wait.h>
+     #include <sys/stat.h>
+     #include <stdlib.h>
+     
+     typedef struct
+     {
+         int g1;
+         int g2;
+         sem_t P_C1;
+         sem_t C2_C1;
+         sem_t C3_C2;
+     } data;
+     
+     int main(int argc, char **argv)
+     {
+     
+         data *d = mmap(NULL, sizeof(data *), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+     
+         if (d == MAP_FAILED)
+         {
+             perror(argv[0]);
+             exit(1);
+         }
+     
+         if (sem_init(&d->P_C1, 1, 0) < 0)
+         {
+             perror(argv[0]);
+             exit(1);
+         }
+         if (sem_init(&d->C2_C1, 1, 0) < 0)
+         {
+             perror(argv[0]);
+             exit(1);
+         }
+         if (sem_init(&d->C3_C2, 1, 0) < 0)
+         {
+             perror(argv[0]);
+             exit(1);
+         }
+     
+         int pid = fork();
+         if (pid < 0)
+         {
+             perror(argv[0]);
+             exit(1);
+         }
+         else if (pid == 0) //child1
+         {
+     
+             int pid3 = fork();
+     
+             if (pid3 < 0)
+             {
+                 perror(argv[0]);
+                 exit(1);
+             }
+             else if (pid3 == 0) //child3
+             {
+                 d->g2 = 7;
+                 sem_post(&d->C3_C2);
+                 printf("[c3] gepost op C3_C2\n");
+                 return 0;
+             }
+     
+             waitpid(pid3, NULL, 0);
+     
+             sem_wait(&d->P_C1);
+             printf("[c1] g1 ontvangen: %d \n", d->g1);
+             sem_wait(&d->C2_C1);
+             printf("[c1] g2 ontvangen: %d \n", d->g2);
+             printf(" g1 + g2*2= %d", d->g1 + d->g2);
+             return 0;
+         }
+     
+         int pid2 = fork();
+     
+         if (pid2 < 0)
+         {
+             perror(argv[0]);
+             exit(1);
+         }
+         else if (pid2 == 0) //child2
+         {
+             sem_wait(&d->C3_C2);
+             printf("[c2] g2 ontvangen: %d \n", d->g2);
+     
+             d->g2 *= 2;
+             sem_post(&d->C2_C1);
+             printf("[c2] gepost op C2_C1\n");
+     
+             return 0;
+         }
+     
+         d->g1 = 5;
+         sem_post(&d->P_C1);
+         printf("[parent] gepost op P_C1\n");
+     
+         waitpid(pid2, NULL, 0);
+         waitpid(pid, NULL, 0);
+     
+         munmap(mmap, sizeof(data *));
+         sem_close(&d->P_C1);
+         sem_close(&d->C2_C1);
+         sem_close(&d->C3_C2);
+     
+         return 0;
+     }
      ```
-
+    
     
 
 
